@@ -381,13 +381,11 @@ views:
             entity: sensor.washer_current_status
             name: Washer
         
-        # Dehumidifer
+        # Dehumidifier
           - type: custom:button-card
-            template: hemma_entity
+            template: hemma_dehumidifier
             entity: humidifier.probreeze_dehumidifier
-            name: Dehumidifer
-            variables:
-              icon: humidifier
+            name: Dehumidifier
 
   # ------------------------------------------------------
   # BEDROOM

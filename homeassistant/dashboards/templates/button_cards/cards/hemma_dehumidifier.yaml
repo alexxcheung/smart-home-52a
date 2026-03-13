@@ -1,0 +1,881 @@
+# hemma_dehumidifier.yaml
+# Dehumidifier card for Probreeze Dehumidifier
+# Shows current humidity, target, mode on main card; popup for full control
+
+hemma_dehumidifier:
+  template: hemma_entity
+  variables:
+    icon: dehumidifier
+  triggers_update:
+    - humidifier.probreeze_dehumidifier
+    - binary_sensor.probreeze_dehumidifier_tank
+    - binary_sensor.probreeze_dehumidifier_defrost
+    - binary_sensor.probreeze_dehumidifier_problem
+
+  state_display: |
+    [[[
+      const state = states['humidifier.probreeze_dehumidifier']?.state;
+      if (state === 'off') return 'Off';
+      
+      const current = states['humidifier.probreeze_dehumidifier']?.attributes?.current_humidity;
+      const target = states['humidifier.probreeze_dehumidifier']?.attributes?.humidity;
+      const mode = states['humidifier.probreeze_dehumidifier']?.attributes?.mode;
+      
+      const modeLabels = {
+        auto: 'Auto',
+        continuous: 'Continuous',
+        boost: 'Boost',
+        laundry: 'Laundry'
+      };
+      
+      const tankFull = states['binary_sensor.probreeze_dehumidifier_tank']?.state === 'on';
+      const defrost = states['binary_sensor.probreeze_dehumidifier_defrost']?.state === 'on';
+      const problem = states['binary_sensor.probreeze_dehumidifier_problem']?.state === 'on';
+      
+      if (tankFull) return '⚠ Tank Full';
+      if (problem) return '⚠ Problem';
+      if (defrost) return 'Defrosting';
+      
+      let display = `${current}%`;
+      if (target) display += ` → ${target}%`;
+      if (mode && modeLabels[mode]) display += ` · ${modeLabels[mode]}`;
+      
+      return display;
+    ]]]
+
+  styles:
+    state:
+      - color: |
+          [[[
+            const state = states['humidifier.probreeze_dehumidifier']?.state;
+            const tankFull = states['binary_sensor.probreeze_dehumidifier_tank']?.state === 'on';
+            const problem = states['binary_sensor.probreeze_dehumidifier_problem']?.state === 'on';
+            
+            if (tankFull || problem) return '#f4a261';
+            if (state === 'on') return '#6bcb77';
+            return 'var(--secondary-text-color)';
+          ]]]
+
+  tap_action:
+    action: fire-dom-event
+    browser_mod:
+      service: browser_mod.popup
+      data:
+        title: Dehumidifier
+        size: normal
+        style: |
+          --popup-max-width: 480px;
+          }
+          ha-dialog {
+            --mdc-dialog-max-width: 480px !important;
+            --vertical-align-dialog: center !important;
+            --dialog-surface-margin-top: auto !important;
+          }
+          .mdc-dialog .mdc-dialog__surface {
+            max-width: 480px !important;
+            width: 480px !important;
+          }
+        content:
+          type: vertical-stack
+          cards:
+
+            # ── Status header ──────────────────────────────────────────────
+            - type: custom:button-card
+              template: hemma_plain_button_card
+              entity: humidifier.probreeze_dehumidifier
+              triggers_update:
+                - humidifier.probreeze_dehumidifier
+                - sensor.probreeze_dehumidifier_temperature
+                - binary_sensor.probreeze_dehumidifier_tank
+                - binary_sensor.probreeze_dehumidifier_defrost
+                - binary_sensor.probreeze_dehumidifier_problem
+              tap_action: { action: none }
+              styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+              custom_fields:
+                content: >
+                  [[[
+                    const state = entity.state ?? 'off';
+                    const current = entity.attributes?.current_humidity ?? '--';
+                    const target = entity.attributes?.humidity ?? '--';
+                    const mode = entity.attributes?.mode ?? 'auto';
+                    const temp = states['sensor.probreeze_dehumidifier_temperature']?.state ?? '--';
+                    
+                    const tankFull = states['binary_sensor.probreeze_dehumidifier_tank']?.state === 'on';
+                    const defrost = states['binary_sensor.probreeze_dehumidifier_defrost']?.state === 'on';
+                    const problem = states['binary_sensor.probreeze_dehumidifier_problem']?.state === 'on';
+                    
+                    const modeLabels = { auto: 'Auto', continuous: 'Continuous', boost: 'Boost', laundry: 'Laundry' };
+                    const statusLabel = state === 'on' ? modeLabels[mode] ?? mode : 'Off';
+                    
+                    const statusColors = {
+                      on: '#6bcb77',
+                      off: 'var(--primary-text-color)'
+                    };
+                    const statusBgColors = {
+                      on: 'rgba(107,203,119,0.08)',
+                      off: 'rgba(255,255,255,0.05)'
+                    };
+                    
+                    const color = statusColors[state] ?? 'var(--primary-text-color)';
+                    const bg = statusBgColors[state] ?? 'transparent';
+                    
+                    let warnings = '';
+                    if (tankFull) warnings += '<span class="warn-badge tank">Tank Full</span>';
+                    if (defrost) warnings += '<span class="warn-badge defrost">Defrosting</span>';
+                    if (problem) warnings += '<span class="warn-badge problem">Problem</span>';
+                    
+                    return `
+                      <div class="dehumidifier-header">
+                        <div class="status-row">
+                          <span class="status-label" style="color:${color};background:${bg}">${statusLabel}</span>
+                          ${warnings}
+                        </div>
+                        <div class="info-row">
+                          <div class="info-item">
+                            <span class="info-value">${current}%</span>
+                            <span class="info-label">Humidity</span>
+                          </div>
+                          <div class="info-item">
+                            <span class="info-value">${target}%</span>
+                            <span class="info-label">Target</span>
+                          </div>
+                          <div class="info-item">
+                            <span class="info-value">${temp}°C</span>
+                            <span class="info-label">Temp</span>
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  ]]]
+              extra_styles: |
+                .dehumidifier-header { padding: 16px 0 12px; border-radius: 12px; box-sizing: border-box; }
+                .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+                .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px 12px; border-radius: 8px; display: inline-block; }
+                .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; letter-spacing: 0.03em; display: inline-block; }
+                .warn-badge.tank { background: rgba(255,107,107,0.18); color: #ff6b6b; }
+                .warn-badge.defrost { background: rgba(100,181,246,0.18); color: #64b5f6; }
+                .warn-badge.problem { background: rgba(244,162,97,0.18); color: #f4a261; }
+                .info-row { display: flex; justify-content: space-around; text-align: center; }
+                .info-item { flex: 1; }
+                .info-value { font-size: 24px; font-weight: 700; display: block; color: var(--primary-text-color); }
+                .info-label { font-size: 11px; font-weight: 600; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.05em; }
+
+            # ══════════════════════════════════════════════════════════════
+            # CONTROLS (only when power is on)
+            # ══════════════════════════════════════════════════════════════
+            - type: conditional
+              conditions:
+                - entity: humidifier.probreeze_dehumidifier
+                  state_not: "off"
+              card:
+                type: vertical-stack
+                cards:
+
+                  # ── Target Humidity Section ─────────────────────────────
+                  - type: custom:button-card
+                    entity: humidifier.probreeze_dehumidifier
+                    name: Target Humidity
+                    show_icon: false
+                    show_state: false
+                    tap_action:
+                      action: none
+                    styles:
+                      card:
+                        - background: transparent
+                        - box-shadow: none
+                        - padding: 24px 0 6px
+                        - height: auto
+                        - justify-content: flex-start
+                      name:
+                        - font-size: 11px
+                        - font-weight: 700
+                        - text-transform: uppercase
+                        - letter-spacing: 0.08em
+                        - opacity: "0.38"
+                        - text-align: left
+
+                  # ── Target humidity controls ────────────────────────────
+                  - type: custom:button-card
+                    entity: humidifier.probreeze_dehumidifier
+                    triggers_update:
+                      - humidifier.probreeze_dehumidifier
+                    show_icon: false
+                    show_name: false
+                    tap_action:
+                      action: none
+                    custom_fields:
+                      humidity_control: |
+                        [[[
+                          const target = entity.attributes?.humidity ?? 50;
+                          return `
+                            <div class="humidity-control">
+                              <div class="humidity-btn minus" id="humidity-minus">−</div>
+                              <div class="humidity-value">${target}%</div>
+                              <div class="humidity-btn plus" id="humidity-plus">+</div>
+                            </div>
+                          `;
+                        ]]]
+                    custom_actions:
+                      humidity-minus:
+                        tap_action:
+                          action: call-service
+                          service: humidifier.set_humidity
+                          service_data:
+                            entity_id: humidifier.probreeze_dehumidifier
+                            humidity: |
+                              [[[
+                                const current = states['humidifier.probreeze_dehumidifier']?.attributes?.humidity ?? 50;
+                                return Math.max(30, current - 5);
+                              ]]]
+                      humidity-plus:
+                        tap_action:
+                          action: call-service
+                          service: humidifier.set_humidity
+                          service_data:
+                            entity_id: humidifier.probreeze_dehumidifier
+                            humidity: |
+                              [[[
+                                const current = states['humidifier.probreeze_dehumidifier']?.attributes?.humidity ?? 50;
+                                return Math.min(80, current + 5);
+                              ]]]
+                    styles:
+                      card:
+                        - background: rgba(255,255,255,0.05)
+                        - border: 1px solid rgba(255,255,255,0.12)
+                        - border-radius: 12px
+                        - box-shadow: none
+                        - height: 64px
+                        - margin: 0
+                      custom_fields:
+                        humidity_control:
+                          - width: 100%
+                    extra_styles: |
+                      .humidity-control { display: flex; align-items: center; justify-content: center; gap: 24px; width: 100%; }
+                      .humidity-value { font-size: 28px; font-weight: 700; min-width: 80px; text-align: center; }
+                      .humidity-btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+                      .humidity-btn:hover { background: rgba(255,255,255,0.2); }
+
+                  # ── Mode Section ────────────────────────────────────────
+                  - type: custom:button-card
+                    entity: humidifier.probreeze_dehumidifier
+                    name: Mode
+                    show_icon: false
+                    show_state: false
+                    tap_action:
+                      action: none
+                    styles:
+                      card:
+                        - background: transparent
+                        - box-shadow: none
+                        - padding: 24px 0 6px
+                        - height: auto
+                        - justify-content: flex-start
+                      name:
+                        - font-size: 11px
+                        - font-weight: 700
+                        - text-transform: uppercase
+                        - letter-spacing: 0.08em
+                        - opacity: "0.38"
+                        - text-align: left
+
+                  # ── Mode buttons ────────────────────────────────────────
+                  - type: horizontal-stack
+                    cards:
+                      - type: custom:button-card
+                        entity: humidifier.probreeze_dehumidifier
+                        triggers_update:
+                          - humidifier.probreeze_dehumidifier
+                        template: hemma_plain_button_card
+                        show_name: true
+                        show_icon: true
+                        icon: mdi:auto-fix
+                        name: Auto
+                        tap_action:
+                          action: call-service
+                          service: humidifier.set_mode
+                          service_data:
+                            entity_id: humidifier.probreeze_dehumidifier
+                            mode: auto
+                        styles:
+                          card:
+                            - border-radius: 12px
+                            - box-shadow: none
+                            - height: 48px
+                            - margin: 0 2px 0 0
+                            - flex: 1 1 0
+                            - min-width: 0
+                            - background: |
+                                [[[
+                                  return entity.attributes?.mode === 'auto' 
+                                    ? 'rgba(107,203,119,0.14)' 
+                                    : 'rgba(255,255,255,0.05)';
+                                ]]]
+                            - border: |
+                                [[[
+                                  return entity.attributes?.mode === 'auto'
+                                    ? '1px solid rgba(107,203,119,0.3)'
+                                    : '1px solid rgba(255,255,255,0.12)';
+                                ]]]
+                          grid:
+                            - justify-content: center
+                          name:
+                            - font-size: 12px
+                            - font-weight: 600
+                            - color: |
+                                [[[
+                                  return entity.attributes?.mode === 'auto' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+                          icon:
+                            - width: 18px
+                            - height: 18px
+                            - color: |
+                                [[[
+                                  return entity.attributes?.mode === 'auto' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+
+                      - type: custom:button-card
+                        entity: humidifier.probreeze_dehumidifier
+                        triggers_update:
+                          - humidifier.probreeze_dehumidifier
+                        template: hemma_plain_button_card
+                        show_name: true
+                        show_icon: true
+                        icon: mdi:infinity
+                        name: Cont.
+                        tap_action:
+                          action: call-service
+                          service: humidifier.set_mode
+                          service_data:
+                            entity_id: humidifier.probreeze_dehumidifier
+                            mode: continuous
+                        styles:
+                          card:
+                            - border-radius: 12px
+                            - box-shadow: none
+                            - height: 48px
+                            - margin: 0 2px
+                            - flex: 1 1 0
+                            - min-width: 0
+                            - background: |
+                                [[[
+                                  return entity.attributes?.mode === 'continuous' 
+                                    ? 'rgba(107,203,119,0.14)' 
+                                    : 'rgba(255,255,255,0.05)';
+                                ]]]
+                            - border: |
+                                [[[
+                                  return entity.attributes?.mode === 'continuous'
+                                    ? '1px solid rgba(107,203,119,0.3)'
+                                    : '1px solid rgba(255,255,255,0.12)';
+                                ]]]
+                          grid:
+                            - justify-content: center
+                          name:
+                            - font-size: 12px
+                            - font-weight: 600
+                            - color: |
+                                [[[
+                                  return entity.attributes?.mode === 'continuous' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+                          icon:
+                            - width: 18px
+                            - height: 18px
+                            - color: |
+                                [[[
+                                  return entity.attributes?.mode === 'continuous' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+
+                      - type: custom:button-card
+                        entity: humidifier.probreeze_dehumidifier
+                        triggers_update:
+                          - humidifier.probreeze_dehumidifier
+                        template: hemma_plain_button_card
+                        show_name: true
+                        show_icon: true
+                        icon: mdi:rocket-launch
+                        name: Boost
+                        tap_action:
+                          action: call-service
+                          service: humidifier.set_mode
+                          service_data:
+                            entity_id: humidifier.probreeze_dehumidifier
+                            mode: boost
+                        styles:
+                          card:
+                            - border-radius: 12px
+                            - box-shadow: none
+                            - height: 48px
+                            - margin: 0 2px
+                            - flex: 1 1 0
+                            - min-width: 0
+                            - background: |
+                                [[[
+                                  return entity.attributes?.mode === 'boost' 
+                                    ? 'rgba(107,203,119,0.14)' 
+                                    : 'rgba(255,255,255,0.05)';
+                                ]]]
+                            - border: |
+                                [[[
+                                  return entity.attributes?.mode === 'boost'
+                                    ? '1px solid rgba(107,203,119,0.3)'
+                                    : '1px solid rgba(255,255,255,0.12)';
+                                ]]]
+                          grid:
+                            - justify-content: center
+                          name:
+                            - font-size: 12px
+                            - font-weight: 600
+                            - color: |
+                                [[[
+                                  return entity.attributes?.mode === 'boost' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+                          icon:
+                            - width: 18px
+                            - height: 18px
+                            - color: |
+                                [[[
+                                  return entity.attributes?.mode === 'boost' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+
+                      - type: custom:button-card
+                        entity: humidifier.probreeze_dehumidifier
+                        triggers_update:
+                          - humidifier.probreeze_dehumidifier
+                        template: hemma_plain_button_card
+                        show_name: true
+                        show_icon: true
+                        icon: mdi:tshirt-crew
+                        name: Laundry
+                        tap_action:
+                          action: call-service
+                          service: humidifier.set_mode
+                          service_data:
+                            entity_id: humidifier.probreeze_dehumidifier
+                            mode: laundry
+                        styles:
+                          card:
+                            - border-radius: 12px
+                            - box-shadow: none
+                            - height: 48px
+                            - margin: 0 0 0 2px
+                            - flex: 1 1 0
+                            - min-width: 0
+                            - background: |
+                                [[[
+                                  return entity.attributes?.mode === 'laundry' 
+                                    ? 'rgba(107,203,119,0.14)' 
+                                    : 'rgba(255,255,255,0.05)';
+                                ]]]
+                            - border: |
+                                [[[
+                                  return entity.attributes?.mode === 'laundry'
+                                    ? '1px solid rgba(107,203,119,0.3)'
+                                    : '1px solid rgba(255,255,255,0.12)';
+                                ]]]
+                          grid:
+                            - justify-content: center
+                          name:
+                            - font-size: 12px
+                            - font-weight: 600
+                            - color: |
+                                [[[
+                                  return entity.attributes?.mode === 'laundry' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+                          icon:
+                            - width: 18px
+                            - height: 18px
+                            - color: |
+                                [[[
+                                  return entity.attributes?.mode === 'laundry' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+
+                  # ── Fan Speed Section ───────────────────────────────────
+                  - type: custom:button-card
+                    entity: select.probreeze_dehumidifier_fan_speed
+                    name: Fan Speed
+                    show_icon: false
+                    show_state: false
+                    tap_action:
+                      action: none
+                    styles:
+                      card:
+                        - background: transparent
+                        - box-shadow: none
+                        - padding: 24px 0 6px
+                        - height: auto
+                        - justify-content: flex-start
+                      name:
+                        - font-size: 11px
+                        - font-weight: 700
+                        - text-transform: uppercase
+                        - letter-spacing: 0.08em
+                        - opacity: "0.38"
+                        - text-align: left
+
+                  # ── Fan speed buttons ───────────────────────────────────
+                  - type: horizontal-stack
+                    cards:
+                      - type: custom:button-card
+                        entity: select.probreeze_dehumidifier_fan_speed
+                        triggers_update:
+                          - select.probreeze_dehumidifier_fan_speed
+                        template: hemma_plain_button_card
+                        show_name: true
+                        show_icon: true
+                        icon: mdi:fan-speed-1
+                        name: Low
+                        tap_action:
+                          action: call-service
+                          service: select.select_option
+                          service_data:
+                            entity_id: select.probreeze_dehumidifier_fan_speed
+                            option: Low
+                        styles:
+                          card:
+                            - border-radius: 12px
+                            - box-shadow: none
+                            - height: 48px
+                            - margin: 0 2px 0 0
+                            - flex: 1 1 0
+                            - min-width: 0
+                            - background: |
+                                [[[
+                                  return entity.state === 'Low' 
+                                    ? 'rgba(107,203,119,0.14)' 
+                                    : 'rgba(255,255,255,0.05)';
+                                ]]]
+                            - border: |
+                                [[[
+                                  return entity.state === 'Low'
+                                    ? '1px solid rgba(107,203,119,0.3)'
+                                    : '1px solid rgba(255,255,255,0.12)';
+                                ]]]
+                          grid:
+                            - justify-content: center
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - color: |
+                                [[[
+                                  return entity.state === 'Low' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+                          icon:
+                            - width: 20px
+                            - height: 20px
+                            - color: |
+                                [[[
+                                  return entity.state === 'Low' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+
+                      - type: custom:button-card
+                        entity: select.probreeze_dehumidifier_fan_speed
+                        triggers_update:
+                          - select.probreeze_dehumidifier_fan_speed
+                        template: hemma_plain_button_card
+                        show_name: true
+                        show_icon: true
+                        icon: mdi:fan-speed-3
+                        name: High
+                        tap_action:
+                          action: call-service
+                          service: select.select_option
+                          service_data:
+                            entity_id: select.probreeze_dehumidifier_fan_speed
+                            option: High
+                        styles:
+                          card:
+                            - border-radius: 12px
+                            - box-shadow: none
+                            - height: 48px
+                            - margin: 0 0 0 2px
+                            - flex: 1 1 0
+                            - min-width: 0
+                            - background: |
+                                [[[
+                                  return entity.state === 'High' 
+                                    ? 'rgba(107,203,119,0.14)' 
+                                    : 'rgba(255,255,255,0.05)';
+                                ]]]
+                            - border: |
+                                [[[
+                                  return entity.state === 'High'
+                                    ? '1px solid rgba(107,203,119,0.3)'
+                                    : '1px solid rgba(255,255,255,0.12)';
+                                ]]]
+                          grid:
+                            - justify-content: center
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - color: |
+                                [[[
+                                  return entity.state === 'High' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+                          icon:
+                            - width: 20px
+                            - height: 20px
+                            - color: |
+                                [[[
+                                  return entity.state === 'High' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+
+                  # ── Options Section ─────────────────────────────────────
+                  - type: custom:button-card
+                    entity: humidifier.probreeze_dehumidifier
+                    name: Options
+                    show_icon: false
+                    show_state: false
+                    tap_action:
+                      action: none
+                    styles:
+                      card:
+                        - background: transparent
+                        - box-shadow: none
+                        - padding: 24px 0 6px
+                        - height: auto
+                        - justify-content: flex-start
+                      name:
+                        - font-size: 11px
+                        - font-weight: 700
+                        - text-transform: uppercase
+                        - letter-spacing: 0.08em
+                        - opacity: "0.38"
+                        - text-align: left
+
+                  # ── Option toggles ──────────────────────────────────────
+                  - type: horizontal-stack
+                    cards:
+                      - type: custom:button-card
+                        entity: switch.probreeze_dehumidifier_sleep
+                        triggers_update:
+                          - switch.probreeze_dehumidifier_sleep
+                        template: hemma_plain_button_card
+                        show_name: true
+                        show_icon: true
+                        icon: mdi:moon-waning-crescent
+                        name: Sleep
+                        tap_action:
+                          action: toggle
+                        styles:
+                          card:
+                            - border-radius: 12px
+                            - box-shadow: none
+                            - height: 48px
+                            - margin: 0 2px 0 0
+                            - flex: 1 1 0
+                            - min-width: 0
+                            - background: |
+                                [[[
+                                  return entity.state === 'on' 
+                                    ? 'rgba(107,203,119,0.14)' 
+                                    : 'rgba(255,255,255,0.05)';
+                                ]]]
+                            - border: |
+                                [[[
+                                  return entity.state === 'on'
+                                    ? '1px solid rgba(107,203,119,0.3)'
+                                    : '1px solid rgba(255,255,255,0.12)';
+                                ]]]
+                          grid:
+                            - justify-content: center
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - color: |
+                                [[[
+                                  return entity.state === 'on' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+                          icon:
+                            - width: 20px
+                            - height: 20px
+                            - color: |
+                                [[[
+                                  return entity.state === 'on' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+
+                      - type: custom:button-card
+                        entity: switch.probreeze_dehumidifier_ventilation_mode
+                        triggers_update:
+                          - switch.probreeze_dehumidifier_ventilation_mode
+                        template: hemma_plain_button_card
+                        show_name: true
+                        show_icon: true
+                        icon: mdi:fan
+                        name: Vent
+                        tap_action:
+                          action: toggle
+                        styles:
+                          card:
+                            - border-radius: 12px
+                            - box-shadow: none
+                            - height: 48px
+                            - margin: 0 2px
+                            - flex: 1 1 0
+                            - min-width: 0
+                            - background: |
+                                [[[
+                                  return entity.state === 'on' 
+                                    ? 'rgba(107,203,119,0.14)' 
+                                    : 'rgba(255,255,255,0.05)';
+                                ]]]
+                            - border: |
+                                [[[
+                                  return entity.state === 'on'
+                                    ? '1px solid rgba(107,203,119,0.3)'
+                                    : '1px solid rgba(255,255,255,0.12)';
+                                ]]]
+                          grid:
+                            - justify-content: center
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - color: |
+                                [[[
+                                  return entity.state === 'on' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+                          icon:
+                            - width: 20px
+                            - height: 20px
+                            - color: |
+                                [[[
+                                  return entity.state === 'on' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+
+                      - type: custom:button-card
+                        entity: lock.probreeze_dehumidifier_child_lock
+                        triggers_update:
+                          - lock.probreeze_dehumidifier_child_lock
+                        template: hemma_plain_button_card
+                        show_name: true
+                        show_icon: true
+                        icon: |
+                          [[[
+                            return entity.state === 'locked' ? 'mdi:lock' : 'mdi:lock-outline';
+                          ]]]
+                        name: Lock
+                        tap_action:
+                          action: call-service
+                          service: |
+                            [[[
+                              return entity.state === 'locked' ? 'lock.unlock' : 'lock.lock';
+                            ]]]
+                          service_data:
+                            entity_id: lock.probreeze_dehumidifier_child_lock
+                        styles:
+                          card:
+                            - border-radius: 12px
+                            - box-shadow: none
+                            - height: 48px
+                            - margin: 0 0 0 2px
+                            - flex: 1 1 0
+                            - min-width: 0
+                            - background: |
+                                [[[
+                                  return entity.state === 'locked' 
+                                    ? 'rgba(107,203,119,0.14)' 
+                                    : 'rgba(255,255,255,0.05)';
+                                ]]]
+                            - border: |
+                                [[[
+                                  return entity.state === 'locked'
+                                    ? '1px solid rgba(107,203,119,0.3)'
+                                    : '1px solid rgba(255,255,255,0.12)';
+                                ]]]
+                          grid:
+                            - justify-content: center
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - color: |
+                                [[[
+                                  return entity.state === 'locked' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+                          icon:
+                            - width: 20px
+                            - height: 20px
+                            - color: |
+                                [[[
+                                  return entity.state === 'locked' ? '#6bcb77' : 'var(--primary-text-color)';
+                                ]]]
+
+            # ══════════════════════════════════════════════════════════════
+            # POWER CONTROLS
+            # ══════════════════════════════════════════════════════════════
+
+            # ── Turn On (when off) ────────────────────────────────────────
+            - type: conditional
+              conditions:
+                - entity: humidifier.probreeze_dehumidifier
+                  state: "off"
+              card:
+                type: custom:button-card
+                entity: humidifier.probreeze_dehumidifier
+                template: hemma_plain_button_card
+                show_name: true
+                show_icon: true
+                icon: mdi:power
+                show_state: false
+                layout: icon_name_state
+                name: Turn On
+                tap_action:
+                  action: call-service
+                  service: humidifier.turn_on
+                  service_data:
+                    entity_id: humidifier.probreeze_dehumidifier
+                styles:
+                  card:
+                    - border-radius: 12px
+                    - box-shadow: none
+                    - margin: 24px 0 16px
+                    - height: 48px
+                    - background: rgba(107,203,119,0.14)
+                  grid:
+                    - justify-content: center
+                  name:
+                    - font-size: 14px
+                    - font-weight: 700
+                    - text-align: center
+                    - color: "#6bcb77"
+                  icon:
+                    - color: "#6bcb77"
+                    - width: 20px
+                    - height: 20px
+
+            # ── Turn Off (when on) ────────────────────────────────────────
+            - type: conditional
+              conditions:
+                - entity: humidifier.probreeze_dehumidifier
+                  state_not: "off"
+              card:
+                type: custom:button-card
+                entity: humidifier.probreeze_dehumidifier
+                template: hemma_plain_button_card
+                show_name: true
+                show_icon: true
+                icon: mdi:power
+                show_state: false
+                layout: icon_name_state
+                name: Turn Off
+                tap_action:
+                  action: call-service
+                  service: humidifier.turn_off
+                  service_data:
+                    entity_id: humidifier.probreeze_dehumidifier
+                styles:
+                  card:
+                    - border-radius: 12px
+                    - box-shadow: none
+                    - margin: 24px 0 16px
+                    - height: 48px
+                    - background: rgba(255,107,107,0.14)
+                  grid:
+                    - justify-content: center
+                  name:
+                    - font-size: 14px
+                    - font-weight: 700
+                    - text-align: center
+                    - color: "#ff6b6b"
+                  icon:
+                    - color: "#ff6b6b"
+                    - width: 20px
+                    - height: 20px
