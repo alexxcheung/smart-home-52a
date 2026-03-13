@@ -72,3 +72,34 @@ start_dishwasher:
     - action: browser_mod.close_popup
       data:
         all: true
+
+# Start washer: if delay-start toggle is on, calculate hours from "Start at" time; otherwise delay 0.
+# Washer uses number.washer_delayed_end in hours (0-19).
+start_washer:
+  alias: "Start Washer"
+  sequence:
+    - action: number.set_value
+      target:
+        entity_id: number.washer_delayed_end
+      data:
+        value: >
+          {% if states('input_boolean.hemma_washer_delay_start') != 'on' %}
+            0
+          {% else %}
+            {% set t_raw = states('input_datetime.hemma_washer_start_at') %}
+            {% set t = t_raw ~ ':00' if (t_raw.split(':') | length) == 2 else t_raw %}
+            {% set tt = as_timestamp(strptime(t ~ ' ' ~ now().strftime('%Y-%m-%d'), '%H:%M:%S %Y-%m-%d')) %}
+            {% set nt = as_timestamp(now()) %}
+            {% set diff = (tt - nt) | int %}
+            {% set secs = (diff if diff > 0 else diff + 86400) %}
+            {% set hours = (secs / 3600) | round(0, 'ceil') | int %}
+            {{ [hours, 19] | min }}
+          {% endif %}
+    - action: select.select_option
+      target:
+        entity_id: select.washer_operation
+      data:
+        option: start
+    - action: browser_mod.close_popup
+      data:
+        all: true

@@ -377,11 +377,9 @@ views:
 
         # Washing Machine
           - type: custom:button-card
-            template: hemma_entity
+            template: hemma_washer
             entity: sensor.washer_current_status
-            name: Washing Machine
-            variables:
-              icon: console
+            name: Washer
         
         # Dehumidifer
           - type: custom:button-card
