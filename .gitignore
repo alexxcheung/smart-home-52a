@@ -1,0 +1,38 @@
+# Secrets and sensitive files - NEVER commit these
+homeassistant/secrets.yaml
+homeassistant/.storage/
+homeassistant/auth
+homeassistant/auth_provider*
+homeassistant/.google*
+homeassistant/google_calendars.yaml
+
+# Database and logs
+homeassistant/*.db
+homeassistant/*.db-*
+homeassistant/*.log
+homeassistant/*.log.*
+
+# Cache and temporary files
+homeassistant/.cache/
+homeassistant/deps/
+homeassistant/tts/
+homeassistant/__pycache__/
+**/__pycache__/
+*.pyc
+
+# Runtime files
+homeassistant/.HA_VERSION
+homeassistant/.ha_run.lock
+homeassistant/.cloud/
+
+# Backups - large tar files, don't track
+homeassistant/backups/
+
+# Other services data
+scrypted/
+portainer_data/
+matter-data/
+
+# OS files
+.DS_Store
+Thumbs.db

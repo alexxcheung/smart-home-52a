@@ -1,0 +1,515 @@
+# /config/dashboards/hemma/hemma.yaml.example
+# Hemma Dashboard - Example Configuration
+# ============================================================================
+# Copy or rename this file to hemma.yaml and customize the entity IDs to match
+# your Home Assistant setup. Search for "YOUR_" to find all placeholders.
+#
+# REQUIRED: Replace all entity IDs with your own entities
+# OPTIONAL: Adjust room names, add/remove rooms, customize features
+# ============================================================================
+
+button_card_templates: !include_dir_merge_named /config/dashboards/templates/button_cards
+
+# Kiosk Mode (optional - requires kiosk-mode HACS integration)
+# Uncomment and customize if you want to hide certain elements
+kiosk_mode:
+  # Default: hide header + sidebar
+  hide_header: false
+  hide_sidebar: false
+  hide_dialog_light_settings_actions: true
+  hide_dialog_logbook: true
+
+  # You can drop these if everything is globally hidden anyway,
+  # but keeping them is fine.
+  mobile_settings:
+    hide_header: true
+    hide_sidebar: true
+
+  tablet_settings:
+    hide_header: true
+    hide_sidebar: true
+
+  custom_settings:
+    # EXCEPTION: show header/sidebar on MacBook web browsers
+    - user_agent: "Macintosh; Intel Mac OS X|Macintosh; Apple M"
+      hide_header: false
+      hide_sidebar: false
+
+views:
+  # ------------------------------------------------------
+  # HOME
+  # ------------------------------------------------------
+  # The main overview room - typically shows whole-home controls
+  # and media player status across all rooms
+  # ------------------------------------------------------
+  - type: custom:grid-layout
+    title: home
+    path: home
+    layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    cards:
+      # NAV BAR (same as Info: desktop nav + menu + time below app header)
+      - type: custom:button-card
+        template: hemma_nav_shell
+      # ROOM HERO CARD
+      - type: custom:button-card
+        template: hemma_room
+        name: Home
+        variables:
+          # Image Configuration
+          # Place your images at: /config/www/hemma/rooms/home.jpg (light mode)
+          #                       /config/www/hemma/rooms/home-night.jpg (dark mode)
+          image: home
+          image_position: center center
+
+          # Temperature
+          # show_temp: true
+          # temp_sensor: weather.forecast_home.temperature
+
+          # Presence Badges (optional - requires person/status sensors)
+          # These show who's home on the hero card
+          show_presence: true
+          presence_entity_1: person.alex
+          presence_entity_2: person.sammy
+
+          # Media Player Badges (shows what's playing across rooms)
+          show_media_badge: true
+          pause_timeout_minutes: 5
+          show_media_player_1: true
+          media_player_1: media_player.samsung_qb90_qe65qn90batxxu
+          show_media_player_2: true
+          media_player_2: media_player.sonos_arc
+          show_media_player_3: true
+          media_player_3: media_player.homepod_living_room
+
+          # Weather Widget
+          show_weather: true
+          weather_mode: outdoor                         
+          weather_entity: weather.forecast_home
+          weather_temp_sensor: state_attr('weather.forecast_home', 'temperature')
+
+          # Temperature Unit (affects comfort labels like "Cool", "Warm", etc.)
+          temp_unit: 'C'                                  # 'F' for Fahrenheit, 'C' for Celsius
+
+      # MOBILE NAVBAR
+      - !include /config/dashboards/templates/includes/hemma_navbar_mobile.yaml
+
+      # ENTITY CARDS
+      - type: custom:layout-card
+        class: hemma-entities
+        layout_type: custom:grid-layout
+        layout: !include /config/dashboards/templates/includes/hemma_entity_layout.yaml
+        cards:
+          - type: custom:button-card
+            template: hemma_doorbell
+            entity: camera.front_door_live_view 
+            camera_view: live
+            name: Front Door
+            variables:
+              icon: doorbell
+              battery_entity: sensor.front_door_battery
+          # Lights
+          - type: custom:button-card
+            template: hemma_light
+            entity: light.xuan_guan
+            name: Genkan light
+            variables:
+              icon: light
+
+          - type: custom:button-card
+            template: hemma_light
+            entity: light.front_door
+            name: Door light
+            variables:
+              icon: light
+
+  # ------------------------------------------------------
+  # INFO
+  # ------------------------------------------------------
+  - type: custom:grid-layout
+    title: Info
+    path: info
+    layout: !include /config/dashboards/templates/includes/hemma_info_layout.yaml
+    card_mod:
+      style: |
+        #root {
+          background-attachment: fixed !important;
+          background-size: cover !important;
+          background-position: center center !important;
+        }
+        #root > *:first-child {
+          overflow: visible !important;
+          pointer-events: none !important;
+          z-index: 50 !important;
+        }
+        #root > *:first-child * {
+          pointer-events: auto !important;
+        }
+    cards:
+      # NAV BAR - spans all columns with zero height so it doesn't consume a grid row
+      - type: custom:button-card
+        template: hemma_nav_shell
+        view_layout:
+          grid-column: 1 / -1
+          height: 0
+          overflow: visible
+          min-height: 0
+          padding: 0
+          margin: 0
+      # Octopus Agile - compact summary card; tap to open full rates popup
+      - type: custom:button-card
+        template: hemma_octopus_agile_rate
+        entity: event.octopus_energy_electricity_20l3765434_2000057767569_current_day_rates
+        variables:
+          next_day_entity: event.octopus_energy_electricity_20l3765434_2000057767569_next_day_rates
+          cost_entity: sensor.octopus_energy_electricity_20l3765434_2000057767569_current_accumulative_cost
+      # Dummy card A
+      - type: custom:button-card
+        show_name: true
+        show_icon: false
+        name: Dummy Card A
+        styles:
+          card:
+            - background: rgba(255,255,255,0.06)
+            - backdrop-filter: blur(20px)
+            - border-radius: 30px
+            - border: 1px solid rgba(255,255,255,0.15)
+            - box-shadow: none
+            - height: 300px
+            - display: flex
+            - align-items: center
+            - justify-content: center
+          name:
+            - font-size: 16px
+            - opacity: 0.5
+      # Dummy card B
+      - type: custom:button-card
+        show_name: true
+        show_icon: false
+        name: Dummy Card B
+        styles:
+          card:
+            - background: rgba(255,255,255,0.06)
+            - backdrop-filter: blur(20px)
+            - border-radius: 30px
+            - border: 1px solid rgba(255,255,255,0.15)
+            - box-shadow: none
+            - height: 300px
+            - display: flex
+            - align-items: center
+            - justify-content: center
+          name:
+            - font-size: 16px
+            - opacity: 0.5
+      # MOBILE / TABLET NAVBAR - placed last so it doesn't consume an early grid cell
+      - !include /config/dashboards/templates/includes/hemma_navbar_mobile.yaml
+
+  # ------------------------------------------------------
+  # LIVING ROOM
+  # ------------------------------------------------------
+  - type: custom:grid-layout
+    title: living-room
+    path: living-room
+    layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    cards:
+      # NAV BAR (same as Info: desktop nav + menu + time below app header)
+      - type: custom:button-card
+        template: hemma_nav_shell
+      # ROOM HERO CARD
+      - type: custom:button-card
+        template: hemma_room
+        name: Living Room
+        variables:
+          image: livingroom
+          image_position: center center
+
+          # Room Sensors (Using your Home Forecast for now)
+          show_temp: true
+          temp_sensor: sensor.radiator_thermostat_x_living_room_temperature
+
+          show_humidity: true
+          humidity_sensor: sensor.radiator_thermostat_x_living_room_humidity
+
+          show_quality: false # Set to true if you add an Air Quality sensor later
+          quality_sensor: sensor.none
+
+          # Weather
+          show_weather: true
+          weather_mode: room
+          temp_unit: 'C'
+
+      # MOBILE NAVBAR
+      - !include /config/dashboards/templates/includes/hemma_navbar_mobile.yaml
+
+      # ENTITY CARDS
+      - type: custom:layout-card
+        class: hemma-entities
+        layout_type: custom:grid-layout
+        layout: !include /config/dashboards/templates/includes/hemma_entity_layout.yaml
+        cards:
+          # Radiator
+          - type: custom:button-card
+            template: hemma_thermostat
+            entity: climate.radiator_thermostat_x_living_room
+            name: Thermostat
+            variables:
+              temp_sensor: sensor.radiator_thermostat_x_living_room_temperature
+              thermostat_toggle_helper: input_boolean.hemma_thermostat_overlay
+      
+          # Light
+          - type: custom:button-card
+            template: hemma_light  
+            entity: light.sofa_light
+            name: Floor Lamp
+            variables:
+              icon: lamp
+
+          - type: custom:button-card
+            template: hemma_light  
+            entity: light.floor_light
+            name: Floor Lightstrip
+            variables:
+              icon: light
+          
+          # Media
+          - type: custom:button-card
+            template: hemma_entity 
+            entity: media_player.samsung_qb90_qe65qn90batxxu
+            name: Samsung TV
+            variables:
+              icon: tv
+            # This section ensures it turns 'Active' (blue/white) when the TV is on
+            state:
+              - operator: template
+                value: |
+                  [[[ return !["off", "standby", "unavailable"].includes(entity.state); ]]]
+          
+          - type: custom:button-card
+            template: hemma_entity
+            entity: media_player.sonos_arc
+            name: Sonos Arc
+            variables:
+              icon: speaker
+            tap_action:
+              action: more-info # Tap the name/card for volume
+  # ------------------------------------------------------
+  # KITCHEN
+  # ------------------------------------------------------
+  - type: custom:grid-layout
+    title: kitchen
+    path: kitchen
+    layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    cards:
+      # NAV BAR (same as Info: desktop nav + menu + time below app header)
+      - type: custom:button-card
+        template: hemma_nav_shell
+      # ROOM HERO CARD
+      - type: custom:button-card
+        template: hemma_room
+        name: Kitchen
+        variables:
+          image: kitchen
+          image_position: center center
+
+      # MOBILE NAVBAR
+      - !include /config/dashboards/templates/includes/hemma_navbar_mobile.yaml
+
+      # ENTITY CARDS
+      - type: custom:layout-card
+        class: hemma-entities
+        layout_type: custom:grid-layout
+        layout: !include /config/dashboards/templates/includes/hemma_entity_layout.yaml
+        cards:
+        # Dishwasher
+          - type: custom:button-card
+            template: hemma_dishwasher
+            entity: sensor.bosch_dishwasher_operation_state
+            name: Dishwasher
+
+  # ------------------------------------------------------
+  # HALLWAY
+  # ------------------------------------------------------
+  - type: custom:grid-layout
+    title: hallway
+    path: hallway
+    layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    cards:
+      # NAV BAR (same as Info: desktop nav + menu + time below app header)
+      - type: custom:button-card
+        template: hemma_nav_shell
+      # ROOM HERO CARD
+      - type: custom:button-card
+        template: hemma_room
+        name: Hallway
+        variables:
+          image: kitchen
+          image_position: center center
+
+          show_temp: true
+          temp_sensor: sensor.radiator_thermostat_x_hallway_temperature
+
+          show_humidity: true
+          humidity_sensor: sensor.radiator_thermostat_x_hallway_humidity
+
+          show_quality: false
+          quality_sensor: sensor.YOUR_AIR_QUALITY
+
+          show_weather: true
+          weather_mode: room
+          temp_unit: 'C'
+
+      # MOBILE NAVBAR
+      - !include /config/dashboards/templates/includes/hemma_navbar_mobile.yaml
+
+      # ENTITY CARDS
+      - type: custom:layout-card
+        class: hemma-entities
+        layout_type: custom:grid-layout
+        layout: !include /config/dashboards/templates/includes/hemma_entity_layout.yaml
+        cards:
+        # Radiator
+          - type: custom:button-card
+            template: hemma_thermostat
+            entity: climate.radiator_thermostat_x_hallway
+            name: Thermostat
+            variables:
+              temp_sensor: sensor.radiator_thermostat_x_hallway_temperature
+              thermostat_toggle_helper: input_boolean.hemma_thermostat_overlay
+
+        # Washing Machine
+          - type: custom:button-card
+            template: hemma_entity
+            entity: sensor.washer_current_status
+            name: Washing Machine
+            variables:
+              icon: console
+        
+        # Dehumidifer
+          - type: custom:button-card
+            template: hemma_entity
+            entity: humidifier.probreeze_dehumidifier
+            name: Dehumidifer
+            variables:
+              icon: humidifier
+
+  # ------------------------------------------------------
+  # BEDROOM
+  # ------------------------------------------------------
+  - type: custom:grid-layout
+    title: bedroom
+    path: bedroom
+    layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    cards:
+      # NAV BAR (same as Info: desktop nav + menu + time below app header)
+      - type: custom:button-card
+        template: hemma_nav_shell
+      # ROOM HERO CARD
+      - type: custom:button-card
+        template: hemma_room
+        name: Bedroom
+        variables:
+          image: bedroom
+          image_position: center center
+
+          show_temp: true
+          temp_sensor: sensor.radiator_thermostat_x_living_room_temperature
+
+          show_humidity: true
+          humidity_sensor: sensor.adiator_thermostat_x_living_room_humidity
+
+          show_quality: true
+          quality_sensor: sensor.YOUR_BEDROOM_AIR_QUALITY
+
+          show_weather: true
+          weather_mode: room
+          temp_unit: 'C'
+
+          # Motion Sensor (optional)
+          show_motion: true
+          # motion_sensor: binary_sensor.YOUR_MOTION_SENSOR
+
+      # MOBILE NAVBAR
+      - !include /config/dashboards/templates/includes/hemma_navbar_mobile.yaml
+
+      # ENTITY CARDS
+      - type: custom:layout-card
+        class: hemma-entities
+        layout_type: custom:grid-layout
+        layout: !include /config/dashboards/templates/includes/hemma_entity_layout.yaml
+        cards:
+          # Light
+          - type: custom:button-card
+            template: hemma_light  
+            entity: light.hue_lightstrip_plus_1
+            name: Floor lightstrip
+            variables:
+              icon: light
+
+  # ------------------------------------------------------
+  # Study
+  # ------------------------------------------------------
+  - type: custom:grid-layout
+    title: study
+    path: study
+    layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    cards:
+      # NAV BAR (same as Info: desktop nav + menu + time below app header)
+      - type: custom:button-card
+        template: hemma_nav_shell
+      # ROOM HERO CARD
+      - type: custom:button-card
+        template: hemma_room
+        name: Study
+        variables:
+          image: bedroom
+          image_position: center center
+
+          show_temp: true
+          temp_sensor: sensor.radiator_thermostat_x_study_temperature
+
+          show_humidity: true
+          humidity_sensor: sensor.radiator_thermostat_x_study_humidity
+
+          show_quality: false
+          quality_sensor: sensor.YOUR_BEDROOM_AIR_QUALITY
+
+          show_weather: true
+          weather_mode: room
+          temp_unit: 'C'
+
+          # Motion Sensor (optional)
+          show_motion: true
+          # motion_sensor: binary_sensor.YOUR_MOTION_SENSOR
+
+      # MOBILE NAVBAR
+      - !include /config/dashboards/templates/includes/hemma_navbar_mobile.yaml
+
+      # ENTITY CARDS
+      - type: custom:layout-card
+        class: hemma-entities
+        layout_type: custom:grid-layout
+        layout: !include /config/dashboards/templates/includes/hemma_entity_layout.yaml
+        cards:
+          # Radiator
+          - type: custom:button-card
+            template: hemma_thermostat
+            entity: climate.radiator_thermostat_x_study_room
+            name: Thermostat
+            variables:
+              temp_sensor: sensor.radiator_thermostat_x_study_temperature
+              thermostat_toggle_helper: input_boolean.hemma_thermostat_overlay
+          
+          # Light
+          - type: custom:button-card
+            template: hemma_light  
+            entity: light.alex_desk_light
+            name: Alex Desk
+            variables:
+              icon: light
+
+          - type: custom:button-card
+            template: hemma_light  
+            entity: light.sammy_desk_light
+            name: Sammy Desk
+            variables:
+              icon: light
+

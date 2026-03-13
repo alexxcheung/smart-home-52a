@@ -1,0 +1,19 @@
+---
+description: Home Assistant 2026.3+ dialog/Browser Mod popup centering — theme + card style only, no custom .py or .js
+alwaysApply: true
+---
+
+# Dialog / Browser Mod Popup Centering (HA 2026.3+)
+
+- **Do not** add or use any custom **.py** or **.js** (e.g. no `popup_center` or similar component) for centering dialogs or Browser Mod popups.
+- Use **theme + card style only**:
+  - **Theme** (`themes/hemma/hemma.yaml`): set `--dialog-surface-margin-top: auto` (and related dialog vars) in Dialog section, `card-mod-dialog-yaml`, and `card-mod-root-yaml` for `ha-dialog`.
+  - **Per-popup** `style:` in a card (e.g. `browser_mod` → `data` → `style:`): if the card sets `--dialog-surface-margin-top`, use **`auto`**, not `0`, so it matches the theme and centers the popup.
+- **Why:** HA 2026.3 uses WebAwesome (`wa-dialog`) and centers with `--dialog-surface-margin-top: auto`. Using `0` pins the dialog to the top; `auto` centers it.
+
+## Example fix in a card
+
+In a card’s `tap_action` → `browser_mod` → `data` → `style:` block, inside `ha-dialog { }`:
+
+- **Wrong:** `--dialog-surface-margin-top: 0 !important;`
+- **Right:** `--dialog-surface-margin-top: auto !important;`

@@ -1,0 +1,56 @@
+# Scripts used by Hemma dashboard and other automations.
+# Start uses home_connect.set_program_and_options with program + delay in one call (reference format).
+
+# Thermostat: sync target temp from climate entity and toggle overlay
+hemma_thermostat_open_overlay:
+  alias: "Hemma Thermostat Open Overlay"
+  fields:
+    climate_entity:
+      description: "Climate entity to get target temperature from"
+    toggle_helper:
+      description: "Input boolean to toggle"
+  sequence:
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.hemma_thermostat_target_temperature
+      data:
+        value: "{{ state_attr(climate_entity, 'temperature') | float(22) }}"
+    - action: input_boolean.toggle
+      target:
+        entity_id: "{{ toggle_helper }}"
+
+# Start immediately: delay 0, programme from select
+start_dishwasher_now:
+  alias: "Start Dishwasher Now"
+  sequence:
+    - action: home_connect.set_program_and_options
+      data:
+        device_id: 919d3f00e9c673b530063b28e7189865
+        affects_to: active_program
+        program: "{{ states('select.bosch_dishwasher_selected_programme') }}"
+        b_s_h_common_option_start_in_relative: "0"
+
+# Start now or at [time]: if delay-start toggle is on, use "Start at" time; otherwise delay 0.
+start_dishwasher:
+  alias: "Start Dishwasher"
+  sequence:
+    - action: home_connect.set_program_and_options
+      data:
+        device_id: 919d3f00e9c673b530063b28e7189865
+        affects_to: active_program
+        program: "{{ states('select.bosch_dishwasher_selected_programme') }}"
+        b_s_h_common_option_start_in_relative: >
+          {% if states('input_boolean.hemma_dishwasher_delay_start') != 'on' %}
+            0
+          {% else %}
+            {% set t_raw = states('input_datetime.hemma_dishwasher_start_at') %}
+            {% set t = t_raw ~ ':00' if (t_raw.split(':') | length) == 2 else t_raw %}
+            {% set tt = as_timestamp(strptime(t ~ ' ' ~ now().strftime('%Y-%m-%d'), '%H:%M:%S %Y-%m-%d')) %}
+            {% set nt = as_timestamp(now()) %}
+            {% set diff = (tt - nt) | int %}
+            {% set secs = (diff if diff > 0 else diff + 86400) %}
+            {{ secs if secs > 60 else 0 }}
+          {% endif %}
+    - action: browser_mod.close_popup
+      data:
+        all: true

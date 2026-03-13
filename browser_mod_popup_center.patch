@@ -1,0 +1,24 @@
+--- browser_mod.js
++++ browser_mod.js
+@@ -170,9 +170,9 @@
+       }
+ 
+       ha-dialog {
+-        --vertical-align-dialog: flex-start;
+-        --dialog-surface-margin-top: var(--ha-space-10, 40px);
+-        --mdc-dialog-max-height: calc(100svh - var(--dialog-surface-margin-top) - var(--ha-space-2) - var(--safe-area-inset-y, 0px));
++        --vertical-align-dialog: center;
++        --dialog-surface-margin-top: 0;
++        --mdc-dialog-max-height: calc(100svh - var(--ha-space-2) - var(--safe-area-inset-y, 0px));
+         --dialog-content-padding: 0;
+ 
+         --ha-dialog-border-radius: var(--popup-border-radius, 28px);
+@@ -284,7 +284,7 @@
+ 
+       @media all and (min-width: 600px) and (min-height: 501px) {
+         ha-dialog {
+-          --dialog-surface-margin-top: 40px;
++          --dialog-surface-margin-top: 0;
+           --mdc-dialog-max-height: calc(100% - 80px);
+         }
+       }

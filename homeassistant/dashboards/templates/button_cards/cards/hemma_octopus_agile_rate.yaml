@@ -1,0 +1,207 @@
+hemma_octopus_agile_rate:
+  # -------------------------------------------------------------------------
+  # Variables (override in hemma.yaml if your entity naming differs)
+  #   next_day_entity: auto-derived by replacing 'current_day_rates' with
+  #                    'next_day_rates' in the main entity ID
+  # -------------------------------------------------------------------------
+  template: hemma_plain_button_card
+
+  variables:
+    next_day_entity: "[[[ return entity.entity_id.replace('current_day_rates', 'next_day_rates') ]]]"
+
+  triggers_update:
+    - "[[[ return entity.entity_id ]]]"
+    - "[[[ return variables.next_day_entity ]]]"
+    - sensor.5_minute_clock
+
+  tap_action:
+    action: fire-dom-event
+    browser_mod:
+      service: browser_mod.popup
+      data:
+        title: "Octopus Agile Rates Today and Tomorrow"
+        size: normal
+        style: |
+          --popup-max-width: 500px;
+          ha-dialog {
+            --mdc-dialog-max-width: 500px !important;
+          }
+          .mdc-dialog .mdc-dialog__surface {
+            max-width: 500px !important;
+            width: 500px !important;
+          }
+        content:
+          type: custom:button-card
+          template: hemma_plain_button_card
+          # entity and next_day_entity are resolved by the outer card at tap time
+          entity: "[[[ return entity.entity_id ]]]"
+          triggers_update:
+            - "[[[ return entity.entity_id ]]]"
+            - "[[[ return variables.next_day_entity ]]]"
+          tap_action:
+            action: none
+          custom_fields:
+            list: >
+              [[[
+                const todayRates = entity?.attributes?.rates ?? [];
+                const nextDayId = entity.entity_id.replace('current_day_rates', 'next_day_rates');
+                const tomorrowEntity = states[nextDayId];
+                const tomorrowRates = tomorrowEntity?.attributes?.rates ?? [];
+                const now = new Date();
+                const toPence = (slot) => (slot.value_inc_vat * 100).toFixed(1);
+                const fmt = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                const allRates = [...todayRates, ...tomorrowRates];
+                const minRate = allRates.length ? Math.min(...allRates.map(r => r.value_inc_vat)) : 0;
+                const maxRate = allRates.length ? Math.max(...allRates.map(r => r.value_inc_vat)) : 1;
+                const barColor = (v) => {
+                  if (v <= 0.10) return '#6bcb77';
+                  if (v <= 0.18) return '#ffd166';
+                  if (v <= 0.25) return '#f4a261';
+                  return '#ff6b6b';
+                };
+                const renderRow = (slot) => {
+                  const v = slot.value_inc_vat;
+                  const isCurrent = now >= new Date(slot.start) && now < new Date(slot.end);
+                  const pct = Math.max(4, Math.round(((v - minRate) / (maxRate - minRate)) * 100));
+                  const color = barColor(v);
+                  const highlight = isCurrent ? 'background:rgba(255,255,255,0.08);border-radius:8px;' : '';
+                  return `
+                    <div class="rrow" style="${highlight}text-align:left">
+                      <span class="rtime" style="text-align:left">${fmt(slot.start)}</span>
+                      <div class="rbar-wrap"><div class="rbar" style="width:${pct}%;background:${color};"></div></div>
+                      <span class="rpence" style="color:${color};text-align:right">${toPence(slot)}p</span>
+                      ${isCurrent ? '<span class="rnow">NOW</span>' : '<span></span>'}
+                    </div>`;
+                };
+                const section = (label, rates) => !rates.length ? '' : `
+                  <div class="rsection" style="text-align:left">
+                    <div class="rsection-label" style="text-align:left">${label}</div>
+                    ${rates.map(renderRow).join('')}
+                  </div>`;
+                const remainingToday = todayRates.filter(r => new Date(r.end) > now);
+                return `
+                  <div class="popup-wrap" style="text-align:left">
+                    <div class="popup-header" style="text-align:left">
+                      <span class="popup-title" style="text-align:left">⚡ Agile Rates</span>
+                      <div class="legend">
+                        <span style="color:#6bcb77">▮</span> &lt;10p
+                        <span style="color:#ffd166">▮</span> 10–18p
+                        <span style="color:#f4a261">▮</span> 18–25p
+                        <span style="color:#ff6b6b">▮</span> &gt;25p
+                      </div>
+                    </div>
+                    <div class="rlist" style="text-align:left;">
+                      ${section('Today', remainingToday)}
+                      ${tomorrowRates.length ? section('Tomorrow', tomorrowRates) : '<div class="rsection" style="text-align:left"><div class="rsection-label" style="text-align:left">Tomorrow</div><div style="font-size:12px;opacity:0.4;padding:8px 6px;text-align:left">Rates not yet published — usually available after 4pm</div></div>'}
+                    </div>
+                  </div>`;
+              ]]]
+          styles:
+            card:
+              - background: transparent
+              - box-shadow: none
+              - border: none
+            custom_fields:
+              list:
+                - width: 100%
+          extra_styles: |
+            .popup-wrap { display: block; width: 100%; padding: 16px; box-sizing: border-box; }
+            .popup-header { position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 4px; }
+            .popup-title { font-size: 15px; font-weight: 700; }
+            .legend { font-size: 10px; opacity: 0.6; display: flex; gap: 6px; align-items: center; }
+            .rlist { display: block; }
+            .rsection { margin-bottom: 8px; }
+            .rsection-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; padding: 8px 4px 4px; }
+            .rrow { display: grid; grid-template-columns: 48px 1fr 40px 32px; align-items: center; gap: 8px; padding: 5px 6px; }
+            .rtime { font-size: 12px; font-weight: 500; opacity: 0.7; font-variant-numeric: tabular-nums; }
+            .rbar-wrap { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+            .rbar { height: 100%; border-radius: 3px; }
+            .rpence { font-size: 12px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+            .rnow { font-size: 9px; font-weight: 700; background: white; color: black; border-radius: 4px; padding: 1px 4px; text-align: center; }
+
+  custom_fields:
+    content: >
+      [[[
+        const todayRates = entity?.attributes?.rates ?? [];
+        const nextDayId = variables.next_day_entity;
+        const tomorrowRates = (states[nextDayId]?.attributes?.rates) ?? [];
+        const now = new Date();
+        const toPence = (slot) => Math.round(slot.value_inc_vat * 10000) / 100;
+        const fmt = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+        const rateColor = (v) => {
+          if (v <= 0.10) return '#6bcb77';
+          if (v <= 0.18) return '#ffd166';
+          if (v <= 0.25) return '#f4a261';
+          return '#ff6b6b';
+        };
+        const currentSlot = todayRates.find(r => now >= new Date(r.start) && now < new Date(r.end));
+        const currentRate = currentSlot ? toPence(currentSlot).toFixed(1) : '—';
+        const currentColor = currentSlot ? rateColor(currentSlot.value_inc_vat) : 'var(--primary-text-color)';
+        // Find cheapest/most expensive consecutive 2-slot (1-hour) window by average price
+        const summarize = (rates) => {
+          if (rates.length < 2) return { cheapest: null, expensive: null };
+          let cheapest = null, expensive = null;
+          let minAvg = Infinity, maxAvg = -Infinity;
+          for (let i = 0; i < rates.length - 1; i++) {
+            const avg = (rates[i].value_inc_vat + rates[i + 1].value_inc_vat) / 2;
+            if (avg < minAvg) { minAvg = avg; cheapest = { start: rates[i].start, end: rates[i + 1].end, avg }; }
+            if (avg > maxAvg) { maxAvg = avg; expensive = { start: rates[i].start, end: rates[i + 1].end, avg }; }
+          }
+          return { cheapest, expensive };
+        };
+        const today = summarize(todayRates);
+        const tomorrow = summarize(tomorrowRates);
+        const row = (label, window) => {
+          if (!window) return `<div class="row muted"><span class="label">${label}</span><span class="value">—</span></div>`;
+          const color = rateColor(window.avg);
+          const avgPence = (window.avg * 100).toFixed(1);
+          return `
+            <div class="row">
+              <span class="label">${label}</span>
+              <span class="value"><span class="rtime-range">${fmt(window.start)} - ${fmt(window.end)}</span><span class="rate" style="color:${color}"> ${avgPence}p</span></span>
+            </div>`;
+        };
+        return `
+          <div class="wrap">
+            <div class="top">
+              <div class="header">
+                <span class="title">⚡ Octopus Agile</span>
+                <span class="now-rate" style="color:${currentColor}">${currentRate}p/kWh</span>
+              </div>
+              <div class="divider"></div>
+              ${row('Cheapest today', today.cheapest)}
+              ${row('Cheapest tomorrow', tomorrow.cheapest)}
+              <div class="divider"></div>
+              ${row('Most expensive today', today.expensive)}
+              ${row('Most expensive tomorrow', tomorrow.expensive)}
+            </div>
+            <div class="hint">Tap to view all rates</div>
+          </div>`;
+      ]]]
+
+  styles:
+    card:
+      - background: rgba(255,255,255,0.06)
+      - backdrop-filter: blur(20px)
+      - border-radius: 30px
+      - border: 1px solid rgba(255,255,255,0.15)
+      - box-shadow: none
+      - cursor: pointer
+    custom_fields:
+      content:
+        - width: 100%
+
+  extra_styles: |
+    .wrap { display: flex; flex-direction: column; width: 100%; padding: 16px; box-sizing: border-box; }
+    .top { display: flex; flex-direction: column; gap: 10px; }
+    .header { display: flex; justify-content: space-between; align-items: baseline; }
+    .title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.5; }
+    .now-rate { font-size: 28px; font-weight: 700; color: var(--primary-text-color); }
+    .divider { height: 1px; background: color-mix(in srgb, var(--secondary-text-color) 25%, transparent); margin: 2px 0; }
+    .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .label { font-size: 12px; opacity: 0.55; white-space: nowrap; }
+    .value { font-size: 13px; font-weight: 600; text-align: right; }
+    .rtime-range { color: var(--primary-text-color); opacity: 0.7; }
+    .rate { font-size: 11px; margin-left: 4px; }
+    .muted { opacity: 0.4; }
+    .hint { font-size: 11px; opacity: 0.3; text-align: center; margin-top: 20px; }

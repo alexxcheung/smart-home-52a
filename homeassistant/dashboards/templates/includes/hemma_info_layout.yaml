@@ -1,0 +1,42 @@
+# Info tab: 3-column grid, rows auto-height
+# Top padding clears the fixed nav bar
+grid-template-columns: repeat(3, minmax(0, 400px))
+grid-auto-rows: auto
+grid-column-gap: 16px
+grid-row-gap: 16px
+place-content: start
+place-items: stretch
+height: 100%
+margin: 0
+padding: 64px 16px 24px 16px
+overflow-y: auto
+position: relative
+
+mediaquery:
+  # Tablet: 3 columns, slightly more side padding
+  "(min-width: 933px) and (max-width: 1400px)":
+    padding: 64px 24px 24px 24px
+
+  # Mobile landscape: 2 columns
+  # max-width 932px covers all iPhones (Pro Max landscape = 932px)
+  # pointer: coarse targets touch phones only, not laptops at similar widths
+  "(max-width: 932px) and (orientation: landscape) and (pointer: coarse)":
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+    padding: 64px 12px 24px 12px
+    grid-column-gap: 12px
+    grid-row-gap: 12px
+
+  # Tablet portrait (e.g. iPad): 2 columns
+  "(min-width: 768px) and (orientation: portrait)":
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+    padding: 64px 16px 24px 16px
+    grid-column-gap: 16px
+    grid-row-gap: 16px
+
+  # Mobile portrait: 1 column
+  # Phones in portrait are 390-430px, well under 767px
+  "(max-width: 767px) and (orientation: portrait)":
+    grid-template-columns: minmax(0, 1fr)
+    padding: 64px 12px 24px 12px
+    grid-column-gap: 0px
+    grid-row-gap: 12px

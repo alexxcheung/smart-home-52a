@@ -1,0 +1,316 @@
+- id: '1756830017515'
+  alias: Work Desk
+  description: ''
+  triggers:
+  - trigger: sun
+    event: sunset
+    offset: -00:30:00
+  conditions:
+  - condition: device
+    type: is_off
+    device_id: d2989a9eeba691de3a1c40a43872458e
+    entity_id: d267dc7f9670fb90e26b90c35ba133c0
+    domain: light
+  - condition: device
+    device_id: 322cbb275deee7edce6388320b436c40
+    domain: device_tracker
+    entity_id: 5287d46e72d6f9d1a46379d3919092b7
+    type: is_home
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 60
+      transition: 2
+    target:
+      device_id: d2989a9eeba691de3a1c40a43872458e
+  - action: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      device_id: 73c6caa3f46390a4628f1899d7f03c2d
+  mode: single
+- id: '1756831807788'
+  alias: Late Night in living room
+  description: ''
+  triggers:
+  - trigger: time
+    at: '22:00:00'
+    weekday:
+    - sat
+    - sun
+    - fri
+    - mon
+    - tue
+    - wed
+    - thu
+  conditions: []
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 50
+    target:
+      area_id:
+      - living_room
+      - bedroom
+  mode: single
+- id: '1756832013214'
+  alias: Sunset Time
+  description: ''
+  triggers:
+  - trigger: sun
+    event: sunset
+    offset: -00:15:00
+  conditions:
+  - condition: or
+    conditions:
+    - condition: device
+      device_id: 322cbb275deee7edce6388320b436c40
+      domain: device_tracker
+      entity_id: 5287d46e72d6f9d1a46379d3919092b7
+      type: is_home
+    - condition: device
+      device_id: fd7dfa4ede01b45f7c566181765332b8
+      domain: device_tracker
+      entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
+      type: is_home
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 60
+    target:
+      area_id:
+      - study_room
+      device_id: ccd22f130a1a7f593d0b6ced1daac9e9
+  - action: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 20
+    target:
+      device_id: a950fdccc6d8772059470ea8b6ff717a
+      area_id: front_door
+  mode: single
+- id: '1756832135280'
+  alias: Welcome Home
+  description: ''
+  triggers:
+  - device_id: 322cbb275deee7edce6388320b436c40
+    domain: device_tracker
+    entity_id: 5287d46e72d6f9d1a46379d3919092b7
+    type: enters
+    trigger: device
+    zone: zone.home
+  - device_id: fd7dfa4ede01b45f7c566181765332b8
+    domain: device_tracker
+    entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
+    type: enters
+    trigger: device
+    zone: zone.home
+  conditions:
+  - condition: or
+    conditions:
+    - condition: sun
+      after: sunset
+    - condition: sun
+      before: sunrise
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 19
+    target:
+      area_id:
+      - front_door
+      - xuan_guan
+  mode: single
+- id: '1756832264041'
+  alias: Someone leave home and turn off devices
+  description: ''
+  triggers:
+  - device_id: 322cbb275deee7edce6388320b436c40
+    domain: device_tracker
+    entity_id: 5287d46e72d6f9d1a46379d3919092b7
+    type: leaves
+    trigger: device
+    zone: zone.home
+  - device_id: fd7dfa4ede01b45f7c566181765332b8
+    domain: device_tracker
+    entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
+    type: leaves
+    trigger: device
+    zone: zone.home
+  conditions:
+  - condition: and
+    conditions:
+    - condition: device
+      device_id: fd7dfa4ede01b45f7c566181765332b8
+      domain: device_tracker
+      entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
+      type: is_not_home
+    - condition: device
+      device_id: 322cbb275deee7edce6388320b436c40
+      domain: device_tracker
+      entity_id: 5287d46e72d6f9d1a46379d3919092b7
+      type: is_not_home
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      area_id:
+      - bedroom
+      - living_room
+      - study_room
+      - xuan_guan
+  mode: single
+- id: '1756832408013'
+  alias: Late night and turn off the entrance lights
+  description: ''
+  triggers:
+  - trigger: time
+    at: 00:00:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - sat
+    - fri
+    - sun
+  conditions: []
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      area_id:
+      - front_door
+      - xuan_guan
+  mode: single
+- id: '1757681212746'
+  alias: Wake up early
+  description: ''
+  triggers:
+  - trigger: time
+    at: 06:30:00
+  conditions:
+  - condition: sun
+    before: sunset
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 25
+    target:
+      area_id:
+      - front_door
+      - xuan_guan
+  - wait_for_trigger:
+    - trigger: sun
+      event: sunrise
+      offset: 0
+  - action: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      area_id:
+      - front_door
+      - xuan_guan
+  mode: single
+- id: '1757681457615'
+  alias: Motion Detected on the front door
+  description: ''
+  triggers:
+  - type: turned_on
+    device_id: 19aa0b4688f45d61d8f0e337f0e4d023
+    entity_id: 0f636de54f26d61063b0dfc3481a400c
+    domain: switch
+    trigger: device
+  conditions:
+  - condition: or
+    conditions:
+    - condition: sun
+      before: sunset
+    - condition: sun
+      after: sunset
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 40
+    target:
+      device_id: 54d73357e284f986e095fdf14d1efb43
+  - action: light.turn_off
+    metadata: {}
+    data:
+      transition: 120
+    target:
+      area_id: front_door
+  mode: single
+- id: '1771334918614'
+  alias: Sleep Time Temperture
+  description: ''
+  triggers:
+  - trigger: time
+    at: 00:00:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - fri
+    - thu
+    - sun
+    - sat
+  conditions: []
+  actions:
+  - action: climate.set_temperature
+    metadata: {}
+    target:
+      entity_id:
+      - climate.radiator_thermostat_x_hallway
+      - climate.radiator_thermostat_x_living_room
+      - climate.radiator_thermostat_x_study_room
+    data:
+      temperature: 15
+  mode: single
+- id: '1771335127878'
+  alias: Wake up and Warm up
+  description: ''
+  triggers:
+  - trigger: time
+    at: 06:15:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+  conditions:
+  - condition: or
+    conditions:
+    - condition: device
+      device_id: 322cbb275deee7edce6388320b436c40
+      domain: device_tracker
+      entity_id: 5287d46e72d6f9d1a46379d3919092b7
+      type: is_home
+    - condition: device
+      device_id: fd7dfa4ede01b45f7c566181765332b8
+      domain: device_tracker
+      entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
+      type: is_home
+    enabled: false
+  actions:
+  - action: climate.set_temperature
+    metadata: {}
+    data:
+      temperature: 20
+    target:
+      entity_id:
+      - climate.radiator_thermostat_x_hallway
+      - climate.radiator_thermostat_x_living_room
+      - climate.radiator_thermostat_x_study_room
+  mode: single

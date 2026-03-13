@@ -1,0 +1,1388 @@
+hemma_dishwasher:
+  # -------------------------------------------------------------------------
+  # Bosch Dishwasher card — extends hemma_entity
+  # Tap  → control popup (status, power, programme, delay, options)
+  # Hold → more-info
+  # -------------------------------------------------------------------------
+  template:
+    - hemma_entity
+
+  variables:
+    icon: dishwasher
+
+  triggers_update:
+    - sensor.bosch_dishwasher_operation_state
+    - sensor.bosch_dishwasher_programme_finish_time
+    - sensor.bosch_dishwasher_programme_progress
+    - switch.bosch_dishwasher_power
+    - sensor.5_minute_clock
+
+  state_display: >
+    [[[
+      const op   = states['sensor.bosch_dishwasher_operation_state']?.state ?? '';
+      const fin  = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
+      const prog = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+      const dSec = parseFloat(states['number.bosch_dishwasher_start_in_relative']?.state ?? 0);
+      if (op === 'run') {
+        if (fin && fin !== 'unavailable' && fin !== 'unknown') {
+          const rem = Math.ceil((new Date(fin) - new Date()) / 60000);
+          if (rem > 0) return `${rem} min left`;
+        }
+        return prog > 0 ? `Running · ${prog}%` : 'Running';
+      }
+      if (op === 'delayedstart' && dSec > 0) {
+        const h = Math.floor(dSec / 3600);
+        const m = Math.floor((dSec % 3600) / 60);
+        return h > 0 ? `Starts in ${h}h ${m}m` : `Starts in ${m}m`;
+      }
+      return {
+        inactive: 'Off', ready: 'Ready', delayedstart: 'Delayed start',
+        pause: 'Paused', actionrequired: 'Action needed',
+        finished: 'Done', error: 'Error', aborting: 'Stopping…',
+      }[op] ?? (op ? op.charAt(0).toUpperCase() + op.slice(1) : '');
+    ]]]
+
+  state:
+    - operator: template
+      value: |
+        [[[
+          return ['run','delayedstart','pause'].includes(
+            states['sensor.bosch_dishwasher_operation_state']?.state
+          );
+        ]]]
+      styles:
+        card:
+          - background: var(--ha-card-background-active)
+          - box-shadow: var(--button-card-box-shadow-active, var(--button-card-box-shadow)) !important
+        name:
+          - color: var(--hemma-entity-active, var(--primary-text-color))
+        state:
+          - color: var(--secondary-text-color)
+        img_cell:
+          - opacity: var(--hemma-entity-picture-active-opacity, 1) !important
+          - filter: var(--hemma-entity-picture-active-filter, none) !important
+        entity_picture:
+          - opacity: var(--hemma-entity-picture-active-opacity, 1) !important
+          - filter: var(--hemma-entity-picture-active-filter, none) !important
+
+  hold_action:
+    action: more-info
+
+  tap_action:
+    action: fire-dom-event
+    browser_mod:
+      service: browser_mod.popup
+      data:
+        title: Bosch Dishwasher
+        size: normal
+        style: |
+          --popup-max-width: 480px;
+          }
+          ha-dialog {
+            --mdc-dialog-max-width: 480px !important;
+            --vertical-align-dialog: center !important;
+            --dialog-surface-margin-top: auto !important;
+          }
+          .mdc-dialog .mdc-dialog__surface {
+            max-width: 480px !important;
+            width: 480px !important;
+          }
+        content:
+          type: vertical-stack
+          cards:
+
+            # ── Status + progress: one conditional per state so popup shows updated status when state changes ──
+            - type: conditional
+              conditions:
+                - entity: sensor.bosch_dishwasher_operation_state
+                  state: inactive
+              card:
+                type: custom:button-card
+                template: hemma_plain_button_card
+                entity: sensor.bosch_dishwasher_operation_state
+                tap_action: { action: none }
+                styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+                custom_fields:
+                  content: >
+                    [[[
+                      const op = entity.state ?? 'unknown';
+                      const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
+                      const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+                      const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
+                      const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
+                      const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
+                      const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
+                      const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
+                      const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
+                      const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
+                      let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
+                      return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
+                    ]]]
+                extra_styles: |
+                  .dw-header { padding: 16px 16px 12px; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
+                  .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+                  .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+                  .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
+                  .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
+            - type: conditional
+              conditions:
+                - entity: sensor.bosch_dishwasher_operation_state
+                  state: ready
+              card:
+                type: custom:button-card
+                template: hemma_plain_button_card
+                entity: sensor.bosch_dishwasher_operation_state
+                tap_action: { action: none }
+                styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+                custom_fields:
+                  content: >
+                    [[[
+                      const op = entity.state ?? 'unknown';
+                      const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
+                      const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+                      const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
+                      const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
+                      const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
+                      const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
+                      const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
+                      const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
+                      const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
+                      let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
+                      return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
+                    ]]]
+                extra_styles: |
+                  .dw-header { padding: 16px 16px 12px; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
+                  .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+                  .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+                  .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
+                  .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
+            - type: conditional
+              conditions:
+                - entity: sensor.bosch_dishwasher_operation_state
+                  state: delayedstart
+              card:
+                type: custom:button-card
+                template: hemma_plain_button_card
+                entity: sensor.bosch_dishwasher_operation_state
+                tap_action: { action: none }
+                styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+                custom_fields:
+                  content: >
+                    [[[
+                      const op = entity.state ?? 'unknown';
+                      const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
+                      const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+                      const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
+                      const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
+                      const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
+                      const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
+                      const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
+                      const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
+                      const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
+                      let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
+                      return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
+                    ]]]
+                extra_styles: |
+                  .dw-header { padding: 16px 16px 12px; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
+                  .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+                  .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+                  .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
+                  .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
+            - type: conditional
+              conditions:
+                - entity: sensor.bosch_dishwasher_operation_state
+                  state: run
+              card:
+                type: custom:button-card
+                template: hemma_plain_button_card
+                entity: sensor.bosch_dishwasher_operation_state
+                tap_action: { action: none }
+                styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+                custom_fields:
+                  content: >
+                    [[[
+                      const op = entity.state ?? 'unknown';
+                      const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
+                      const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+                      const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
+                      const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
+                      const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
+                      const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
+                      const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
+                      const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
+                      const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
+                      let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
+                      return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
+                    ]]]
+                extra_styles: |
+                  .dw-header { padding: 16px 16px 12px; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
+                  .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+                  .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+                  .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
+                  .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
+            - type: conditional
+              conditions:
+                - entity: sensor.bosch_dishwasher_operation_state
+                  state: pause
+              card:
+                type: custom:button-card
+                template: hemma_plain_button_card
+                entity: sensor.bosch_dishwasher_operation_state
+                tap_action: { action: none }
+                styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+                custom_fields:
+                  content: >
+                    [[[
+                      const op = entity.state ?? 'unknown';
+                      const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
+                      const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+                      const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
+                      const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
+                      const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
+                      const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
+                      const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
+                      const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
+                      const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
+                      let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
+                      return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
+                    ]]]
+                extra_styles: |
+                  .dw-header { padding: 16px 16px 12px; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
+                  .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+                  .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+                  .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
+                  .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
+            - type: conditional
+              conditions:
+                - entity: sensor.bosch_dishwasher_operation_state
+                  state: actionrequired
+              card:
+                type: custom:button-card
+                template: hemma_plain_button_card
+                entity: sensor.bosch_dishwasher_operation_state
+                tap_action: { action: none }
+                styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+                custom_fields:
+                  content: >
+                    [[[
+                      const op = entity.state ?? 'unknown';
+                      const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
+                      const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+                      const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
+                      const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
+                      const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
+                      const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
+                      const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
+                      const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
+                      const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
+                      let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
+                      return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
+                    ]]]
+                extra_styles: |
+                  .dw-header { padding: 16px 16px 12px; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
+                  .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+                  .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+                  .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
+                  .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
+            - type: conditional
+              conditions:
+                - entity: sensor.bosch_dishwasher_operation_state
+                  state: finished
+              card:
+                type: custom:button-card
+                template: hemma_plain_button_card
+                entity: sensor.bosch_dishwasher_operation_state
+                tap_action: { action: none }
+                styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+                custom_fields:
+                  content: >
+                    [[[
+                      const op = entity.state ?? 'unknown';
+                      const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
+                      const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+                      const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
+                      const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
+                      const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
+                      const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
+                      const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
+                      const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
+                      const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
+                      let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
+                      return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
+                    ]]]
+                extra_styles: |
+                  .dw-header { padding: 16px 16px 12px; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
+                  .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+                  .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+                  .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
+                  .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
+            - type: conditional
+              conditions:
+                - entity: sensor.bosch_dishwasher_operation_state
+                  state: error
+              card:
+                type: custom:button-card
+                template: hemma_plain_button_card
+                entity: sensor.bosch_dishwasher_operation_state
+                tap_action: { action: none }
+                styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+                custom_fields:
+                  content: >
+                    [[[
+                      const op = entity.state ?? 'unknown';
+                      const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
+                      const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+                      const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
+                      const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
+                      const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
+                      const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
+                      const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
+                      const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
+                      const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
+                      let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
+                      return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
+                    ]]]
+                extra_styles: |
+                  .dw-header { padding: 16px 16px 12px; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
+                  .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+                  .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+                  .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
+                  .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
+            - type: conditional
+              conditions:
+                - entity: sensor.bosch_dishwasher_operation_state
+                  state: aborting
+              card:
+                type: custom:button-card
+                template: hemma_plain_button_card
+                entity: sensor.bosch_dishwasher_operation_state
+                tap_action: { action: none }
+                styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+                custom_fields:
+                  content: >
+                    [[[
+                      const op = entity.state ?? 'unknown';
+                      const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
+                      const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+                      const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
+                      const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
+                      const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
+                      const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
+                      const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
+                      const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
+                      const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
+                      let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
+                      return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
+                    ]]]
+                extra_styles: |
+                  .dw-header { padding: 16px 16px 12px; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
+                  .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+                  .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
+                  .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+                  .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
+                  .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
+
+            # ── Power: Turn On (shown when off) ───────────────────────────
+            - type: custom:button-card
+              entity: switch.bosch_dishwasher_power
+              triggers_update:
+                - switch.bosch_dishwasher_power
+              template: hemma_plain_button_card
+              show_name: true
+              show_icon: true
+              icon: mdi:power
+              show_state: false
+              layout: icon_name_state
+              name: Turn On
+              tap_action:
+                action: toggle
+              hold_action:
+                action: none
+              double_tap_action:
+                action: none
+              state:
+                - value: "on"
+                  styles:
+                    card:
+                      - display: none !important
+              styles:
+                card:
+                  - border-radius: 12px
+                  - box-shadow: none
+                  - margin: 24px 0 0
+                  - height: 48px
+                  - background: rgba(107,203,119,0.14)
+                grid:
+                  - justify-content: center
+                name:
+                  - font-size: 14px
+                  - font-weight: 700
+                  - text-align: center
+                  - color: "#6bcb77"
+                icon:
+                  - color: "#6bcb77"
+                  - width: 20px
+                  - height: 20px
+
+            # ── Power: Turn Off (shown when on) ───────────────────────────
+            - type: custom:button-card
+              entity: switch.bosch_dishwasher_power
+              triggers_update:
+                - switch.bosch_dishwasher_power
+              template: hemma_plain_button_card
+              show_name: true
+              show_icon: true
+              icon: mdi:power
+              show_state: false
+              layout: icon_name_state
+              name: Turn Off
+              tap_action:
+                action: toggle
+              hold_action:
+                action: none
+              double_tap_action:
+                action: none
+              state:
+                - value: "off"
+                  styles:
+                    card:
+                      - display: none !important
+                - value: "unavailable"
+                  styles:
+                    card:
+                      - display: none !important
+              styles:
+                card:
+                  - border-radius: 12px
+                  - box-shadow: none
+                  - margin: 24px 0 0
+                  - height: 48px
+                  - background: rgba(255,107,107,0.14)
+                grid:
+                  - justify-content: center
+                name:
+                  - font-size: 14px
+                  - font-weight: 700
+                  - text-align: center
+                  - color: "#ff6b6b"
+                icon:
+                  - color: "#ff6b6b"
+                  - width: 20px
+                  - height: 20px
+
+            # ── Sections below power (only when power is on) ───────────────
+            - type: conditional
+              conditions:
+                - entity: switch.bosch_dishwasher_power
+                  state: "on"
+              card:
+                type: vertical-stack
+                cards:
+                  # ── Programme label ────────────────────────────────────────────
+                  - type: custom:button-card
+                    entity: switch.bosch_dishwasher_power
+                    triggers_update:
+                      - switch.bosch_dishwasher_power
+                    name: Programme
+                    show_icon: false
+                    show_state: false
+                    tap_action:
+                      action: none
+                    styles:
+                      card:
+                        - background: transparent
+                        - box-shadow: none
+                        - padding: 24px 0 6px
+                        - height: auto
+                        - justify-content: flex-start
+                      name:
+                        - font-size: 11px
+                        - font-weight: 700
+                        - text-transform: uppercase
+                        - letter-spacing: 0.08em
+                        - opacity: "0.38"
+                        - text-align: left
+
+                  # ── Programme chips — row 1: Eco 50°, Auto, Intensive 70° ────────
+                  - type: horizontal-stack
+                    cards:
+                      - type: custom:button-card
+                        entity: select.bosch_dishwasher_selected_programme
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Eco 50°
+                        tap_action:
+                          action: call-service
+                          service: select.select_option
+                          service_data:
+                            entity_id: select.bosch_dishwasher_selected_programme
+                            option: dishcare_dishwasher_program_eco_50
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: dishcare_dishwasher_program_eco_50
+                            styles:
+                              card:
+                                - background: "rgba(255,255,255,0.92) !important"
+                                - border: "1.5px solid transparent !important"
+                                - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                              name:
+                                - color: "#1a1a1a !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1.5px solid rgba(255,255,255,0.14)
+                            - background: transparent
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 8px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - flex: 1 1 0
+                            - margin: 0 2px 0 0
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - opacity: "0.45"
+      
+                      - type: custom:button-card
+                        entity: select.bosch_dishwasher_selected_programme
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Auto
+                        tap_action:
+                          action: call-service
+                          service: select.select_option
+                          service_data:
+                            entity_id: select.bosch_dishwasher_selected_programme
+                            option: dishcare_dishwasher_program_auto_2
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: dishcare_dishwasher_program_auto_2
+                            styles:
+                              card:
+                                - background: "rgba(255,255,255,0.92) !important"
+                                - border: "1.5px solid transparent !important"
+                                - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                              name:
+                                - color: "#1a1a1a !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1.5px solid rgba(255,255,255,0.14)
+                            - background: transparent
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 8px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - flex: 1 1 0
+                            - margin: 0 2px
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - opacity: "0.45"
+      
+                      - type: custom:button-card
+                        entity: select.bosch_dishwasher_selected_programme
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Intensive 70°
+                        tap_action:
+                          action: call-service
+                          service: select.select_option
+                          service_data:
+                            entity_id: select.bosch_dishwasher_selected_programme
+                            option: dishcare_dishwasher_program_intensiv_70
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: dishcare_dishwasher_program_intensiv_70
+                            styles:
+                              card:
+                                - background: "rgba(255,255,255,0.92) !important"
+                                - border: "1.5px solid transparent !important"
+                                - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                              name:
+                                - color: "#1a1a1a !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1.5px solid rgba(255,255,255,0.14)
+                            - background: transparent
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 8px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - flex: 1 1 0
+                            - margin: 0 0 0 2px
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - opacity: "0.45"
+      
+                  # ── Programme chips — row 2: Quick 65°, Night Wash, Machine Care ─
+                  - type: horizontal-stack
+                    cards:
+                      - type: custom:button-card
+                        entity: select.bosch_dishwasher_selected_programme
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Quick 65°
+                        tap_action:
+                          action: call-service
+                          service: select.select_option
+                          service_data:
+                            entity_id: select.bosch_dishwasher_selected_programme
+                            option: dishcare_dishwasher_program_quick_65
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: dishcare_dishwasher_program_quick_65
+                            styles:
+                              card:
+                                - background: "rgba(255,255,255,0.92) !important"
+                                - border: "1.5px solid transparent !important"
+                                - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                              name:
+                                - color: "#1a1a1a !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1.5px solid rgba(255,255,255,0.14)
+                            - background: transparent
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 8px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - flex: 1 1 0
+                            - margin: 8px 2px 0 0
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - opacity: "0.45"
+      
+                      - type: custom:button-card
+                        entity: select.bosch_dishwasher_selected_programme
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Night Wash
+                        tap_action:
+                          action: call-service
+                          service: select.select_option
+                          service_data:
+                            entity_id: select.bosch_dishwasher_selected_programme
+                            option: dishcare_dishwasher_program_night_wash
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: dishcare_dishwasher_program_night_wash
+                            styles:
+                              card:
+                                - background: "rgba(255,255,255,0.92) !important"
+                                - border: "1.5px solid transparent !important"
+                                - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                              name:
+                                - color: "#1a1a1a !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1.5px solid rgba(255,255,255,0.14)
+                            - background: transparent
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 8px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - flex: 1 1 0
+                            - margin: 8px 2px 0
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - opacity: "0.45"
+      
+                      - type: custom:button-card
+                        entity: select.bosch_dishwasher_selected_programme
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Machine Care
+                        tap_action:
+                          action: call-service
+                          service: select.select_option
+                          service_data:
+                            entity_id: select.bosch_dishwasher_selected_programme
+                            option: dishcare_dishwasher_program_machine_care
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: dishcare_dishwasher_program_machine_care
+                            styles:
+                              card:
+                                - background: "rgba(255,255,255,0.92) !important"
+                                - border: "1.5px solid transparent !important"
+                                - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                              name:
+                                - color: "#1a1a1a !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1.5px solid rgba(255,255,255,0.14)
+                            - background: transparent
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 8px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - flex: 1 1 0
+                            - margin: 8px 0 0 2px
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - opacity: "0.45"
+      
+                  # ── Programme chips — row 3: Pre-rinse ────────────────────────
+                  - type: horizontal-stack
+                    cards:
+                      - type: custom:button-card
+                        entity: select.bosch_dishwasher_selected_programme
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Pre-rinse
+                        tap_action:
+                          action: call-service
+                          service: select.select_option
+                          service_data:
+                            entity_id: select.bosch_dishwasher_selected_programme
+                            option: dishcare_dishwasher_program_pre_rinse
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: dishcare_dishwasher_program_pre_rinse
+                            styles:
+                              card:
+                                - background: "rgba(255,255,255,0.92) !important"
+                                - border: "1.5px solid transparent !important"
+                                - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                              name:
+                                - color: "#1a1a1a !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1.5px solid rgba(255,255,255,0.14)
+                            - background: transparent
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 8px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - flex: 1 1 0
+                            - margin: 8px 2px 0 0
+                          name:
+                            - font-size: 13px
+                            - font-weight: 600
+                            - opacity: "0.45"
+      
+                      - type: custom:button-card
+                        show_icon: false
+                        show_name: false
+                        tap_action:
+                          action: none
+                        styles:
+                          card:
+                            - background: transparent
+                            - box-shadow: none
+                            - border: none
+                            - flex: 1 1 0
+                            - min-width: 0
+      
+                      - type: custom:button-card
+                        show_icon: false
+                        show_name: false
+                        tap_action:
+                          action: none
+                        styles:
+                          card:
+                            - background: transparent
+                            - box-shadow: none
+                            - border: none
+                            - flex: 1 1 0
+                            - min-width: 0
+      
+                  # ── Options label ──────────────────────────────────────────────
+                  - type: custom:button-card
+                    entity: switch.bosch_dishwasher_power
+                    name: Options
+                    show_icon: false
+                    tap_action:
+                      action: none
+                    triggers_update:
+                      - switch.bosch_dishwasher_power
+                    styles:
+                      card:
+                        - background: transparent
+                        - box-shadow: none
+                        - padding: 24px 16px 6px
+                        - height: auto
+                        - justify-content: flex-start
+                      name:
+                        - font-size: 11px
+                        - font-weight: 700
+                        - text-transform: uppercase
+                        - letter-spacing: 0.08em
+                        - opacity: "0.38"
+                        - text-align: left
+      
+                  # ── Option chips — row 1: Extra Dry, Hygiene+, Intensive Zone ───
+                  - type: horizontal-stack
+                    cards:
+                      - type: custom:button-card
+                        entity: switch.bosch_dishwasher_extra_dry
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Extra Dry
+                        tap_action:
+                          action: toggle
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: "on"
+                            styles:
+                              card:
+                                - background: "rgba(107,203,119,0.18) !important"
+                                - border: "1px solid rgba(107,203,119,0.38) !important"
+                              name:
+                                - color: "#6bcb77 !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1px solid rgba(255,255,255,0.12)
+                            - background: rgba(255,255,255,0.05)
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 7px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - margin: 0 2px 0 0
+                          name:
+                            - font-size: 12px
+                            - font-weight: 600
+                            - opacity: "0.65"
+      
+                      - type: custom:button-card
+                        entity: switch.bosch_dishwasher_hygiene
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: "Hygiene +"
+                        tap_action:
+                          action: toggle
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: "on"
+                            styles:
+                              card:
+                                - background: "rgba(107,203,119,0.18) !important"
+                                - border: "1px solid rgba(107,203,119,0.38) !important"
+                              name:
+                                - color: "#6bcb77 !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1px solid rgba(255,255,255,0.12)
+                            - background: rgba(255,255,255,0.05)
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 7px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - margin: 0 2px
+                          name:
+                            - font-size: 12px
+                            - font-weight: 600
+                            - opacity: "0.65"
+      
+                      - type: custom:button-card
+                        entity: switch.bosch_dishwasher_intensive_zone
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Intensive Zone
+                        tap_action:
+                          action: toggle
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: "on"
+                            styles:
+                              card:
+                                - background: "rgba(107,203,119,0.18) !important"
+                                - border: "1px solid rgba(107,203,119,0.38) !important"
+                              name:
+                                - color: "#6bcb77 !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1px solid rgba(255,255,255,0.12)
+                            - background: rgba(255,255,255,0.05)
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 7px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - margin: 0 0 0 4px
+                          name:
+                            - font-size: 12px
+                            - font-weight: 600
+                            - opacity: "0.65"
+      
+                  # ── Option chips — row 2: Vario Speed, Silence, Child Lock ─────
+                  - type: horizontal-stack
+                    cards:
+                      - type: custom:button-card
+                        entity: switch.bosch_dishwasher_vario_speed
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Vario Speed
+                        tap_action:
+                          action: toggle
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: "on"
+                            styles:
+                              card:
+                                - background: "rgba(107,203,119,0.18) !important"
+                                - border: "1px solid rgba(107,203,119,0.38) !important"
+                              name:
+                                - color: "#6bcb77 !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1px solid rgba(255,255,255,0.12)
+                            - background: rgba(255,255,255,0.05)
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 7px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - margin: 8px 4px 0 0
+                          name:
+                            - font-size: 12px
+                            - font-weight: 600
+                            - opacity: "0.65"
+      
+                      - type: custom:button-card
+                        entity: switch.bosch_dishwasher_silence_on_demand
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Silence
+                        tap_action:
+                          action: toggle
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: "on"
+                            styles:
+                              card:
+                                - background: "rgba(107,203,119,0.18) !important"
+                                - border: "1px solid rgba(107,203,119,0.38) !important"
+                              name:
+                                - color: "#6bcb77 !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1px solid rgba(255,255,255,0.12)
+                            - background: rgba(255,255,255,0.05)
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 7px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - margin: 8px 4px 0
+                          name:
+                            - font-size: 12px
+                            - font-weight: 600
+                            - opacity: "0.65"
+      
+                      - type: custom:button-card
+                        entity: switch.bosch_dishwasher_child_lock
+                        triggers_update:
+                          - switch.bosch_dishwasher_power
+                        show_icon: false
+                        name: Child Lock
+                        tap_action:
+                          action: toggle
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        state:
+                          - value: "on"
+                            styles:
+                              card:
+                                - background: "rgba(107,203,119,0.18) !important"
+                                - border: "1px solid rgba(107,203,119,0.38) !important"
+                              name:
+                                - color: "#6bcb77 !important"
+                                - opacity: "1 !important"
+                        styles:
+                          card:
+                            - border-radius: 20px
+                            - border: 1px solid rgba(255,255,255,0.12)
+                            - background: rgba(255,255,255,0.05)
+                            - box-shadow: none
+                            - height: auto
+                            - padding: 7px 4px
+                            - overflow: hidden
+                            - min-width: 0
+                            - margin: 8px 0 0 4px
+                          name:
+                            - font-size: 12px
+                            - font-weight: 600
+                            - opacity: "0.65"
+      
+                  # ── Delay start + Start at (only when power is on) ──────────────
+                  - type: conditional
+                    conditions:
+                      - entity: switch.bosch_dishwasher_power
+                        state: "on"
+                    card:
+                      type: vertical-stack
+                      card_mod:
+                        style: |
+                          ha-card .content {
+                            display: flex !important;
+                            flex-direction: column !important;
+                            gap: 8px !important;
+                          }
+                      cards:
+                        # Delay start — button card (tap toggles); alignment matches Turn Off
+                        - type: custom:button-card
+                          entity: input_boolean.hemma_dishwasher_delay_start
+                          triggers_update:
+                            - input_boolean.hemma_dishwasher_delay_start
+                          template: hemma_plain_button_card
+                          show_name: true
+                          show_icon: true
+                          icon: mdi:clock-start
+                          show_state: false
+                          layout: icon_name_state
+                          name: Enable delay start
+                          tap_action:
+                            action: toggle
+                          hold_action:
+                            action: none
+                          double_tap_action:
+                            action: none
+                          state:
+                            - value: "on"
+                              styles:
+                                card:
+                                  - background: "rgba(107,203,119,0.14) !important"
+                                  - border: "1px solid rgba(107,203,119,0.28) !important"
+                                name:
+                                  - color: "#6bcb77 !important"
+                                icon:
+                                  - color: "#6bcb77 !important"
+                          styles:
+                            card:
+                              - border-radius: 12px
+                              - box-shadow: none
+                              - margin: 24px 0 0 0
+                              - padding: 16px 0 8px 0
+                              - height: 48px
+                              - background: transparent
+                              - border: 1px solid rgba(255,255,255,0.12)
+                            grid:
+                              - justify-content: center
+                              - align-items: center
+                            name:
+                              - font-size: 14px
+                              - font-weight: 700
+                              - text-align: center
+                            icon:
+                              - width: 20px
+                              - height: 20px
+      
+                        # Start at — button card (tap opens time picker); alignment matches Turn Off
+                        - type: conditional
+                          conditions:
+                            - entity: input_boolean.hemma_dishwasher_delay_start
+                              state: "on"
+                          card:
+                            type: custom:button-card
+                            entity: input_datetime.hemma_dishwasher_start_at
+                            triggers_update:
+                              - input_datetime.hemma_dishwasher_start_at
+                            template: hemma_plain_button_card
+                            show_name: true
+                            show_icon: true
+                            icon: mdi:clock-outline
+                            show_state: true
+                            layout: icon_name_state
+                            name: Start at
+                            tap_action:
+                              action: more-info
+                            hold_action:
+                              action: none
+                            double_tap_action:
+                              action: none
+                            styles:
+                              card:
+                                - border-radius: 12px
+                                - box-shadow: none
+                                - margin: 8px 0 8px 0
+                                - padding: 16px 0 8px 0
+                                - height: 48px
+                                - background: transparent
+                                - border: 1px solid rgba(255,255,255,0.12)
+                              grid:
+                                - justify-content: center
+                                - align-items: center
+                              name:
+                                - font-size: 14px
+                                - font-weight: 700
+                                - text-align: center
+                              state:
+                                - font-size: 13px
+                                - text-align: center
+                              icon:
+                                - width: 20px
+                                - height: 20px
+      
+                  # ── Dynamic action button ──────────────────────────────────────
+      
+                  # Remote Start — conditional so popup refreshes; only when ready or finished; disabled when door open or no programme
+                  - type: conditional
+                    conditions:
+                      - entity: sensor.bosch_dishwasher_operation_state
+                        state:
+                          - ready
+                          - finished
+                    card:
+                      type: custom:button-card
+                      entity: sensor.bosch_dishwasher_operation_state
+                      template: hemma_plain_button_card
+                      show_name: true
+                      show_icon: true
+                      icon: mdi:play
+                      show_state: false
+                      layout: icon_name_state
+                      name: Remote Start
+                      tap_action:
+                        action: call-service
+                        service: script.start_dishwasher
+                        # Popup closes after script runs (script ends with browser_mod.close_popup)
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - operator: template
+                          value: "[[[ return (states['sensor.bosch_dishwasher_door']?.state || '') !== 'closed'; ]]]"
+                          styles:
+                            card:
+                              - opacity: "0.4 !important"
+                              - pointer-events: none !important
+                        - operator: template
+                          value: >
+                            [[[
+                              const prog = states['select.bosch_dishwasher_selected_programme']?.state;
+                              return !prog || prog === 'unknown' || prog === 'unavailable' || prog === '';
+                            ]]]
+                          styles:
+                            card:
+                              - opacity: "0.35 !important"
+                              - pointer-events: none !important
+                      styles:
+                        card:
+                          - border-radius: 12px
+                          - box-shadow: none
+                          - margin: 24px 0 16px
+                          - height: 48px
+                          - background: rgba(107,203,119,0.14)
+                          - border: 1px solid rgba(107,203,119,0.28)
+                        grid:
+                          - justify-content: center
+                        name:
+                          - font-size: 14px
+                          - font-weight: 700
+                          - text-align: center
+                          - color: "#6bcb77"
+                        icon:
+                          - color: "#6bcb77"
+                          - width: 20px
+                          - height: 20px
+      
+                  # Start Now — conditional so popup refreshes when state leaves delayedstart
+                  - type: conditional
+                    conditions:
+                      - entity: sensor.bosch_dishwasher_operation_state
+                        state: delayedstart
+                    card:
+                      type: custom:button-card
+                      entity: sensor.bosch_dishwasher_operation_state
+                      template: hemma_plain_button_card
+                      show_name: true
+                      show_icon: true
+                      icon: mdi:play-circle
+                      show_state: false
+                      layout: icon_name_state
+                      name: Start Now
+                      tap_action:
+                        action: call-service
+                        service: number.set_value
+                        service_data:
+                          entity_id: number.bosch_dishwasher_start_in_relative
+                          value: 0
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      styles:
+                        card:
+                          - border-radius: 12px
+                          - box-shadow: none
+                          - margin: 24px 0 8px
+                          - height: 48px
+                          - background: rgba(255,209,102,0.14)
+                          - border: 1px solid rgba(255,209,102,0.28)
+                        grid:
+                          - justify-content: center
+                        name:
+                          - font-size: 14px
+                          - font-weight: 700
+                          - text-align: center
+                          - color: "#ffd166"
+                        icon:
+                          - color: "#ffd166"
+                          - width: 20px
+                          - height: 20px
+      
+                  # Stop Programme — conditional so popup refreshes when state leaves run/pause/delayedstart/ etc.
+                  - type: conditional
+                    conditions:
+                      - entity: sensor.bosch_dishwasher_operation_state
+                        state:
+                          - delayedstart
+                          - run
+                          - pause
+                          - actionrequired
+                          - error
+                          - aborting
+                    card:
+                      type: custom:button-card
+                      entity: sensor.bosch_dishwasher_operation_state
+                      template: hemma_plain_button_card
+                      show_name: true
+                      show_icon: true
+                      icon: mdi:stop
+                      show_state: false
+                      layout: icon_name_state
+                      name: >
+                        [[[
+                          return { delayedstart: 'Cancel programme', run: 'Stop Programme', pause: 'Stop Programme',
+                            actionrequired: 'Stop Programme', error: 'Stop / Reset',
+                            aborting: 'Stopping…' }[entity.state] ?? 'Stop Programme';
+                        ]]]
+                      tap_action:
+                        action: call-service
+                        service: button.press
+                        service_data:
+                          entity_id: button.bosch_dishwasher_stop_programme
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: aborting
+                          styles:
+                            card:
+                              - opacity: "0.45 !important"
+                              - pointer-events: none !important
+                      styles:
+                        card:
+                          - border-radius: 12px
+                          - box-shadow: none
+                          - margin: 0 0 16px
+                          - height: 48px
+                          - background: rgba(255,107,107,0.14)
+                          - border: 1px solid rgba(255,107,107,0.28)
+                        grid:
+                          - justify-content: center
+                        name:
+                          - font-size: 14px
+                          - font-weight: 700
+                          - text-align: center
+                          - color: "#ff6b6b"
+                        icon:
+                          - color: "#ff6b6b"
+                          - width: 20px
+                          - height: 20px

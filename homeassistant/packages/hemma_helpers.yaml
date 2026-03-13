@@ -1,0 +1,67 @@
+# packages/hemma_helpers.yaml
+# ============================================================================
+# REQUIRED: Hemma Dashboard Helper Entities
+#
+# These helper entities are required for the Hemma dashboard to function.
+# Place this file in your /config/packages/ directory and ensure packages
+# are enabled in your configuration.yaml:
+#
+#   homeassistant:
+#     packages: !include_dir_named packages
+#
+# ENTITIES CREATED:
+#   - input_boolean.hemma_thermostat_overlay: Thermostat card temperature adjustment overlay
+#   - input_boolean.hemma_mobile_navigation: Mobile nav menu state
+#   - input_number.hemma_thermostat_target_temperature: Thermostat target temp
+#   - input_select.hemma_thermostat_mode: Heat/Cool mode selector
+#
+# OPTIONAL: Adjust min/max values for input_number to match your climate needs.
+# ============================================================================
+
+input_boolean:
+  hemma_thermostat_overlay:
+    name: Thermostat Overlay
+    initial: off
+
+  hemma_mobile_navigation:
+    name: Mobile Navigation
+    initial: off
+
+  hemma_dishwasher_delay_start:
+    name: Dishwasher Delay Start
+    initial: off
+
+input_number:
+  hemma_thermostat_target_temperature:
+    name: Thermostat Target Temperature
+    min: 16
+    max: 28
+    step: 0.5
+    unit_of_measurement: "°C"
+    mode: slider
+
+  # Dishwasher delay (seconds). Set by script from start-at time; kept for compatibility.
+  hemma_dishwasher_delay_seconds:
+    name: Dishwasher Delay Start
+    min: 0
+    max: 86400
+    step: 900
+    unit_of_measurement: s
+    mode: slider
+
+# Time-of-day picker: "Start at 18:30". Script passes delay (seconds) in home_connect.set_program_and_options.
+input_datetime:
+  hemma_dishwasher_start_at:
+    name: Dishwasher Start At
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+
+input_select:
+  hemma_thermostat_mode:
+    name: Thermostat Mode
+    options:
+      - heat
+      - cool
+    initial: heat
+

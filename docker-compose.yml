@@ -1,0 +1,78 @@
+version: '3.7'
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    volumes:
+      - ./homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro  # This connects HA to the Pi's Bluetooth
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    security_opt:
+      - apparmor:unconfined  # This removes the security block for Bluetooth
+
+  scrypted:
+    container_name: scrypted
+    image: koush/scrypted
+    restart: unless-stopped
+    network_mode: host
+    ports:
+      - "11080:11080"
+      - "10443:10443"
+    volumes:
+      - ./scrypted:/server/volume
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./portainer_data:/data
+
+  otbr:
+    image: ghcr.io/ownbee/hass-otbr-docker:latest
+    container_name: otbr
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - /dev/net/tun:/dev/net/tun
+      - /run/dbus:/run/dbus:rw # Added for Bluetooth/mDNS support
+    environment:
+      - DEVICE=/dev/ttyUSB0
+      - BAUDRATE=460800
+      - OTBR_REST_PORT=8081
+      - FLOW_CONTROL=0
+      - NAT64=1
+      - DNS64=1
+    devices:
+      # Map the physical port into the container
+      - /dev/ttyUSB0:/dev/ttyUSB0
+
+  matter-server:
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    container_name: matter-server
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    security_opt:
+      - seccomp:unconfined # <--- Essential for UDPEndPoint (the error you saw)
+      - apparmor:unconfined
+    # These two lines allow the container to bypass the "Network Unreachable" block
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: ["--storage-path", "/data", "--primary-interface", "eth0"]
+    volumes:
+      - ./matter-data:/data
+      - /run/dbus:/run/dbus:rw

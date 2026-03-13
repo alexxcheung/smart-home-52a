@@ -1,0 +1,83 @@
+# Nav shell: same navigation bar structure as hemma_room (desktop nav + menu + time)
+# Use this as the first card on non-room views (e.g. Info) so the nav matches room views.
+hemma_nav_shell:
+  template:
+    - hemma_default
+  show_name: false
+  show_icon: false
+  show_state: false
+  tap_action: { action: none }
+  hold_action: { action: none }
+
+  custom_fields:
+    navigation:
+      card: !include /config/dashboards/templates/includes/hemma_navigation.yaml
+    menu:
+      card:
+        type: custom:button-card
+        template: hemma_menu_icon
+    time:
+      card:
+        type: custom:button-card
+        template: hemma_time
+
+  styles:
+    card:
+      - height: 0 !important
+      - min-height: 0 !important
+      - overflow: visible !important
+      - padding: 0 !important
+      - margin: 0 !important
+      - border: none !important
+      - box-shadow: none !important
+      - background: none !important
+    grid:
+      - height: 0 !important
+      - min-height: 0 !important
+      - overflow: visible !important
+    custom_fields:
+      # Relative to header: below header when shown, top when hidden
+      navigation:
+        - position: fixed
+        - top: calc(var(--app-header-height, 46px) + 8px)
+        - left: 0
+        - right: 0
+        - z-index: 50
+        - overflow: visible
+        - pointer-events: auto
+        - "--mdc-ripple-press-opacity": 0
+        - "-webkit-tap-highlight-color": transparent
+        - filter: none
+      time:
+        - display: >
+            [[[
+              const w = window?.innerWidth || 1024;
+              const h = window?.innerHeight || 800;
+              const isMobile = w <= 767 || h <= 500;
+              return isMobile ? 'none' : 'block';
+            ]]]
+        - position: fixed
+        - top: calc(var(--app-header-height, 46px) + 16px)
+        - right: 16px
+        - z-index: 10
+        - overflow: visible
+        - pointer-events: none
+        - "--mdc-ripple-press-opacity": 0
+        - "-webkit-tap-highlight-color": transparent
+      menu:
+        - position: fixed
+        - top: calc(var(--app-header-height, 46px) + 8px)
+        - left: >
+            [[[
+              const w = window?.innerWidth || 1024;
+              const h = window?.innerHeight || 800;
+              if (w <= 767 || h <= 500) {
+                return 'calc(var(--hero-gutter) - 11px)';
+              }
+              return 'calc(var(--hero-gutter) - 6px)';
+            ]]]
+        - width: 40px
+        - height: 40px
+        - z-index: 10
+        - pointer-events: auto
+        - cursor: pointer

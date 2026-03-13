@@ -1,0 +1,85 @@
+hemma_time:
+  template:
+    - hemma_default
+
+  show_label: true
+  show_icon: false
+  show_state: false
+  show_name: true
+
+  variables:
+    time_entity: sensor.time
+    date_entity: sensor.date      # New: Requires 'date' in your time_date sensor config
+    show_date: true               # New: Toggle to show/hide date
+    use_12h: true
+    time_suffix:
+
+  triggers_update:
+    - '[[[ return variables.time_entity || "sensor.time" ]]]'
+    - '[[[ return variables.date_entity || "sensor.date" ]]]'
+
+  name: >
+    [[[
+      const time = states['sensor.time']?.state || '00:00';
+      let [hh, mm] = time.split(':');
+      hh = parseInt(hh, 10);
+      const ampm = hh >= 12 ? 'PM' : 'AM';
+      hh = hh % 12 || 12;
+      return `${hh}:${mm} ${ampm}`;
+    ]]]
+
+  # The "label" is the Weekday + Date
+  label: >
+    [[[
+      const dateEnt = states['sensor.date'];
+      if (!dateEnt) return "";
+      const d = new Date(dateEnt.state + "T00:00:00");
+      const options = { weekday: 'short', month: 'short', day: 'numeric' };
+      return d.toLocaleDateString('en-US', options).toUpperCase();
+    ]]]
+
+  styles:
+    grid:
+      - grid-template-areas: '"n" "l"'
+      - grid-template-columns: max-content
+      - grid-template-rows: min-content
+      - row-gap: 4px
+      - align-items: start
+      - justify-items: start
+
+    card:
+      - background: transparent
+      - box-shadow: none
+      - border-radius: 0
+      - padding: 0
+      - margin: 0
+      - height: min-content
+      - width: max-content
+      - min-width: 0
+      - overflow: visible
+      - pointer-events: none
+      - "--mdc-ripple-press-opacity": 0
+      - "-webkit-tap-highlight-color": transparent
+
+    name:
+      - color: var(--primary-text-color)
+      - opacity: var(--hemma-time-opacity, 0.6)
+      - letter-spacing: 1px
+      - font-size: 18px
+      - line-height: 1
+      - text-transform: uppercase
+      - font-weight: 700
+      - justify-self: end
+      - align-self: center
+      - padding: 0
+      - margin: 0
+
+    label:
+      - color: var(--primary-text-color)
+      - opacity: 0.6
+      - font-size: 14px
+      - letter-spacing: 1px
+      - text-transform: uppercase
+      - font-weight: 500
+      - justify-self: end
+      - margin-top: 2px

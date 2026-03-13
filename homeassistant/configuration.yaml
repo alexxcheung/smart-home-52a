@@ -1,0 +1,36 @@
+# Load packages (e.g. packages/hemma_helpers.yaml for input_number, input_boolean, etc.)
+homeassistant:
+  packages: !include_dir_named packages
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+logger:
+  default: info
+  logs:
+    homeassistant.components.matter: debug
+    matter_server.client: debug
+
+lovelace:
+  mode: storage
+  dashboards:
+    dashboard-hemma:
+      mode: yaml
+      title: "Hemma"
+      icon: mdi:home-variant
+      show_in_sidebar: true
+      filename: dashboards/hemma/hemma.yaml
+
+sensor:
+  - platform: time_date
+    display_options: 
+    - 'time'
+    - 'date'

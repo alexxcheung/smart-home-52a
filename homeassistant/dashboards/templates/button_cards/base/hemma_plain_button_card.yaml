@@ -1,0 +1,37 @@
+hemma_plain_button_card:
+  # -------------------------------------------------------------------------
+  # Base template for custom-content cards in the Hemma dashboard.
+  #
+  # Hides all default button-card UI (icon, name, state, label) and fixes the
+  # internal CSS grid that normally offsets content ~40% to the right due to
+  # the hidden icon column ghost. Replaces the grid with a clean flex column.
+  #
+  # Usage:
+  #   template: hemma_button_card   (or alongside other templates)
+  #
+  # The card's content div (from custom_fields) will be:
+  #   - full width (align-items: stretch)
+  #   - left-aligned text
+  #   - no internal padding (add your own in a .wrap div)
+  # -------------------------------------------------------------------------
+
+  show_name: false
+  show_icon: false
+  show_state: false
+  show_label: false
+  show_last_changed: false
+
+  styles:
+    card:
+      - padding: 0
+
+  extra_styles: |
+    :host { --button-card-light-color: transparent; }
+    #container {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      padding: 0 !important;
+      text-align: left !important;
+      height: auto !important;
+    }
