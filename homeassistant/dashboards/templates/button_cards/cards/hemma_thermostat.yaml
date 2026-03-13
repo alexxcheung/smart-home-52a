@@ -333,15 +333,10 @@ hemma_thermostat:
                   name: SET
                   tap_action:
                     action: call-service
-                    service: climate.set_temperature
+                    service: script.hemma_thermostat_set_and_close
                     service_data:
-                      entity_id: '[[[ return entity.entity_id ]]]'
-                      temperature: |
-                        [[[
-                          const st = states['input_number.hemma_thermostat_target_temperature'];
-                          const n = parseFloat(st?.state);
-                          return Number.isFinite(n) ? n : null;
-                        ]]]
+                      climate_entity: '[[[ return entity.entity_id ]]]'
+                      toggle_helper: '[[[ return variables.thermostat_toggle_helper ]]]'
                   styles:
                     card:
                       - height: 100%

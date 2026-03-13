@@ -513,3 +513,10 @@ views:
             variables:
               icon: light
 
+          - type: custom:button-card
+            template: hemma_light  
+            entity: light.study_floor_light
+            name: Floor Light
+            variables:
+              icon: light
+
