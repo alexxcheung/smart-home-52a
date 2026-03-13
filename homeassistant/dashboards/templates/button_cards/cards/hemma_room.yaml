@@ -8,6 +8,7 @@ hemma_room:
   triggers_update:
     - sensor.time
     - sensor.date
+    - sun.sun
     - '[[[ return variables.motion_sensor ]]]'
     - '[[[ return variables.temp_sensor ]]]'
     - '[[[ return variables.quality_sensor ]]]'
@@ -96,7 +97,9 @@ hemma_room:
       - --hero-img: >
           [[[
             const base = variables.image || 'default';
-            const isDark = !!(hass?.themes?.darkMode);
+            // Use sun.sun state: below_horizon = dark/night, above_horizon = light/day
+            const sunState = states['sun.sun']?.state;
+            const isDark = sunState === 'below_horizon';
             const picked = isDark ? (variables.image_night || `${base}-night`) : base;
             const url = `/local/hemma/rooms/${picked}.jpg`;
             return `url("${url}")`;
