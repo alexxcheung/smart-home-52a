@@ -341,7 +341,8 @@ views:
         template: hemma_room
         name: Hallway
         variables:
-          image: kitchen
+          image: hallway
+          image_ext: png
           image_position: center center
 
           show_temp: true
@@ -456,7 +457,8 @@ views:
         template: hemma_room
         name: Study
         variables:
-          image: bedroom
+          image: studyroom
+          image_ext: png
           image_position: center center
 
           show_temp: true

@@ -30,6 +30,7 @@ hemma_room:
   variables:
     image:
     image_night:
+    image_ext: jpg
     image_position:
 
     show_quality: false
@@ -97,11 +98,12 @@ hemma_room:
       - --hero-img: >
           [[[
             const base = variables.image || 'default';
+            const ext = variables.image_ext || 'jpg';
             // Use sun.sun state: below_horizon = dark/night, above_horizon = light/day
             const sunState = states['sun.sun']?.state;
             const isDark = sunState === 'below_horizon';
             const picked = isDark ? (variables.image_night || `${base}-night`) : base;
-            const url = `/local/hemma/rooms/${picked}.jpg`;
+            const url = `/local/hemma/rooms/${picked}.${ext}`;
             return `url("${url}")`;
           ]]]
       - --hero-img-pos: >
@@ -334,9 +336,10 @@ hemma_room:
     preload: |
       [[[
         const base = variables.image || 'default';
+        const ext = variables.image_ext || 'jpg';
         const night = variables.image_night || `${base}-night`;
-        const dayUrl = `/local/hemma/rooms/${base}.jpg`;
-        const nightUrl = `/local/hemma/rooms/${night}.jpg`;
+        const dayUrl = `/local/hemma/rooms/${base}.${ext}`;
+        const nightUrl = `/local/hemma/rooms/${night}.${ext}`;
 
         return `
           <img src="${dayUrl}" alt="" />

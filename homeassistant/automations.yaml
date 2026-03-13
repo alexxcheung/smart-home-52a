@@ -314,3 +314,45 @@
       - climate.radiator_thermostat_x_living_room
       - climate.radiator_thermostat_x_study_room
   mode: single
+
+- id: '1771400000001'
+  alias: Hemma Theme - Switch to Dark at Sunset
+  description: Switch dashboard theme to dark mode when sun sets
+  triggers:
+  - trigger: sun
+    event: sunset
+  conditions: []
+  actions:
+  - action: frontend.set_theme
+    data:
+      name: Hemma
+      mode: dark
+  mode: single
+
+- id: '1771400000002'
+  alias: Hemma Theme - Switch to Light at Sunrise
+  description: Switch dashboard theme to light mode when sun rises
+  triggers:
+  - trigger: sun
+    event: sunrise
+  conditions: []
+  actions:
+  - action: frontend.set_theme
+    data:
+      name: Hemma
+      mode: light
+  mode: single
+
+- id: '1771400000003'
+  alias: Hemma Theme - Set on HA Start
+  description: Set theme mode based on current sun position when HA starts
+  triggers:
+  - trigger: homeassistant
+    event: start
+  conditions: []
+  actions:
+  - action: frontend.set_theme
+    data:
+      name: Hemma
+      mode: "{{ 'dark' if states('sun.sun') == 'below_horizon' else 'light' }}"
+  mode: single
