@@ -6,6 +6,11 @@ hemma_badge_presence:
   variables:
     enabled: true
 
+  icon: mdi:account
+
+  tap_action:
+    action: none
+
   show_state: false
   show_label: false
   show_entity_picture: >

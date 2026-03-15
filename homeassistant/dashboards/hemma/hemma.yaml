@@ -22,12 +22,12 @@ kiosk_mode:
   # You can drop these if everything is globally hidden anyway,
   # but keeping them is fine.
   mobile_settings:
-    hide_header: true
-    hide_sidebar: true
+    hide_header: false
+    hide_sidebar: false
 
   tablet_settings:
-    hide_header: true
-    hide_sidebar: true
+    hide_header: false
+    hide_sidebar: false
 
   custom_settings:
     # EXCEPTION: show header/sidebar on MacBook web browsers
@@ -68,8 +68,8 @@ views:
           # Presence Badges (optional - requires person/status sensors)
           # These show who's home on the hero card
           show_presence: true
-          presence_entity_1: person.alex
-          presence_entity_2: person.sammy
+          presence_entity_1: sensor.presence_alex
+          presence_entity_2: sensor.presence_sammy
 
           # Media Player Badges (shows what's playing across rooms)
           show_media_badge: true

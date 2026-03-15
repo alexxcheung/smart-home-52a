@@ -64,7 +64,7 @@ hemma_room:
     show_media_player_4: false
     media_player_4:
 
-    show_weather: false
+    show_weather: true
     weather_mode:
     weather_entity:
     weather_temp_sensor:

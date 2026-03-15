@@ -75,3 +75,223 @@ input_select:
       - cool
     initial: heat
 
+# ============================================================================
+# PRESENCE TRACKING WITH RICH STATES
+# States: home, just_arrived, away, just_left, extended_away
+# ============================================================================
+input_select:
+  presence_alex:
+    name: "Alex"
+    options:
+      - home
+      - just_arrived
+      - away
+      - just_left
+      - extended_away
+    initial: away
+    icon: mdi:account
+
+  presence_sammy:
+    name: "Sammy"
+    options:
+      - home
+      - just_arrived
+      - away
+      - just_left
+      - extended_away
+    initial: away
+    icon: mdi:account
+
+# Template sensors that mirror input_select with friendly_name attribute
+template:
+  - sensor:
+      - name: "Alex"
+        unique_id: hemma_presence_alex
+        state: "{{ states('input_select.presence_alex') }}"
+        attributes:
+          source_entity: device_tracker.imalex_17
+
+      - name: "Sammy"
+        unique_id: hemma_presence_sammy
+        state: "{{ states('input_select.presence_sammy') }}"
+        attributes:
+          source_entity: device_tracker.imsammy_iphone
+
+# Automations for presence state transitions
+automation:
+  # -------------------------
+  # Alex Presence Automations
+  # -------------------------
+  - id: hemma_presence_alex_arrived
+    alias: "Alex - Arrived Home"
+    trigger:
+      - trigger: state
+        entity_id: device_tracker.imalex_17
+        to: "home"
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_alex
+        data:
+          option: just_arrived
+
+  - id: hemma_presence_alex_home
+    alias: "Alex - Settled Home"
+    trigger:
+      - trigger: state
+        entity_id: input_select.presence_alex
+        to: "just_arrived"
+        for:
+          minutes: 10
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_alex
+        data:
+          option: home
+
+  - id: hemma_presence_alex_left
+    alias: "Alex - Left Home"
+    trigger:
+      - trigger: state
+        entity_id: device_tracker.imalex_17
+        to: "not_home"
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_alex
+        data:
+          option: just_left
+
+  - id: hemma_presence_alex_away
+    alias: "Alex - Away"
+    trigger:
+      - trigger: state
+        entity_id: input_select.presence_alex
+        to: "just_left"
+        for:
+          minutes: 10
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_alex
+        data:
+          option: away
+
+  - id: hemma_presence_alex_extended
+    alias: "Alex - Extended Away"
+    trigger:
+      - trigger: state
+        entity_id: input_select.presence_alex
+        to: "away"
+        for:
+          hours: 24
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_alex
+        data:
+          option: extended_away
+
+  # Set initial state on HA start
+  - id: hemma_presence_alex_init
+    alias: "Alex - Initialize on Start"
+    trigger:
+      - trigger: homeassistant
+        event: start
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_alex
+        data:
+          option: >
+            {{ 'home' if states('device_tracker.imalex_17') == 'home' else 'away' }}
+
+  # -------------------------
+  # Sammy Presence Automations
+  # -------------------------
+  - id: hemma_presence_sammy_arrived
+    alias: "Sammy - Arrived Home"
+    trigger:
+      - trigger: state
+        entity_id: device_tracker.imsammy_iphone
+        to: "home"
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_sammy
+        data:
+          option: just_arrived
+
+  - id: hemma_presence_sammy_home
+    alias: "Sammy - Settled Home"
+    trigger:
+      - trigger: state
+        entity_id: input_select.presence_sammy
+        to: "just_arrived"
+        for:
+          minutes: 10
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_sammy
+        data:
+          option: home
+
+  - id: hemma_presence_sammy_left
+    alias: "Sammy - Left Home"
+    trigger:
+      - trigger: state
+        entity_id: device_tracker.imsammy_iphone
+        to: "not_home"
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_sammy
+        data:
+          option: just_left
+
+  - id: hemma_presence_sammy_away
+    alias: "Sammy - Away"
+    trigger:
+      - trigger: state
+        entity_id: input_select.presence_sammy
+        to: "just_left"
+        for:
+          minutes: 10
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_sammy
+        data:
+          option: away
+
+  - id: hemma_presence_sammy_extended
+    alias: "Sammy - Extended Away"
+    trigger:
+      - trigger: state
+        entity_id: input_select.presence_sammy
+        to: "away"
+        for:
+          hours: 24
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_sammy
+        data:
+          option: extended_away
+
+  # Set initial state on HA start
+  - id: hemma_presence_sammy_init
+    alias: "Sammy - Initialize on Start"
+    trigger:
+      - trigger: homeassistant
+        event: start
+    action:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.presence_sammy
+        data:
+          option: >
+            {{ 'home' if states('device_tracker.imsammy_iphone') == 'home' else 'away' }}
+
