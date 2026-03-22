@@ -388,6 +388,9 @@ views:
             entity: humidifier.probreeze_dehumidifier
             name: Dehumidifier
 
+      # Bubble Card pop-up (must be last on this view; hash #hemma-dehumidifier)
+      - !include /config/dashboards/templates/button_cards/cards/hemma_dehumidifier/hemma_dehumidifier_bubble_popup.yml
+
   # ------------------------------------------------------
   # BEDROOM
   # ------------------------------------------------------
@@ -517,4 +520,16 @@ views:
             name: Floor Light
             variables:
               icon: light
+
+  # ------------------------------------------------------
+  # Dehumidifier — full controls (native view; tap tile on Home to open)
+  # No browser_mod: cards get normal HA entity subscriptions here.
+  # ------------------------------------------------------
+  - title: Dehumidifier
+    path: dehumidifier
+    subview: true
+    type: masonry
+    cards:
+      - type: vertical-stack
+        cards: !include /config/dashboards/templates/button_cards/cards/hemma_dehumidifier/hemma_dehumidifier_panel_cards.yaml
 

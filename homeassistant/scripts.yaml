@@ -19,6 +19,83 @@ hemma_thermostat_open_overlay:
       target:
         entity_id: "{{ toggle_helper }}"
 
+# Dehumidifier: −/+ call humidifier.set_humidity on the unit (30–80 %). Helper is updated for fast UI.
+# Current target: device attribute if present, else synced input_number (e.g. unit offline).
+hemma_dehumidifier_humidity_minus_1:
+  alias: "Dehumidifier target −1 (device)"
+  sequence:
+    - variables:
+        cur: "{{ (state_attr('humidifier.probreeze_dehumidifier', 'humidity') if state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none else states('input_number.hemma_dehumidifier_target_humidity')) | int(50) }}"
+        new_h: "{{ [[cur - 1, 30] | max, 80] | min }}"
+    - action: humidifier.set_humidity
+      target:
+        entity_id: humidifier.probreeze_dehumidifier
+      data:
+        humidity: "{{ new_h }}"
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.hemma_dehumidifier_target_humidity
+      data:
+        value: "{{ new_h }}"
+hemma_dehumidifier_humidity_minus_5:
+  alias: "Dehumidifier target −5 (device)"
+  sequence:
+    - variables:
+        cur: "{{ (state_attr('humidifier.probreeze_dehumidifier', 'humidity') if state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none else states('input_number.hemma_dehumidifier_target_humidity')) | int(50) }}"
+        new_h: "{{ [[cur - 5, 30] | max, 80] | min }}"
+    - action: humidifier.set_humidity
+      target:
+        entity_id: humidifier.probreeze_dehumidifier
+      data:
+        humidity: "{{ new_h }}"
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.hemma_dehumidifier_target_humidity
+      data:
+        value: "{{ new_h }}"
+hemma_dehumidifier_humidity_plus_1:
+  alias: "Dehumidifier target +1 (device)"
+  sequence:
+    - variables:
+        cur: "{{ (state_attr('humidifier.probreeze_dehumidifier', 'humidity') if state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none else states('input_number.hemma_dehumidifier_target_humidity')) | int(50) }}"
+        new_h: "{{ [[cur + 1, 30] | max, 80] | min }}"
+    - action: humidifier.set_humidity
+      target:
+        entity_id: humidifier.probreeze_dehumidifier
+      data:
+        humidity: "{{ new_h }}"
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.hemma_dehumidifier_target_humidity
+      data:
+        value: "{{ new_h }}"
+hemma_dehumidifier_humidity_plus_5:
+  alias: "Dehumidifier target +5 (device)"
+  sequence:
+    - variables:
+        cur: "{{ (state_attr('humidifier.probreeze_dehumidifier', 'humidity') if state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none else states('input_number.hemma_dehumidifier_target_humidity')) | int(50) }}"
+        new_h: "{{ [[cur + 5, 30] | max, 80] | min }}"
+    - action: humidifier.set_humidity
+      target:
+        entity_id: humidifier.probreeze_dehumidifier
+      data:
+        humidity: "{{ new_h }}"
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.hemma_dehumidifier_target_humidity
+      data:
+        value: "{{ new_h }}"
+
+# Optional: push the synced helper value to the unit (e.g. after editing the helper elsewhere).
+hemma_dehumidifier_target_apply:
+  alias: "Dehumidifier - Apply helper target to device"
+  sequence:
+    - action: humidifier.set_humidity
+      target:
+        entity_id: humidifier.probreeze_dehumidifier
+      data:
+        humidity: "{{ states('input_number.hemma_dehumidifier_target_humidity') | int }}"
+
 # Thermostat: set temperature and close overlay
 hemma_thermostat_set_and_close:
   alias: "Hemma Thermostat Set and Close"

@@ -53,6 +53,16 @@ input_number:
     unit_of_measurement: s
     mode: slider
 
+  # Dehumidifier target humidity (mirrors device; scripts update this when using −/+)
+  hemma_dehumidifier_target_humidity:
+    name: Dehumidifier Target Humidity
+    min: 30
+    max: 80
+    step: 1
+    unit_of_measurement: "%"
+    mode: slider
+    initial: 50
+
 # Time-of-day picker: "Start at 18:30". Script passes delay (seconds) in home_connect.set_program_and_options.
 input_datetime:
   hemma_dishwasher_start_at:
@@ -294,4 +304,20 @@ automation:
         data:
           option: >
             {{ 'home' if states('device_tracker.imsammy_iphone') == 'home' else 'away' }}
+
+  # Sync dehumidifier target humidity to input_number (device → UI and on start)
+  - id: hemma_dehumidifier_sync_target
+    alias: "Dehumidifier - Sync target humidity to helper"
+    trigger:
+      - trigger: state
+        entity_id: humidifier.probreeze_dehumidifier
+      - trigger: homeassistant
+        event: start
+    condition: "{{ state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none }}"
+    action:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.hemma_dehumidifier_target_humidity
+        data:
+          value: "{{ state_attr('humidifier.probreeze_dehumidifier', 'humidity') | int }}"
 
