@@ -1,6 +1,6 @@
-# Info tab: 3-column grid, rows auto-height
+# Info tab: 3-column grid, rows auto-height — equal-width columns (share full row)
 # Top padding clears the fixed nav bar
-grid-template-columns: repeat(3, minmax(0, 400px))
+grid-template-columns: repeat(3, minmax(0, 1fr))
 grid-auto-rows: auto
 grid-column-gap: 16px
 grid-row-gap: 16px

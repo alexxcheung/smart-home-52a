@@ -131,11 +131,6 @@ views:
     layout: !include /config/dashboards/templates/includes/hemma_info_layout.yaml
     card_mod:
       style: |
-        #root {
-          background-attachment: fixed !important;
-          background-size: cover !important;
-          background-position: center center !important;
-        }
         #root > *:first-child {
           overflow: visible !important;
           pointer-events: none !important;
@@ -155,6 +150,21 @@ views:
           min-height: 0
           padding: 0
           margin: 0
+      # Page background — zero-height full-width row like nav so it does not steal column 1
+      - type: custom:button-card
+        template: hemma_info_page_background
+        view_layout:
+          grid-column: 1 / -1
+          height: 0
+          overflow: visible
+          min-height: 0
+          padding: 0
+          margin: 0
+        variables:
+          image: info
+          image_ext: jpg
+          image_ext_night: png
+          image_position: center center
       # Octopus Agile - compact summary card; tap to open full rates popup
       - type: custom:button-card
         template: hemma_octopus_agile_rate
