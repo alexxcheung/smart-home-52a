@@ -338,7 +338,7 @@
                     mode: auto
                 styles:
                   card:
-                    - border-radius: 12px
+                    - border-radius: 20px
                     - box-shadow: none
                     - height: 48px
                     - margin: "0 2px 0 0"
@@ -346,23 +346,27 @@
                     - min-width: 0
                     - background: |
                         [[[
-                          return entity.attributes?.mode === 'auto' ? 'rgba(107,203,119,0.14)' : 'rgba(255,255,255,0.05)';
+                          return entity.attributes?.mode === 'auto' ? 'rgba(255,255,255,0.92)' : 'transparent';
                         ]]]
                     - border: |
                         [[[
-                          return entity.attributes?.mode === 'auto' ? '1px solid rgba(107,203,119,0.3)' : '1px solid rgba(255,255,255,0.12)';
+                          return entity.attributes?.mode === 'auto' ? '1.5px solid transparent' : '1.5px solid rgba(255,255,255,0.14)';
                         ]]]
                   grid: [ { "justify-content": center } ]
                   name:
                     - font-size: 12px
                     - font-weight: 600
                     - color: |
-                        [[[ return entity.attributes?.mode === 'auto' ? '#6bcb77' : 'var(--primary-text-color)'; ]]]
+                        [[[ return entity.attributes?.mode === 'auto' ? '#1a1a1a' : 'var(--primary-text-color)'; ]]]
+                    - opacity: |
+                        [[[ return entity.attributes?.mode === 'auto' ? '1' : '0.45'; ]]]
                   icon:
                     - width: "18px"
                     - height: "18px"
                     - color: |
-                        [[[ return entity.attributes?.mode === 'auto' ? '#6bcb77' : 'var(--primary-text-color)'; ]]]
+                        [[[ return entity.attributes?.mode === 'auto' ? '#1a1a1a' : 'var(--primary-text-color)'; ]]]
+                    - opacity: |
+                        [[[ return entity.attributes?.mode === 'auto' ? '1' : '0.45'; ]]]
               - type: custom:button-card
                 entity: humidifier.probreeze_dehumidifier
                 triggers_update:
@@ -380,7 +384,7 @@
                     mode: continuous
                 styles:
                   card:
-                    - border-radius: 12px
+                    - border-radius: 20px
                     - box-shadow: none
                     - height: 48px
                     - margin: "0 2px"
@@ -388,23 +392,27 @@
                     - min-width: 0
                     - background: |
                         [[[
-                          return entity.attributes?.mode === 'continuous' ? 'rgba(107,203,119,0.14)' : 'rgba(255,255,255,0.05)';
+                          return entity.attributes?.mode === 'continuous' ? 'rgba(255,255,255,0.92)' : 'transparent';
                         ]]]
                     - border: |
                         [[[
-                          return entity.attributes?.mode === 'continuous' ? '1px solid rgba(107,203,119,0.3)' : '1px solid rgba(255,255,255,0.12)';
+                          return entity.attributes?.mode === 'continuous' ? '1.5px solid transparent' : '1.5px solid rgba(255,255,255,0.14)';
                         ]]]
                   grid: [ { "justify-content": center } ]
                   name:
                     - font-size: 12px
                     - font-weight: 600
                     - color: |
-                        [[[ return entity.attributes?.mode === 'continuous' ? '#6bcb77' : 'var(--primary-text-color)'; ]]]
+                        [[[ return entity.attributes?.mode === 'continuous' ? '#1a1a1a' : 'var(--primary-text-color)'; ]]]
+                    - opacity: |
+                        [[[ return entity.attributes?.mode === 'continuous' ? '1' : '0.45'; ]]]
                   icon:
                     - width: "18px"
                     - height: "18px"
                     - color: |
-                        [[[ return entity.attributes?.mode === 'continuous' ? '#6bcb77' : 'var(--primary-text-color)'; ]]]
+                        [[[ return entity.attributes?.mode === 'continuous' ? '#1a1a1a' : 'var(--primary-text-color)'; ]]]
+                    - opacity: |
+                        [[[ return entity.attributes?.mode === 'continuous' ? '1' : '0.45'; ]]]
               - type: custom:button-card
                 entity: humidifier.probreeze_dehumidifier
                 triggers_update:
@@ -422,7 +430,7 @@
                     mode: boost
                 styles:
                   card:
-                    - border-radius: 12px
+                    - border-radius: 20px
                     - box-shadow: none
                     - height: 48px
                     - margin: "0 2px"
@@ -430,23 +438,27 @@
                     - min-width: 0
                     - background: |
                         [[[
-                          return entity.attributes?.mode === 'boost' ? 'rgba(107,203,119,0.14)' : 'rgba(255,255,255,0.05)';
+                          return entity.attributes?.mode === 'boost' ? 'rgba(255,255,255,0.92)' : 'transparent';
                         ]]]
                     - border: |
                         [[[
-                          return entity.attributes?.mode === 'boost' ? '1px solid rgba(107,203,119,0.3)' : '1px solid rgba(255,255,255,0.12)';
+                          return entity.attributes?.mode === 'boost' ? '1.5px solid transparent' : '1.5px solid rgba(255,255,255,0.14)';
                         ]]]
                   grid: [ { "justify-content": center } ]
                   name:
                     - font-size: 12px
                     - font-weight: 600
                     - color: |
-                        [[[ return entity.attributes?.mode === 'boost' ? '#6bcb77' : 'var(--primary-text-color)'; ]]]
+                        [[[ return entity.attributes?.mode === 'boost' ? '#1a1a1a' : 'var(--primary-text-color)'; ]]]
+                    - opacity: |
+                        [[[ return entity.attributes?.mode === 'boost' ? '1' : '0.45'; ]]]
                   icon:
                     - width: "18px"
                     - height: "18px"
                     - color: |
-                        [[[ return entity.attributes?.mode === 'boost' ? '#6bcb77' : 'var(--primary-text-color)'; ]]]
+                        [[[ return entity.attributes?.mode === 'boost' ? '#1a1a1a' : 'var(--primary-text-color)'; ]]]
+                    - opacity: |
+                        [[[ return entity.attributes?.mode === 'boost' ? '1' : '0.45'; ]]]
               - type: custom:button-card
                 entity: humidifier.probreeze_dehumidifier
                 triggers_update:
@@ -464,7 +476,7 @@
                     mode: laundry
                 styles:
                   card:
-                    - border-radius: 12px
+                    - border-radius: 20px
                     - box-shadow: none
                     - height: 48px
                     - margin: "0 0 0 2px"
@@ -472,23 +484,27 @@
                     - min-width: 0
                     - background: |
                         [[[
-                          return entity.attributes?.mode === 'laundry' ? 'rgba(107,203,119,0.14)' : 'rgba(255,255,255,0.05)';
+                          return entity.attributes?.mode === 'laundry' ? 'rgba(255,255,255,0.92)' : 'transparent';
                         ]]]
                     - border: |
                         [[[
-                          return entity.attributes?.mode === 'laundry' ? '1px solid rgba(107,203,119,0.3)' : '1px solid rgba(255,255,255,0.12)';
+                          return entity.attributes?.mode === 'laundry' ? '1.5px solid transparent' : '1.5px solid rgba(255,255,255,0.14)';
                         ]]]
                   grid: [ { "justify-content": center } ]
                   name:
                     - font-size: 12px
                     - font-weight: 600
                     - color: |
-                        [[[ return entity.attributes?.mode === 'laundry' ? '#6bcb77' : 'var(--primary-text-color)'; ]]]
+                        [[[ return entity.attributes?.mode === 'laundry' ? '#1a1a1a' : 'var(--primary-text-color)'; ]]]
+                    - opacity: |
+                        [[[ return entity.attributes?.mode === 'laundry' ? '1' : '0.45'; ]]]
                   icon:
                     - width: "18px"
                     - height: "18px"
                     - color: |
-                        [[[ return entity.attributes?.mode === 'laundry' ? '#6bcb77' : 'var(--primary-text-color)'; ]]]
+                        [[[ return entity.attributes?.mode === 'laundry' ? '#1a1a1a' : 'var(--primary-text-color)'; ]]]
+                    - opacity: |
+                        [[[ return entity.attributes?.mode === 'laundry' ? '1' : '0.45'; ]]]
 
           # ── Fan Speed Section ───────────────────────────────────
           - type: custom:button-card
@@ -533,7 +549,7 @@
                     option: Low
                 styles:
                   card:
-                    - border-radius: 12px
+                    - border-radius: 20px
                     - box-shadow: none
                     - height: 48px
                     - margin: 0 2px 0 0
@@ -542,14 +558,14 @@
                     - background: |
                         [[[
                           return entity.state === 'Low' 
-                            ? 'rgba(107,203,119,0.14)' 
-                            : 'rgba(255,255,255,0.05)';
+                            ? 'rgba(255,255,255,0.92)' 
+                            : 'transparent';
                         ]]]
                     - border: |
                         [[[
                           return entity.state === 'Low'
-                            ? '1px solid rgba(107,203,119,0.3)'
-                            : '1px solid rgba(255,255,255,0.12)';
+                            ? '1.5px solid transparent'
+                            : '1.5px solid rgba(255,255,255,0.14)';
                         ]]]
                   grid:
                     - justify-content: center
@@ -558,15 +574,19 @@
                     - font-weight: 600
                     - color: |
                         [[[
-                          return entity.state === 'Low' ? '#6bcb77' : 'var(--primary-text-color)';
+                          return entity.state === 'Low' ? '#1a1a1a' : 'var(--primary-text-color)';
                         ]]]
+                    - opacity: |
+                        [[[ return entity.state === 'Low' ? '1' : '0.45'; ]]]
                   icon:
                     - width: 20px
                     - height: 20px
                     - color: |
                         [[[
-                          return entity.state === 'Low' ? '#6bcb77' : 'var(--primary-text-color)';
+                          return entity.state === 'Low' ? '#1a1a1a' : 'var(--primary-text-color)';
                         ]]]
+                    - opacity: |
+                        [[[ return entity.state === 'Low' ? '1' : '0.45'; ]]]
 
               - type: custom:button-card
                 entity: select.probreeze_dehumidifier_fan_speed
@@ -585,7 +605,7 @@
                     option: High
                 styles:
                   card:
-                    - border-radius: 12px
+                    - border-radius: 20px
                     - box-shadow: none
                     - height: 48px
                     - margin: 0 0 0 2px
@@ -594,14 +614,14 @@
                     - background: |
                         [[[
                           return entity.state === 'High' 
-                            ? 'rgba(107,203,119,0.14)' 
-                            : 'rgba(255,255,255,0.05)';
+                            ? 'rgba(255,255,255,0.92)' 
+                            : 'transparent';
                         ]]]
                     - border: |
                         [[[
                           return entity.state === 'High'
-                            ? '1px solid rgba(107,203,119,0.3)'
-                            : '1px solid rgba(255,255,255,0.12)';
+                            ? '1.5px solid transparent'
+                            : '1.5px solid rgba(255,255,255,0.14)';
                         ]]]
                   grid:
                     - justify-content: center
@@ -610,15 +630,19 @@
                     - font-weight: 600
                     - color: |
                         [[[
-                          return entity.state === 'High' ? '#6bcb77' : 'var(--primary-text-color)';
+                          return entity.state === 'High' ? '#1a1a1a' : 'var(--primary-text-color)';
                         ]]]
+                    - opacity: |
+                        [[[ return entity.state === 'High' ? '1' : '0.45'; ]]]
                   icon:
                     - width: 20px
                     - height: 20px
                     - color: |
                         [[[
-                          return entity.state === 'High' ? '#6bcb77' : 'var(--primary-text-color)';
+                          return entity.state === 'High' ? '#1a1a1a' : 'var(--primary-text-color)';
                         ]]]
+                    - opacity: |
+                        [[[ return entity.state === 'High' ? '1' : '0.45'; ]]]
 
           # ── Options Section ─────────────────────────────────────
           - type: custom:button-card
@@ -659,7 +683,7 @@
                   action: toggle
                 styles:
                   card:
-                    - border-radius: 12px
+                    - border-radius: 20px
                     - box-shadow: none
                     - height: 48px
                     - margin: 0 2px 0 0
@@ -668,14 +692,14 @@
                     - background: |
                         [[[
                           return entity.state === 'on' 
-                            ? 'rgba(107,203,119,0.14)' 
-                            : 'rgba(255,255,255,0.05)';
+                            ? 'rgba(255,255,255,0.92)' 
+                            : 'transparent';
                         ]]]
                     - border: |
                         [[[
                           return entity.state === 'on'
-                            ? '1px solid rgba(107,203,119,0.3)'
-                            : '1px solid rgba(255,255,255,0.12)';
+                            ? '1.5px solid transparent'
+                            : '1.5px solid rgba(255,255,255,0.14)';
                         ]]]
                   grid:
                     - justify-content: center
@@ -684,15 +708,19 @@
                     - font-weight: 600
                     - color: |
                         [[[
-                          return entity.state === 'on' ? '#6bcb77' : 'var(--primary-text-color)';
+                          return entity.state === 'on' ? '#1a1a1a' : 'var(--primary-text-color)';
                         ]]]
+                    - opacity: |
+                        [[[ return entity.state === 'on' ? '1' : '0.45'; ]]]
                   icon:
                     - width: 20px
                     - height: 20px
                     - color: |
                         [[[
-                          return entity.state === 'on' ? '#6bcb77' : 'var(--primary-text-color)';
+                          return entity.state === 'on' ? '#1a1a1a' : 'var(--primary-text-color)';
                         ]]]
+                    - opacity: |
+                        [[[ return entity.state === 'on' ? '1' : '0.45'; ]]]
 
               - type: custom:button-card
                 entity: switch.probreeze_dehumidifier_ventilation_mode
@@ -707,7 +735,7 @@
                   action: toggle
                 styles:
                   card:
-                    - border-radius: 12px
+                    - border-radius: 20px
                     - box-shadow: none
                     - height: 48px
                     - margin: 0 2px
@@ -716,14 +744,14 @@
                     - background: |
                         [[[
                           return entity.state === 'on' 
-                            ? 'rgba(107,203,119,0.14)' 
-                            : 'rgba(255,255,255,0.05)';
+                            ? 'rgba(255,255,255,0.92)' 
+                            : 'transparent';
                         ]]]
                     - border: |
                         [[[
                           return entity.state === 'on'
-                            ? '1px solid rgba(107,203,119,0.3)'
-                            : '1px solid rgba(255,255,255,0.12)';
+                            ? '1.5px solid transparent'
+                            : '1.5px solid rgba(255,255,255,0.14)';
                         ]]]
                   grid:
                     - justify-content: center
@@ -732,15 +760,19 @@
                     - font-weight: 600
                     - color: |
                         [[[
-                          return entity.state === 'on' ? '#6bcb77' : 'var(--primary-text-color)';
+                          return entity.state === 'on' ? '#1a1a1a' : 'var(--primary-text-color)';
                         ]]]
+                    - opacity: |
+                        [[[ return entity.state === 'on' ? '1' : '0.45'; ]]]
                   icon:
                     - width: 20px
                     - height: 20px
                     - color: |
                         [[[
-                          return entity.state === 'on' ? '#6bcb77' : 'var(--primary-text-color)';
+                          return entity.state === 'on' ? '#1a1a1a' : 'var(--primary-text-color)';
                         ]]]
+                    - opacity: |
+                        [[[ return entity.state === 'on' ? '1' : '0.45'; ]]]
 
               - type: custom:button-card
                 entity: lock.probreeze_dehumidifier_child_lock
@@ -764,7 +796,7 @@
                     entity_id: lock.probreeze_dehumidifier_child_lock
                 styles:
                   card:
-                    - border-radius: 12px
+                    - border-radius: 20px
                     - box-shadow: none
                     - height: 48px
                     - margin: 0 0 0 2px
@@ -773,14 +805,14 @@
                     - background: |
                         [[[
                           return entity.state === 'locked' 
-                            ? 'rgba(107,203,119,0.14)' 
-                            : 'rgba(255,255,255,0.05)';
+                            ? 'rgba(255,255,255,0.92)' 
+                            : 'transparent';
                         ]]]
                     - border: |
                         [[[
                           return entity.state === 'locked'
-                            ? '1px solid rgba(107,203,119,0.3)'
-                            : '1px solid rgba(255,255,255,0.12)';
+                            ? '1.5px solid transparent'
+                            : '1.5px solid rgba(255,255,255,0.14)';
                         ]]]
                   grid:
                     - justify-content: center
@@ -789,12 +821,16 @@
                     - font-weight: 600
                     - color: |
                         [[[
-                          return entity.state === 'locked' ? '#6bcb77' : 'var(--primary-text-color)';
+                          return entity.state === 'locked' ? '#1a1a1a' : 'var(--primary-text-color)';
                         ]]]
+                    - opacity: |
+                        [[[ return entity.state === 'locked' ? '1' : '0.45'; ]]]
                   icon:
                     - width: 20px
                     - height: 20px
                     - color: |
                         [[[
-                          return entity.state === 'locked' ? '#6bcb77' : 'var(--primary-text-color)';
+                          return entity.state === 'locked' ? '#1a1a1a' : 'var(--primary-text-color)';
                         ]]]
+                    - opacity: |
+                        [[[ return entity.state === 'locked' ? '1' : '0.45'; ]]]
