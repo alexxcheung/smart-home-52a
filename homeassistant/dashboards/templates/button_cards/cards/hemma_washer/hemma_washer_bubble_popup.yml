@@ -1,0 +1,114 @@
+# hemma_washer/hemma_washer_bubble_popup.yml
+# Lovelace fragment (not a button-card template). Uses .yml so !include_dir_merge_named
+# on button_cards/ (*.yaml only) does not merge this dict into button_card_templates.
+#
+# Washer Bubble pop-up — must be LAST on Hallway view (Bubble README).
+# Open: navigate → '#hemma-washer'
+#
+# Bubble card body matches includes/hemma_bubble_popup_shell.yaml; edit both if you change the shell.
+
+type: vertical-stack
+cards:
+  - type: custom:bubble-card
+    card_type: pop-up
+    force_icon: false
+    show_header: true
+    close_by_clicking_outside: true
+    width_desktop: 500px
+    margin_top_mobile: '0px'
+    margin_top_desktop: '0px'
+    bg_color: '#1c1c1c'
+    bg_opacity: '55'
+    bg_blur: '20'
+    shadow_opacity: '55'
+    hash: '#hemma-washer'
+    name: Washing Machine
+    # Status-only header (no toggle): power must be turned on at the physical machine.
+    entity: sensor.washer_current_status
+    button_type: state
+    entity_picture_local: /local/hemma/icons/washing_machine.svg
+    styles: |
+      :host {
+        --bubble-backdrop-background-color: rgba(0, 0, 0, 0.45) !important;
+        --bubble-pop-up-background-color: var(--ha-card-background) !important;
+        --bubble-pop-up-main-background-color: var(--ha-card-background) !important;
+        --hemma-bubble-popup-inset-block: max(24px, 5vh);
+        --hemma-bubble-popup-inset-inline: max(16px, 3vw);
+        --hemma-bubble-popup-max-height: calc(
+          100dvh - 2 * var(--hemma-bubble-popup-inset-block)
+          - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+        );
+      }
+      .bubble-pop-up:not(.editor) {
+        top: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-top, 0px)) !important;
+        bottom: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-bottom, 0px)) !important;
+        left: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        right: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        margin-top: auto !important;
+        margin-bottom: auto !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        height: fit-content !important;
+        max-height: var(--hemma-bubble-popup-max-height) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        border-radius: var(--bubble-pop-up-border-radius, 42px) !important;
+        overflow: hidden !important;
+        transition: transform 0.3s ease, opacity 0.3s ease !important;
+      }
+      .bubble-pop-up:not(.editor).is-popup-closed {
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+      .bubble-pop-up:not(.editor).is-popup-opened {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-background {
+        border-radius: inherit !important;
+        background-color: var(--ha-card-background) !important;
+        backdrop-filter: blur(20px) saturate(1.1) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(1.1) !important;
+      }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-container {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        padding-bottom: 72px !important;
+      }
+      @media only screen and (min-width: 600px) and (max-width: 767px) {
+        .bubble-pop-up:not(.editor) {
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+          left: calc(
+            50% - min(var(--desktop-width, 500px), calc(100vw - 2 * var(--hemma-bubble-popup-inset-inline))) / 2
+          ) !important;
+          right: auto !important;
+          width: min(var(--desktop-width, 500px), calc(100vw - 2 * var(--hemma-bubble-popup-inset-inline))) !important;
+          max-width: min(var(--desktop-width, 500px), calc(100vw - 2 * var(--hemma-bubble-popup-inset-inline))) !important;
+        }
+      }
+      @media only screen and (min-width: 768px) {
+        .bubble-pop-up:not(.editor) {
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+          left: calc(
+            var(--mdc-drawer-width, 0px) / 2 + 50%
+            - min(
+              var(--desktop-width, 500px),
+              calc(100vw - var(--mdc-drawer-width, 0px) - 2 * var(--hemma-bubble-popup-inset-inline))
+            ) / 2
+          ) !important;
+          right: auto !important;
+          width: min(
+            var(--desktop-width, 500px),
+            calc(100vw - var(--mdc-drawer-width, 0px) - 2 * var(--hemma-bubble-popup-inset-inline))
+          ) !important;
+          max-width: min(
+            var(--desktop-width, 500px),
+            calc(100vw - var(--mdc-drawer-width, 0px) - 2 * var(--hemma-bubble-popup-inset-inline))
+          ) !important;
+        }
+      }
+  - type: vertical-stack
+    cards: !include /config/dashboards/templates/button_cards/cards/hemma_washer/hemma_washer_panel_cards.yaml

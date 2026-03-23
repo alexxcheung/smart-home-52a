@@ -383,7 +383,7 @@ views:
           - type: custom:button-card
             template: hemma_washer
             entity: sensor.washer_current_status
-            name: Washer
+            name: Washing Machine
         
         # Dehumidifier
           - type: custom:button-card
@@ -391,7 +391,8 @@ views:
             entity: humidifier.probreeze_dehumidifier
             name: Dehumidifier
 
-      # Bubble Card pop-up (must be last on this view; hash #hemma-dehumidifier)
+      # Bubble Card pop-up (must be last on this view; hash #hemma-washer then #hemma-dehumidifier)
+      - !include /config/dashboards/templates/button_cards/cards/hemma_washer/hemma_washer_bubble_popup.yml
       - !include /config/dashboards/templates/button_cards/cards/hemma_dehumidifier/hemma_dehumidifier_bubble_popup.yml
 
   # ------------------------------------------------------

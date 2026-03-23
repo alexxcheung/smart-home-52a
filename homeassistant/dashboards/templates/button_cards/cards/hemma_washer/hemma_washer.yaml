@@ -1,0 +1,83 @@
+hemma_washer:
+  # -------------------------------------------------------------------------
+  # Washer card — extends hemma_entity
+  # Tap  → Bubble Card pop-up on Hallway (navigate to #hemma-washer)
+  # Hold → more-info
+  # -------------------------------------------------------------------------
+  template:
+    - hemma_entity
+
+  variables:
+    icon: washing_machine
+
+  triggers_update:
+    - sensor.washer_current_status
+    - sensor.washer_remaining_time
+    - sensor.washer_total_time
+    - switch.washer_power
+    - binary_sensor.washer_remote_start
+
+  state_display: >
+    [[[ 
+      const status = states['sensor.washer_current_status']?.state ?? '';
+      const remaining = states['sensor.washer_remaining_time']?.state;
+      const total = states['sensor.washer_total_time']?.state;
+      
+      // Running states
+      const runningStates = ['running', 'spinning', 'rinsing', 'drying', 'detecting', 'cool_down'];
+      
+      if (runningStates.includes(status)) {
+        if (remaining && remaining !== 'unavailable' && remaining !== 'unknown') {
+          const rem = Math.ceil((new Date(remaining) - new Date()) / 60000);
+          if (rem > 0) return `${rem} min left`;
+        }
+        if (total && total !== 'unavailable' && total !== 'unknown') {
+          return `${total} min total`;
+        }
+        return status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ');
+      }
+      
+      // Status labels
+      const labels = {
+        power_off: 'Off',
+        sleep: 'Sleep',
+        initial: 'Ready',
+        reserved: 'Scheduled',
+        pause: 'Paused',
+        rinse_hold: 'Rinse Hold',
+        end: 'Done',
+        refreshing: 'Refreshing',
+        error: 'Error'
+      };
+      
+      return labels[status] ?? (status ? status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ') : '');
+    ]]]
+
+  state:
+    - operator: template
+      value: |
+        [[[ 
+          const status = states['sensor.washer_current_status']?.state ?? '';
+          return ['running', 'spinning', 'rinsing', 'drying', 'detecting', 'cool_down', 'reserved', 'pause'].includes(status);
+        ]]]
+      styles:
+        card:
+          - background: var(--ha-card-background-active)
+          - box-shadow: var(--button-card-box-shadow-active, var(--button-card-box-shadow)) !important
+        name:
+          - color: var(--hemma-entity-active, var(--primary-text-color))
+        state:
+          - color: var(--secondary-text-color)
+        img_cell:
+          - opacity: var(--hemma-entity-picture-active-opacity, 1) !important
+          - filter: var(--hemma-entity-picture-active-filter, none) !important
+        entity_picture:
+          - opacity: var(--hemma-entity-picture-active-opacity, 1) !important
+          - filter: var(--hemma-entity-picture-active-filter, none) !important
+
+  hold_action:
+    action: more-info
+
+  tap_action:
+    action: navigate
+    navigation_path: '#hemma-washer'
