@@ -1,7 +1,8 @@
 # Shared Bubble Card (pop-up) keys — template for new devices & docs.
-# Home Assistant cannot merge <<: !include. Dehumidifier inlines this in
-# button_cards/cards/hemma_dehumidifier/hemma_dehumidifier_bubble_popup.yml (keep in sync).
-# For other devices: paste here + vars, or use dashboards/templates/scripts/render_bubble_popup_card.py.
+# Home Assistant cannot merge <<: !include. Keep in sync with:
+#   button_cards/cards/hemma_dehumidifier/hemma_dehumidifier_bubble_popup.yml
+#   button_cards/cards/hemma_dishwasher/hemma_dishwasher_bubble_popup.yml
+# For other devices: paste this mapping under type: custom:bubble-card, then add hash, name, entity, etc.
 
 card_type: pop-up
 force_icon: false
