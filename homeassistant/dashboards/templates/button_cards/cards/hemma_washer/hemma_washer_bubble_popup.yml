@@ -11,7 +11,9 @@ type: vertical-stack
 cards:
   - type: custom:bubble-card
     card_type: pop-up
-    force_icon: false
+    # Use MDI washer icon (sensor entity may not have a device picture).
+    force_icon: true
+    icon: mdi:washing-machine
     show_header: true
     close_by_clicking_outside: true
     width_desktop: 500px
@@ -26,7 +28,8 @@ cards:
     # Status-only header (no toggle): power must be turned on at the physical machine.
     entity: sensor.washer_current_status
     button_type: state
-    entity_picture_local: /local/hemma/icons/washing_machine.svg
+    # Hide raw state next to title (e.g. "Off" / power_off) — details are in the panel below.
+    show_state: false
     styles: |
       :host {
         --bubble-backdrop-background-color: rgba(0, 0, 0, 0.45) !important;
