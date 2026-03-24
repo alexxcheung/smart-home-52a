@@ -29,7 +29,7 @@ hemma_washer:
       if (runningStates.includes(status)) {
         if (remaining && remaining !== 'unavailable' && remaining !== 'unknown') {
           const rem = Math.ceil((new Date(remaining) - new Date()) / 60000);
-          if (rem > 0) return `${rem} min left`;
+          if (rem > 0) return `Running - ${rem} Min Left`;
         }
         if (total && total !== 'unavailable' && total !== 'unknown') {
           return `${total} min total`;

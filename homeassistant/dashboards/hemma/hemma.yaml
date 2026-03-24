@@ -46,6 +46,7 @@ views:
     title: home
     path: home
     layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    card_mod: !include /config/dashboards/templates/includes/hemma_screen_view_card_mod.yaml
     cards:
       # NAV BAR (same as Info: desktop nav + menu + time below app header)
       - type: custom:button-card
@@ -220,6 +221,7 @@ views:
     title: living-room
     path: living-room
     layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    card_mod: !include /config/dashboards/templates/includes/hemma_screen_view_card_mod.yaml
     cards:
       # NAV BAR (same as Info: desktop nav + menu + time below app header)
       - type: custom:button-card
@@ -308,6 +310,7 @@ views:
     title: kitchen
     path: kitchen
     layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    card_mod: !include /config/dashboards/templates/includes/hemma_screen_view_card_mod.yaml
     cards:
       # NAV BAR (same as Info: desktop nav + menu + time below app header)
       - type: custom:button-card
@@ -345,6 +348,7 @@ views:
     title: hallway
     path: hallway
     layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    card_mod: !include /config/dashboards/templates/includes/hemma_screen_view_card_mod.yaml
     cards:
       # NAV BAR (same as Info: desktop nav + menu + time below app header)
       - type: custom:button-card
@@ -412,6 +416,7 @@ views:
     title: bedroom
     path: bedroom
     layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    card_mod: !include /config/dashboards/templates/includes/hemma_screen_view_card_mod.yaml
     cards:
       # NAV BAR (same as Info: desktop nav + menu + time below app header)
       - type: custom:button-card
@@ -465,6 +470,7 @@ views:
     title: study
     path: study
     layout: !include /config/dashboards/templates/includes/hemma_screen_layout.yaml
+    card_mod: !include /config/dashboards/templates/includes/hemma_screen_view_card_mod.yaml
     cards:
       # NAV BAR (same as Info: desktop nav + menu + time below app header)
       - type: custom:button-card

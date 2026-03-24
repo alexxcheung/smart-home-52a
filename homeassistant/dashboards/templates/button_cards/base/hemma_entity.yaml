@@ -105,7 +105,6 @@ hemma_entity:
       - position: relative
       - height: var(--hemma-entity-height-current, var(--hemma-entity-height-desktop, 180px))
       - padding: var(--hemma-entity-inner-pad-current, var(--hemma-entity-inner-pad-desktop, 22px))
-      - scroll-snap-align: start
       - display: |
           [[[
             return (states['input_boolean.hemma_mobile_navigation'].state === 'on') ? 'none' : 'block';

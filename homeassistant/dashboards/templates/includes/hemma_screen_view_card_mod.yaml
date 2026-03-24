@@ -1,0 +1,8 @@
+# Room / home views using hemma_screen_layout.yaml — keep the hero background from scrolling
+# with the page; vertical scroll stays on .hemma-entities (layout-card). Do not use on Info.
+style: |
+  #root {
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+    overscroll-behavior-y: none !important;
+  }

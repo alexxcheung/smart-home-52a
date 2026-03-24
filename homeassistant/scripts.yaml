@@ -147,30 +147,50 @@ start_dishwasher:
             {{ secs if secs > 60 else 0 }}
           {% endif %}
 
-# Start washer: if delay-start toggle is on, calculate hours from "Start at" time; otherwise delay 0.
-# Washer uses number.washer_delayed_end in hours (0-19).
+# Washer: FinishInRelative (seconds), not hour-based delayed_end / relative_hour_to_stop.
+# "Start at" → finish_in_relative = seconds_until_start + program duration (total time, minutes).
+# program: must match home_connect enum (e.g. laundry_care_washer_program_cotton). Tries selected then active select; prefixes short slugs.
+# If validation still fails, set the first entity_id below to your real "Selected program" select (Settings → Devices → Washer).
 start_washer:
   alias: "Start Washer"
   sequence:
-    - action: number.set_value
-      target:
-        entity_id: number.washer_delayed_end
+    - action: home_connect.set_program_and_options
       data:
-        value: >
+        device_id: "{{ device_id('select.washer_operation') }}"
+        affects_to: active_program
+        program: >
+          {% set ns = namespace(p='') %}
+          {% for eid in ['select.washer_selected_program', 'select.washer_active_program'] %}
+            {% if ns.p == '' %}
+              {% set s = states(eid) | default('', true) | trim %}
+              {% if s not in ['unknown', 'unavailable', 'none', ''] %}
+                {% set ns.p = s %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {% set raw = ns.p %}
+          {% if raw.startswith('laundry_care_') %}
+            {{ raw }}
+          {% elif raw %}
+            laundry_care_washer_program_{{ raw }}
+          {% else %}
+            {{ raw }}
+          {% endif %}
+        b_s_h_common_option_finish_in_relative: >
+          {% set dur_min = states('sensor.washer_total_time') | float(0) %}
+          {% set dur_sec = (dur_min * 60) | int %}
+          {% if dur_sec < 60 %}
+            {% set dur_sec = 7200 %}
+          {% endif %}
           {% if states('input_boolean.hemma_washer_delay_start') != 'on' %}
-            0
+            {{ dur_sec }}
           {% else %}
             {% set t_raw = states('input_datetime.hemma_washer_start_at') %}
             {% set t = t_raw ~ ':00' if (t_raw.split(':') | length) == 2 else t_raw %}
             {% set tt = as_timestamp(strptime(t ~ ' ' ~ now().strftime('%Y-%m-%d'), '%H:%M:%S %Y-%m-%d')) %}
             {% set nt = as_timestamp(now()) %}
             {% set diff = (tt - nt) | int %}
-            {% set secs = (diff if diff > 0 else diff + 86400) %}
-            {% set hours = (secs / 3600) | round(0, 'ceil') | int %}
-            {{ [hours, 19] | min }}
+            {% set secs_start = (diff if diff > 0 else diff + 86400) %}
+            {% set secs_start = secs_start if secs_start > 60 else 0 %}
+            {{ secs_start + dur_sec }}
           {% endif %}
-    - action: select.select_option
-      target:
-        entity_id: select.washer_operation
-      data:
-        option: start

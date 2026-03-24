@@ -67,7 +67,7 @@
                     <div class="prog-bar">
                       <div class="prog-fill" style="width:${progress}%;background:${color}"></div>
                     </div>
-                    <span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span>
+                    <span class="prog-info">${progress}%${remStr ? ' · ' + remStr : ''}</span>
                   </div>
                 ` : ''}
               </div>
@@ -77,8 +77,11 @@
         .washer-header { padding: 16px 0 12px; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
         .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
         .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
-        .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-        .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
+        /* Progress only: 24px below status row; horizontal padding to line up with Stop chip (Stop card unchanged) */
+        .prog-wrap { width: 100%; max-width: 100%; padding: 24px 4px 0; margin-bottom: 2px; box-sizing: border-box; }
+        .prog-bar { width: 100%; max-width: 100%; height: 8px; box-sizing: border-box; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+        .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+        .prog-info { font-size: 11px; font-weight: 600; color: #ffffff; }
         .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
 
     # ── Message: Power off - need to enable Remote Start at machine ──
@@ -276,119 +279,94 @@
           - height: 20px
 
 
-    # ── Controls (always visible; delay / start / stop) ───────────
+    # ── Controls: delay + start when idle/ready; during wash only Stop ───────────
     - type: vertical-stack
       cards:
-        # ── Delay Start (layout matches dishwasher) ─────────────
-        - type: vertical-stack
-          card_mod:
-            style: |
-              ha-card .content {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 0 !important;
-              }
-          cards:
-            - type: custom:button-card
-              entity: sensor.washer_current_status
-              name: Delay Start
-              show_icon: false
-              show_state: false
-              tap_action:
-                action: none
-              styles:
-                card:
-                  - background: transparent
-                  - box-shadow: none
-                  # 16px space below title before delay button (matches dishwasher spacing intent)
-                  - padding: 24px 0 16px
-                  - height: auto
-                  - justify-content: flex-start
-                name:
-                  - font-size: 11px
-                  - font-weight: 700
-                  - text-transform: uppercase
-                  - letter-spacing: 0.08em
-                  - opacity: "0.38"
-                  - text-align: left
+        # ── Delay Start (hidden while a cycle is active — only Stop is shown then)
+        - type: conditional
+          conditions:
+            - entity: sensor.washer_current_status
+              state_not: running
+            - entity: sensor.washer_current_status
+              state_not: spinning
+            - entity: sensor.washer_current_status
+              state_not: rinsing
+            - entity: sensor.washer_current_status
+              state_not: drying
+            - entity: sensor.washer_current_status
+              state_not: detecting
+            - entity: sensor.washer_current_status
+              state_not: cool_down
+            - entity: sensor.washer_current_status
+              state_not: pause
+          card:
+            type: vertical-stack
+            card_mod:
+              style: |
+                ha-card .content {
+                  display: flex !important;
+                  flex-direction: column !important;
+                  gap: 0 !important;
+                }
+            cards:
+              - type: custom:button-card
+                entity: sensor.washer_current_status
+                name: Delay Start
+                show_icon: false
+                show_state: false
+                tap_action:
+                  action: none
+                styles:
+                  card:
+                    - background: transparent
+                    - box-shadow: none
+                    # 16px space below title before delay button (matches dishwasher spacing intent)
+                    - padding: 24px 0 16px
+                    - height: auto
+                    - justify-content: flex-start
+                  name:
+                    - font-size: 11px
+                    - font-weight: 700
+                    - text-transform: uppercase
+                    - letter-spacing: 0.08em
+                    - opacity: "0.38"
+                    - text-align: left
 
-            - type: custom:button-card
-              entity: input_boolean.hemma_washer_delay_start
-              triggers_update:
-                - input_boolean.hemma_washer_delay_start
-              template: hemma_plain_button_card
-              show_name: true
-              show_icon: true
-              icon: mdi:clock-start
-              show_state: false
-              layout: icon_name_state
-              name: >
-                [[[
-                  return entity?.state === 'on' ? "'Delay Start' Enabled" : "Enable 'Delay Start'";
-                ]]]
-              tap_action:
-                action: toggle
-              hold_action:
-                action: none
-              double_tap_action:
-                action: none
-              state:
-                - value: "on"
-                  styles:
-                    card:
-                      - background: "rgba(107,203,119,0.14) !important"
-                      - border: "1px solid rgba(107,203,119,0.28) !important"
-                    name:
-                      - color: "#6bcb77 !important"
-                    icon:
-                      - color: "#6bcb77 !important"
-              styles:
-                card:
-                  - border-radius: 12px
-                  - box-shadow: none
-                  - margin: 0
-                  - height: 48px
-                  - background: rgba(255,255,255,0.08)
-                  - border: 1px solid rgba(255,255,255,0.20)
-                grid:
-                  - justify-content: center
-                name:
-                  - font-size: 14px
-                  - font-weight: 700
-                  - text-align: center
-                  - color: "#cfd6dd"
-                icon:
-                  - color: "#cfd6dd"
-                  - width: 20px
-                  - height: 20px
-
-            - type: conditional
-              conditions:
-                - entity: input_boolean.hemma_washer_delay_start
-                  state: "on"
-              card:
-                type: custom:button-card
-                entity: input_datetime.hemma_washer_start_at
+              - type: custom:button-card
+                entity: input_boolean.hemma_washer_delay_start
                 triggers_update:
-                  - input_datetime.hemma_washer_start_at
+                  - input_boolean.hemma_washer_delay_start
                 template: hemma_plain_button_card
                 show_name: true
                 show_icon: true
-                icon: mdi:clock-outline
-                show_state: true
+                icon: mdi:clock-start
+                show_state: false
                 layout: icon_name_state
-                name: Start at
+                name: >
+                  [[[
+                    return entity?.state === 'on' ? "'Delay Start' Enabled" : "Enable 'Delay Start'";
+                  ]]]
                 tap_action:
-                  action: more-info
+                  action: toggle
                 hold_action:
                   action: none
                 double_tap_action:
                   action: none
+                state:
+                  - value: "on"
+                    styles:
+                      card:
+                        - background: "rgba(107,203,119,0.14) !important"
+                        - border: "1px solid rgba(107,203,119,0.28) !important"
+                      name:
+                        - color: "#6bcb77 !important"
+                      icon:
+                        - color: "#6bcb77 !important"
                 styles:
                   card:
                     - border-radius: 12px
                     - box-shadow: none
-                    - margin: 0 0 16px
+                    - margin: 0
                     - height: 48px
                     - background: rgba(255,255,255,0.08)
                     - border: 1px solid rgba(255,255,255,0.20)
@@ -399,14 +377,56 @@
                     - font-weight: 700
                     - text-align: center
                     - color: "#cfd6dd"
-                  state:
-                    - font-size: 13px
-                    - text-align: center
-                    - color: "#cfd6dd"
                   icon:
                     - color: "#cfd6dd"
                     - width: 20px
                     - height: 20px
+
+              - type: conditional
+                conditions:
+                  - entity: input_boolean.hemma_washer_delay_start
+                    state: "on"
+                card:
+                  type: custom:button-card
+                  entity: input_datetime.hemma_washer_start_at
+                  triggers_update:
+                    - input_datetime.hemma_washer_start_at
+                  template: hemma_plain_button_card
+                  show_name: true
+                  show_icon: true
+                  icon: mdi:clock-outline
+                  show_state: true
+                  layout: icon_name_state
+                  name: Start at
+                  tap_action:
+                    action: more-info
+                  hold_action:
+                    action: none
+                  double_tap_action:
+                    action: none
+                  styles:
+                    card:
+                      - border-radius: 12px
+                      - box-shadow: none
+                      - margin: 0 0 16px
+                      - height: 48px
+                      - background: rgba(255,255,255,0.08)
+                      - border: 1px solid rgba(255,255,255,0.20)
+                    grid:
+                      - justify-content: center
+                    name:
+                      - font-size: 14px
+                      - font-weight: 700
+                      - text-align: center
+                      - color: "#cfd6dd"
+                    state:
+                      - font-size: 13px
+                      - text-align: center
+                      - color: "#cfd6dd"
+                    icon:
+                      - color: "#cfd6dd"
+                      - width: 20px
+                      - height: 20px
 
         # ── Start button: green chip when binary_sensor.washer_remote_start is on (Start Now / Start with Delay).
         #    Neutral dimmed chip = remote start off or unavailable — use the machine’s Remote Start, not “disabled” by delay.
@@ -420,6 +440,10 @@
               state_not: rinsing
             - entity: sensor.washer_current_status
               state_not: drying
+            - entity: sensor.washer_current_status
+              state_not: detecting
+            - entity: sensor.washer_current_status
+              state_not: cool_down
             - entity: sensor.washer_current_status
               state_not: pause
           card:
@@ -557,7 +581,8 @@
               card:
                 - border-radius: 12px
                 - box-shadow: none
-                - margin: 0 0 16px
+                - margin: 0
+                - padding-bottom: 0
                 - height: 48px
                 - background: rgba(255,107,107,0.14)
               grid:

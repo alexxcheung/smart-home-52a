@@ -215,6 +215,10 @@ Hemma:
   hemma-entity-col-width-desktop: 280px
   hemma-entity-justify-desktop: start
   hemma-entity-right-inset-desktop: 0px
+  # Horizontal entity strip: flush to viewport edge; first card offset via padding-left (see --hemma-entity-scroll-pad-left-current)
+  hemma-entity-left-inset-desktop: 0px
+  # Optional: set to e.g. 12px to nudge past hero text; unset = use rail (same as HOME)
+  # hemma-entity-scroll-pad-left-desktop:
   hemma-entity-bottom-desktop: 20px
   hemma-entity-shadow-pad-right-desktop: 0px
   hemma-entity-overflow-y-desktop: hidden
@@ -464,6 +468,13 @@ Hemma:
         max-width: 100vw !important;
       }
 
+      /* iPad: reduce whole-page rubber-band (Safari) — does not block .hemma-entities inner scroll */
+      @media (min-width: 768px) and (max-width: 1366px) {
+        html, body {
+          overscroll-behavior-y: none !important;
+        }
+      }
+
       @media (max-width: 767px) and (orientation: portrait) {
         html, body {
           overflow: hidden !important;
@@ -629,7 +640,8 @@ Hemma:
         --hemma-entity-rows-current: var(--hemma-entity-rows-desktop, repeat(1, auto));
         --hemma-entity-justify-current: var(--hemma-entity-justify-desktop, flex-start);
         --hemma-entity-right-inset-current: var(--hemma-entity-right-inset-desktop, 0px);
-        --hemma-entity-left-inset-current: var(--hemma-rail-left, var(--page-gutter, 8vw));
+        --hemma-entity-left-inset-current: var(--hemma-entity-left-inset-desktop, 0px);
+        --hemma-entity-scroll-pad-left-current: var(--hemma-entity-scroll-pad-left-desktop, var(--hemma-rail-left, var(--page-gutter, 8vw)));
         --hemma-entity-bottom-current: var(--hemma-entity-bottom-desktop, 20px);
         --hemma-entity-shadow-pad-right-current: var(--hemma-entity-shadow-pad-right-desktop, 0px);
         --hemma-entity-overflow-y-current: var(--hemma-entity-overflow-y-desktop, hidden);
@@ -865,7 +877,8 @@ Hemma:
         overflow-x: hidden !important;
         -webkit-overflow-scrolling: touch !important;
         overscroll-behavior: contain !important;
-        touch-action: pan-y !important;
+        /* Allow horizontal pans to reach the inner entity strip; pan-y-only could fight the row scroller and jump back. */
+        touch-action: pan-x pan-y !important;
         overflow-anchor: none !important;
         scroll-snap-type: y proximity !important;
         padding-bottom: var(--tiles-pad-bottom) !important;
@@ -887,7 +900,7 @@ Hemma:
             overflow-x: hidden !important;
             -webkit-overflow-scrolling: touch !important;
             overscroll-behavior: contain !important;
-            touch-action: pan-y !important;
+            touch-action: pan-x pan-y !important;
             overflow-anchor: none !important;
           }
         }
@@ -905,7 +918,46 @@ Hemma:
         }
       }
 
-      @media (min-width: 768px) and (max-width: 1249px) and (min-height: 501px) and (hover: none) and (pointer: coarse) {
+      /* iPad / tablet width only: Safari often reports hover:hover + pointer:fine, so pointer/hover queries above never match. */
+      @media (min-width: 768px) and (max-width: 1366px) {
+        :host {
+          overflow: hidden !important;
+          max-height: 100dvh !important;
+          overscroll-behavior: none !important;
+          overscroll-behavior-y: none !important;
+        }
+
+        hui-view-container#view {
+          height: 100dvh !important;
+          min-height: 0 !important;
+          max-height: 100dvh !important;
+          overflow: hidden !important;
+          overflow-y: hidden !important;
+          overscroll-behavior: none !important;
+          overscroll-behavior-y: none !important;
+          -webkit-overflow-scrolling: auto !important;
+        }
+
+        hui-view,
+        hui-view > #columns {
+          min-height: 0 !important;
+          max-height: 100dvh !important;
+          overflow: hidden !important;
+          overflow-y: hidden !important;
+          overscroll-behavior: none !important;
+          overscroll-behavior-y: none !important;
+          -webkit-overflow-scrolling: auto !important;
+        }
+
+        hui-view $ grid-layout $ #root {
+          overflow: hidden !important;
+          overflow-y: hidden !important;
+          overscroll-behavior-y: none !important;
+        }
+      }
+
+      /* Tablet / iPad touch: lock outer view scroll (includes iPad Pro landscape ~1366px; was capped at 1249 before). */
+      @media (min-width: 768px) and (max-width: 1400px) and (min-height: 501px) and (hover: none) and (pointer: coarse) {
         :host {
           overflow: hidden !important;
           overscroll-behavior-y: none !important;
@@ -915,15 +967,37 @@ Hemma:
         hui-view-container#view {
           height: 100vh !important;
           min-height: 100vh !important;
+          max-height: 100dvh !important;
           overflow: hidden !important;
+          overflow-y: hidden !important;
+          overscroll-behavior-y: none !important;
         }
 
         hui-view,
         hui-view > #columns {
           height: 100vh !important;
           min-height: 100vh !important;
+          max-height: 100dvh !important;
           overflow: hidden !important;
+          overflow-y: hidden !important;
           overscroll-behavior-y: none !important;
+        }
+      }
+
+      /* iPad with trackpad / mouse (fine pointer): still no hover — stop page rubber-band / column scroll */
+      @media (min-width: 768px) and (max-width: 1366px) and (hover: none) and (pointer: fine) {
+        hui-view-container#view {
+          max-height: 100dvh !important;
+          overflow: hidden !important;
+          overflow-y: hidden !important;
+          overscroll-behavior-y: none !important;
+        }
+
+        hui-view,
+        hui-view > #columns {
+          overflow-y: hidden !important;
+          overscroll-behavior-y: none !important;
+          max-height: 100dvh !important;
         }
       }
 
