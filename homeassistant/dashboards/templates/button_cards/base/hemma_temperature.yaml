@@ -38,8 +38,16 @@ hemma_temperature:
         : (variables.temp_sensor || '');
     ]]]
 
+  # Outdoor + weather row: same as hemma_weather — Bubble (#hemma-weather-forecast), not more-info.
+  # (The big temp/condition text uses this template; the icon strip uses hemma_weather.)
   tap_action:
-    action: more-info
+    action: >
+      [[[
+        const mode = String(variables.weather_mode || '').toLowerCase();
+        const useOutdoorRow = (mode === 'outdoor') && !!variables.show_weather;
+        if (useOutdoorRow) return 'navigate';
+        return 'more-info';
+      ]]]
     entity: >
       [[[
         const mode = String(variables.weather_mode || '').toLowerCase();
@@ -47,6 +55,13 @@ hemma_temperature:
         return useOutdoorRow
           ? (variables.weather_entity || '')
           : (variables.temp_sensor || '');
+      ]]]
+    navigation_path: >
+      [[[
+        const mode = String(variables.weather_mode || '').toLowerCase();
+        const useOutdoorRow = (mode === 'outdoor') && !!variables.show_weather;
+        if (!useOutdoorRow) return '';
+        return '#hemma-weather-forecast';
       ]]]
 
   extra_styles: |

@@ -340,7 +340,8 @@
                 - font-weight: 700
                 - text-transform: uppercase
                 - letter-spacing: 0.08em
-                - opacity: "0.38"
+                - color: "#ffffff"
+                - opacity: "0.8"
                 - text-align: left
 
           # ── Programme chips — row 1: Eco 50°, Auto, Intensive 70° ────────
@@ -700,7 +701,8 @@
                 - font-weight: 700
                 - text-transform: uppercase
                 - letter-spacing: 0.08em
-                - opacity: "0.38"
+                - color: "#ffffff"
+                - opacity: "0.8"
                 - text-align: left
 
           # ── Option chips — row 1: Extra Dry, Hygiene+, Intensive Zone ───

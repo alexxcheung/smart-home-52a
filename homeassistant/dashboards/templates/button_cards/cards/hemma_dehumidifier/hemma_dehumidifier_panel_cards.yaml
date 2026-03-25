@@ -122,7 +122,8 @@
                 - font-weight: 700
                 - text-transform: uppercase
                 - letter-spacing: 0.08em
-                - opacity: "0.38"
+                - color: "#ffffff"
+                - opacity: "0.8"
                 - text-align: center
 
           # ── Target humidity row (same horizontal-stack pattern as Mode buttons: flex + grid justify center)
@@ -315,7 +316,8 @@
                 - font-weight: 700
                 - text-transform: uppercase
                 - letter-spacing: 0.08em
-                - opacity: "0.38"
+                - color: "#ffffff"
+                - opacity: "0.8"
                 - text-align: left
 
           # ── Mode buttons ────────────────────────────────────────
@@ -526,7 +528,8 @@
                 - font-weight: 700
                 - text-transform: uppercase
                 - letter-spacing: 0.08em
-                - opacity: "0.38"
+                - color: "#ffffff"
+                - opacity: "0.8"
                 - text-align: left
 
           # ── Fan speed buttons ───────────────────────────────────
@@ -664,7 +667,8 @@
                 - font-weight: 700
                 - text-transform: uppercase
                 - letter-spacing: 0.08em
-                - opacity: "0.38"
+                - color: "#ffffff"
+                - opacity: "0.8"
                 - text-align: left
 
           # ── Option toggles ──────────────────────────────────────

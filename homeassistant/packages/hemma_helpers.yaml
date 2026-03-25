@@ -14,6 +14,8 @@
 #   - input_boolean.hemma_mobile_navigation: Mobile nav menu state
 #   - input_number.hemma_thermostat_target_temperature: Thermostat target temp
 #   - input_select.hemma_thermostat_mode: Heat/Cool mode selector
+#   - input_select.hemma_weather_popup_forecast_tab: Weather Bubble Daily/Hourly tab
+#   - sensor.hemma_weather_today_range: Today's forecast high/low for weather popup header
 #
 # OPTIONAL: Adjust min/max values for input_number to match your climate needs.
 # ============================================================================
@@ -112,6 +114,14 @@ input_select:
     initial: away
     icon: mdi:account
 
+  hemma_weather_popup_forecast_tab:
+    name: Weather popup forecast tab
+    options:
+      - Daily
+      - Hourly
+    initial: Daily
+    icon: mdi:weather-partly-cloudy
+
 # Template sensors that mirror input_select with friendly_name attribute
 template:
   - sensor:
@@ -126,6 +136,34 @@ template:
         state: "{{ states('input_select.presence_sammy') }}"
         attributes:
           source_entity: device_tracker.imsammy_iphone
+
+  # Today's high/low from Pirate Weather / any weather entity (for Hemma popup header).
+  - trigger:
+      - platform: state
+        entity_id: weather.forecast_home
+      - platform: time_pattern
+        hours: "/3"
+      - platform: homeassistant
+        event: start
+    action:
+      - action: weather.get_forecasts
+        data:
+          entity_id: weather.forecast_home
+          type: daily
+        response_variable: daily
+    sensor:
+      - name: Hemma weather today range
+        unique_id: hemma_weather_today_range
+        state: OK
+        attributes:
+          temp_high: >-
+            {% if daily is defined and daily.get('weather.forecast_home', {}).forecast | default([]) | length > 0 %}
+              {{ daily['weather.forecast_home'].forecast[0].temperature }}
+            {% endif %}
+          temp_low: >-
+            {% if daily is defined and daily.get('weather.forecast_home', {}).forecast | default([]) | length > 0 %}
+              {{ daily['weather.forecast_home'].forecast[0].templow }}
+            {% endif %}
 
 # Automations for presence state transitions
 automation:

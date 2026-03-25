@@ -1,0 +1,333 @@
+# hemma_weather_panel_cards.yaml — Bubble body (Hemma / dehumidifier-style + native forecast).
+# Entity: weather.forecast_home (Pirate Weather). Align packages/hemma_helpers + this file if different.
+- type: vertical-stack
+  cards:
+    # ── Current conditions (reference-style header + detail rows) ──
+    - type: custom:button-card
+      template: hemma_plain_button_card
+      entity: weather.forecast_home
+      triggers_update:
+        - weather.forecast_home
+        - sensor.hemma_weather_today_range
+      tap_action: { action: none }
+      styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+      custom_fields:
+        content: >
+          [[[
+            const w = hass.states['weather.forecast_home'];
+            const rangeEnt = hass.states['sensor.hemma_weather_today_range'];
+            if (!w) {
+              return '<div class="weather-popup-hero">Weather unavailable</div>';
+            }
+
+            const condRaw = String(w.state || 'unknown').toLowerCase();
+            const iconMap = {
+              sunny: 'mdi:weather-sunny',
+              'clear-night': 'mdi:weather-night',
+              partlycloudy: 'mdi:weather-partly-cloudy',
+              cloudy: 'mdi:weather-cloudy',
+              rainy: 'mdi:weather-rainy',
+              pouring: 'mdi:weather-pouring',
+              snowy: 'mdi:weather-snowy',
+              'snowy-rainy': 'mdi:weather-snowy-rainy',
+              hail: 'mdi:weather-hail',
+              lightning: 'mdi:weather-lightning',
+              'lightning-rainy': 'mdi:weather-lightning-rainy',
+              fog: 'mdi:weather-fog',
+              windy: 'mdi:weather-windy',
+              'windy-variant': 'mdi:weather-windy-variant',
+              exceptional: 'mdi:alert-circle-outline'
+            };
+            const icon = iconMap[condRaw] || w.attributes?.icon || 'mdi:weather-partly-cloudy';
+
+            let condLabel = condRaw.replace(/_/g, ' ').replace(/-/g, ' ');
+            condLabel = condLabel.replace(/\b\w/g, c => c.toUpperCase());
+            if (hass.localize) {
+              const t = hass.localize(`state.weather.${condRaw}`);
+              if (t && !t.includes(`state.weather.${condRaw}`)) condLabel = t;
+            }
+
+            const temp = w.attributes?.temperature;
+            const tempStr = (temp !== undefined && temp !== null && !Number.isNaN(Number(temp)))
+              ? `${Number(temp).toFixed(1)}°` : '—';
+            const unit = hass.config?.unit_system?.temperature || '';
+
+            const hi = rangeEnt?.attributes?.temp_high;
+            const lo = rangeEnt?.attributes?.temp_low;
+            const hiStr = (hi !== undefined && hi !== null && hi !== '' && !Number.isNaN(Number(hi)))
+              ? `${Number(hi).toFixed(1)}°` : '—';
+            const loStr = (lo !== undefined && lo !== null && lo !== '' && !Number.isNaN(Number(lo)))
+              ? `${Number(lo).toFixed(1)}°` : '—';
+
+            const pressure = hass.formatEntityAttributeValue(w, 'pressure') || '—';
+            const humidity = hass.formatEntityAttributeValue(w, 'humidity') || '—';
+            const windSp = hass.formatEntityAttributeValue(w, 'wind_speed') || '';
+            const bear = w.attributes?.wind_bearing;
+            const cardinals = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+            const card = (bear !== undefined && bear !== null && !Number.isNaN(Number(bear)))
+              ? cardinals[Math.round(((Number(bear) % 360) / 45)) % 8] : '';
+            const windStr = windSp ? (card ? `${windSp} (${card})` : windSp) : '—';
+
+            const esc = (s) => String(s ?? '')
+              .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+            return `
+              <div class="weather-popup-hero">
+                <div class="hero-top">
+                  <div class="hero-lead">
+                    <div class="hero-icon-wrap">
+                      <ha-icon icon="${icon}" class="hero-weather-icon"></ha-icon>
+                    </div>
+                    <div class="hero-mid">
+                      <div class="hero-condition">${esc(condLabel)}</div>
+                    </div>
+                  </div>
+                  <div class="hero-temp-block">
+                    <div class="hero-temp">${esc(tempStr)}${unit ? `<span class="hero-unit">${esc(unit)}</span>` : ''}</div>
+                    <div class="hero-hilo">${esc(hiStr)} / ${esc(loStr)}</div>
+                  </div>
+                </div>
+                <div class="weather-stats">
+                  <div class="stat-row">
+                    <ha-icon icon="mdi:gauge" class="stat-ico"></ha-icon>
+                    <span class="stat-label">Air pressure</span>
+                    <span class="stat-val">${esc(pressure)}</span>
+                  </div>
+                  <div class="stat-row">
+                    <ha-icon icon="mdi:water-percent" class="stat-ico"></ha-icon>
+                    <span class="stat-label">Humidity</span>
+                    <span class="stat-val">${esc(humidity)}</span>
+                  </div>
+                  <div class="stat-row">
+                    <ha-icon icon="mdi:weather-windy" class="stat-ico"></ha-icon>
+                    <span class="stat-label">Wind speed</span>
+                    <span class="stat-val">${esc(windStr)}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          ]]]
+      extra_styles: |
+        .weather-popup-hero { padding: 8px 0 20px; box-sizing: border-box; max-width: 100%; }
+        /* Icon + label in a row (label to the right of icon); temps on the far right */
+        .hero-top {
+          display: flex;
+          flex-wrap: nowrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 20px;
+          padding: 16px 0;
+          box-sizing: border-box;
+        }
+        .hero-lead {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          align-items: center;
+          gap: 12px;
+          flex: 0 1 auto;
+          min-width: 0;
+        }
+        .hero-icon-wrap {
+          flex: 0 0 56px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        ha-icon.hero-weather-icon { --mdc-icon-size: 56px; width: 56px; height: 56px; color: var(--state-icon-color, #e0e0e0); display: block; }
+        .hero-mid {
+          flex: 0 1 auto;
+          min-width: 0;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          text-align: left;
+        }
+        .hero-condition {
+          font-size: 1.35rem;
+          font-weight: 700;
+          line-height: 1.25;
+          color: var(--primary-text-color);
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          text-align: left;
+        }
+        .hero-temp-block { flex: 0 0 auto; text-align: right; margin-left: auto; }
+        .hero-temp { font-size: 1.75rem; font-weight: 700; line-height: 1.1; color: var(--primary-text-color); }
+        .hero-unit { font-size: 0.55em; font-weight: 600; opacity: 0.7; margin-left: 2px; }
+        .hero-hilo { font-size: 12px; opacity: 0.55; margin-top: 4px; }
+        .weather-stats { display: flex; flex-direction: column; gap: 14px; }
+        .stat-row { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+        ha-icon.stat-ico { flex: 0 0 22px; --mdc-icon-size: 22px; width: 22px; height: 22px; color: #64b5f6; }
+        .stat-label { flex: 1 1 auto; opacity: 0.72; text-align: left; }
+        .stat-val { flex: 0 0 auto; font-weight: 600; text-align: right; max-width: 55%; }
+
+    # ── Forecast section title ──
+    - type: custom:button-card
+      entity: weather.forecast_home
+      name: Forecast
+      show_icon: false
+      show_state: false
+      tap_action: { action: none }
+      styles:
+        card:
+          - background: transparent
+          - box-shadow: none
+          - padding: 8px 0 4px
+          - height: auto
+        name:
+          - font-size: 11px
+          - font-weight: 700
+          - text-transform: uppercase
+          - letter-spacing: 0.08em
+          - color: "#ffffff"
+          - opacity: "0.8"
+          - text-align: left
+
+    # ── Daily / Hourly tabs ──
+    - type: horizontal-stack
+      cards:
+        - type: custom:button-card
+          template: hemma_plain_button_card
+          entity: weather.forecast_home
+          triggers_update:
+            - input_select.hemma_weather_popup_forecast_tab
+          name: Daily
+          show_name: true
+          show_icon: false
+          show_state: false
+          tap_action:
+            action: call-service
+            service: input_select.select_option
+            target:
+              entity_id: input_select.hemma_weather_popup_forecast_tab
+            data:
+              option: Daily
+          styles:
+            card:
+              - background: transparent
+              - box-shadow: none
+              - border: none
+              - border-radius: 0
+              - padding: 10px 12px
+              - flex: 1
+              - border-bottom: "[[[ return states['input_select.hemma_weather_popup_forecast_tab']?.state === 'Daily' ? '2px solid var(--primary-color)' : '2px solid transparent'; ]]]"
+            name:
+              - font-size: 14px
+              - font-weight: 700
+              - text-align: center
+              - opacity: "[[[ return states['input_select.hemma_weather_popup_forecast_tab']?.state === 'Daily' ? 1 : 0.45; ]]]"
+
+        - type: custom:button-card
+          template: hemma_plain_button_card
+          entity: weather.forecast_home
+          triggers_update:
+            - input_select.hemma_weather_popup_forecast_tab
+          name: Hourly
+          show_name: true
+          show_icon: false
+          show_state: false
+          tap_action:
+            action: call-service
+            service: input_select.select_option
+            target:
+              entity_id: input_select.hemma_weather_popup_forecast_tab
+            data:
+              option: Hourly
+          styles:
+            card:
+              - background: transparent
+              - box-shadow: none
+              - border: none
+              - border-radius: 0
+              - padding: 10px 12px
+              - flex: 1
+              - border-bottom: "[[[ return states['input_select.hemma_weather_popup_forecast_tab']?.state === 'Hourly' ? '2px solid var(--primary-color)' : '2px solid transparent'; ]]]"
+            name:
+              - font-size: 14px
+              - font-weight: 700
+              - text-align: center
+              - opacity: "[[[ return states['input_select.hemma_weather_popup_forecast_tab']?.state === 'Hourly' ? 1 : 0.45; ]]]"
+
+    # ── Native forecast strips (icons + high/low or hourly temps) ──
+    - type: conditional
+      conditions:
+        - entity: input_select.hemma_weather_popup_forecast_tab
+          state: Daily
+      card:
+        type: weather-forecast
+        entity: weather.forecast_home
+        forecast_type: daily
+        forecast_slots: 6
+        show_current: false
+        card_mod:
+          style: |
+            ha-card {
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+              --ha-card-border-width: 0px !important;
+            }
+            .forecast {
+              padding-top: 16px !important;
+              padding-bottom: 16px !important;
+            }
+            .attribution,
+            ha-card .attribution {
+              display: none !important;
+            }
+
+    - type: conditional
+      conditions:
+        - entity: input_select.hemma_weather_popup_forecast_tab
+          state: Hourly
+      card:
+        type: weather-forecast
+        entity: weather.forecast_home
+        forecast_type: hourly
+        forecast_slots: 6
+        show_current: false
+        card_mod:
+          style: |
+            ha-card {
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+              --ha-card-border-width: 0px !important;
+            }
+            .forecast {
+              padding-top: 16px !important;
+              padding-bottom: 16px !important;
+            }
+            .attribution,
+            ha-card .attribution {
+              display: none !important;
+            }
+
+    # ── Attribution (Pirate Weather: entity attribute) ──
+    - type: custom:button-card
+      template: hemma_plain_button_card
+      entity: weather.forecast_home
+      triggers_update:
+        - weather.forecast_home
+      tap_action: { action: none }
+      styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+      custom_fields:
+        content: >
+          [[[
+            const a = hass.states['weather.forecast_home']?.attributes?.attribution || '';
+            if (!a) return '';
+            const esc = (s) => String(s)
+              .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            return `<div class="weather-attrib">${esc(a)}</div>`;
+          ]]]
+      extra_styles: |
+        .weather-attrib {
+          font-size: 12px;
+          line-height: 1.35;
+          opacity: 0.45;
+          text-align: center;
+          padding: 12px 8px 4px;
+        }

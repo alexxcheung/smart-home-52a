@@ -123,6 +123,9 @@ views:
             variables:
               icon: light
 
+      # Weather forecast Bubble (must be last on Home view; hash #hemma-weather-forecast)
+      - !include /config/dashboards/templates/button_cards/cards/hemma_weather/hemma_weather_bubble_popup.yml
+
   # ------------------------------------------------------
   # INFO
   # ------------------------------------------------------

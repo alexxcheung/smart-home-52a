@@ -25,8 +25,14 @@ hemma_weather:
   show_label: true
   show_state: false
 
+  # Outdoor (default): Bubble forecast popup (#hemma-weather-forecast). Room: more-info on room temp sensor.
   tap_action:
-    action: more-info
+    action: >
+      [[[
+        const mode = String(variables.weather_mode || '').toLowerCase();
+        if (mode === 'room' && variables.temp_sensor) return 'more-info';
+        return 'navigate';
+      ]]]
     entity: >
       [[[
         const mode = String(variables.weather_mode || '').toLowerCase();
@@ -34,6 +40,12 @@ hemma_weather:
           return variables.temp_sensor;
         }
         return entity?.entity_id;
+      ]]]
+    navigation_path: >
+      [[[
+        const mode = String(variables.weather_mode || '').toLowerCase();
+        if (mode === 'room' && variables.temp_sensor) return '';
+        return '#hemma-weather-forecast';
       ]]]
 
   triggers_update:
