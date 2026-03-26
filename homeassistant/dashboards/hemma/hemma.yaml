@@ -544,6 +544,12 @@ views:
             variables:
               icon: light
 
+          # Printer
+          - type: custom:button-card
+            template: hemma_printer
+            entity: sensor.hp_officejet_pro_9720e_series
+            name: Printer
+
   # ------------------------------------------------------
   # Dehumidifier — full controls (native view; tap tile on Home to open)
   # No browser_mod: cards get normal HA entity subscriptions here.

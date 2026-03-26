@@ -1,0 +1,67 @@
+hemma_printer:
+  template:
+    - hemma_entity
+
+  show_icon: true
+  show_entity_picture: false
+  icon: mdi:printer
+
+  variables:
+    black_sensor: sensor.hp_officejet_pro_9720e_series_black_cartridge
+    cyan_sensor: sensor.hp_officejet_pro_9720e_series_cyan_cartridge
+    magenta_sensor: sensor.hp_officejet_pro_9720e_series_magenta_cartridge
+    yellow_sensor: sensor.hp_officejet_pro_9720e_series_yellow_cartridge
+
+  triggers_update:
+    - sensor.hp_officejet_pro_9720e_series
+    - sensor.hp_officejet_pro_9720e_series_black_cartridge
+    - sensor.hp_officejet_pro_9720e_series_cyan_cartridge
+    - sensor.hp_officejet_pro_9720e_series_magenta_cartridge
+    - sensor.hp_officejet_pro_9720e_series_yellow_cartridge
+
+  state_display: |
+    [[[
+      const raw = (entity?.state || '').toString().toLowerCase();
+      const map = { idle: 'Idle', printing: 'Printing', stopped: 'Stopped' };
+      return map[raw] || (raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : 'Unknown');
+    ]]]
+
+  custom_fields:
+    levels: |
+      [[[
+        const pct = (eid) => {
+          const v = parseFloat(states[eid]?.state);
+          return Number.isFinite(v) ? Math.max(0, Math.min(100, Math.round(v))) : null;
+        };
+        const b = pct(variables.black_sensor);
+        const c = pct(variables.cyan_sensor);
+        const m = pct(variables.magenta_sensor);
+        const y = pct(variables.yellow_sensor);
+        const cell = (txt, color, value) =>
+          `<span style="color:${color};font-weight:700">${txt}</span> ${value === null ? '--' : value + '%'}`;
+        return `
+          <div style="font-size:11px; opacity:0.88; line-height:1.25;">
+            ${cell('K', '#b0b6bf', b)} ·
+            ${cell('C', '#61dafb', c)} ·
+            ${cell('M', '#ff5fa2', m)} ·
+            ${cell('Y', '#ffd166', y)}
+          </div>
+        `;
+      ]]]
+
+  styles:
+    grid:
+      - grid-template-rows: 1fr min-content 8px min-content min-content
+      - grid-template-areas: |
+          "i"
+          "levels"
+          "."
+          "n"
+          "s"
+      - row-gap: 4px
+    custom_fields:
+      levels:
+        - grid-area: levels
+        - justify-self: start
+        - align-self: end
+        - margin-top: 2px
