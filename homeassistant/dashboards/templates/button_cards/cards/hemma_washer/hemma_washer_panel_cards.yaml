@@ -61,6 +61,7 @@
                 <div class="status-row">
                   <span class="status-label" style="color:${color};background:${bg}">${labels[status] ?? status}</span>
                   ${!remoteStart && status !== 'power_off' ? '<span class="warn-badge">Remote Start Disabled</span>' : ''}
+                  ${remoteStart && status !== 'power_off' ? '<span class="ok-badge">Remote Start Enabled</span>' : ''}
                 </div>
                 ${progress > 0 ? `
                   <div class="prog-wrap">
@@ -83,6 +84,58 @@
         .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
         .prog-info { font-size: 11px; font-weight: 600; color: #ffffff; }
         .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
+        .ok-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(107,203,119,0.18); color: #6bcb77; letter-spacing: 0.03em; display: inline-block; }
+
+    # ── Instruction section header (shown only when a tips card is shown) ──
+    - type: custom:button-card
+      entity: sensor.washer_current_status
+      triggers_update:
+        - sensor.washer_current_status
+        - binary_sensor.washer_remote_start
+      show_icon: false
+      show_state: false
+      tap_action:
+        action: none
+      state:
+        - operator: template
+          value: |
+            [[[
+              const status = states['sensor.washer_current_status']?.state;
+              const remoteStart = states['binary_sensor.washer_remote_start']?.state;
+              // Show header only when one of the instruction cards should be visible.
+              const showPowerOffInstruction = status === 'power_off';
+              const showRemoteStartInstruction = status !== 'power_off' && status !== 'sleep' && status !== 'error' && remoteStart === 'off';
+              const showErrorInstruction = status === 'error';
+              return showPowerOffInstruction || showRemoteStartInstruction || showErrorInstruction;
+            ]]]
+          styles:
+            card:
+              - display: flex !important
+        - operator: default
+          styles:
+            card:
+              - display: none !important
+              - height: 0 !important
+              - margin: 0 !important
+              - padding: 0 !important
+              - border: none !important
+      name: Instruction
+      styles:
+        card:
+          - background: transparent
+          - box-shadow: none
+          - margin: 12px 0 0
+          - padding: 0 0 16px
+          - height: auto
+          - justify-content: flex-start
+        name:
+          - font-size: 11px
+          - font-weight: 700
+          - text-transform: uppercase
+          - letter-spacing: 0.08em
+          - color: "#ffffff"
+          - opacity: "0.8"
+          - text-align: left
 
     # ── Message: Power off - need to enable Remote Start at machine ──
     - type: custom:button-card
@@ -99,10 +152,10 @@
           [[[
             return `
               <div style="text-align: center; padding: 8px 0;">
-                <div style="font-size: 13px; font-weight: 600; color: var(--secondary-text-color); opacity: 0.8; margin-bottom: 8px;">
-                  To enable remote control:
+                <div style="font-size: 15px; font-weight: 600; color: var(--secondary-text-color); opacity: 0.8; margin-bottom: 8px;">
+                  To start remote control:
                 </div>
-                <div style="font-size: 12px; color: var(--secondary-text-color); opacity: 0.6; line-height: 1.6;">
+                <div style="font-size: 14px; color: var(--secondary-text-color); opacity: 0.6; line-height: 1.6;">
                   1. Press Power on the machine<br>
                   2. Hold Remote Start for 3 sec<br>
                   3. Wait for door to lock
@@ -111,7 +164,13 @@
             `;
           ]]]
       state:
-        - value: "power_off"
+        - operator: template
+          value: |
+            [[[
+              const status = states['sensor.washer_current_status']?.state;
+              const remoteStart = states['binary_sensor.washer_remote_start']?.state;
+              return status === 'power_off';
+            ]]]
           styles:
             card:
               - display: flex !important
@@ -119,11 +178,15 @@
           styles:
             card:
               - display: none !important
+              - height: 0 !important
+              - margin: 0 !important
+              - padding: 0 !important
+              - border: none !important
       styles:
         card:
           - border-radius: 12px
           - box-shadow: none
-          - margin: 24px 0 16px
+          - margin: 0 0 24px
           - height: auto
           - padding: 12px
           - background: rgba(255,255,255,0.05)
@@ -145,10 +208,10 @@
           [[[
             return `
               <div style="text-align: center; padding: 8px 0;">
-                <div style="font-size: 13px; font-weight: 600; color: #f4a261; margin-bottom: 8px;">
+                <div style="font-size: 15px; font-weight: 600; color: #f4a261; margin-bottom: 8px;">
                   ⚠ Remote Start not enabled
                 </div>
-                <div style="font-size: 12px; color: var(--secondary-text-color); opacity: 0.6; line-height: 1.6;">
+                <div style="font-size: 14px; color: var(--secondary-text-color); opacity: 0.6; line-height: 1.6;">
                   Hold Remote Start button on machine for 3 sec
                 </div>
               </div>
@@ -160,7 +223,7 @@
             [[[
               const status = states['sensor.washer_current_status']?.state;
               const remoteStart = entity.state;
-              return status !== 'power_off' && status !== 'sleep' && remoteStart === 'off';
+              return status !== 'power_off' && status !== 'sleep' && status !== 'error' && remoteStart === 'off';
             ]]]
           styles:
             card:
@@ -169,38 +232,46 @@
           styles:
             card:
               - display: none !important
+              - height: 0 !important
+              - margin: 0 !important
+              - padding: 0 !important
+              - border: none !important
       styles:
         card:
           - border-radius: 12px
           - box-shadow: none
-          - margin: 24px 0 16px
+          - margin: 0 0 24px
           - height: auto
           - padding: 12px
           - background: rgba(244,162,97,0.1)
           - border: 1px solid rgba(244,162,97,0.3)
 
-    # ── Remote Start enabled indicator ──
+    # ── Error status instruction ──
     - type: custom:button-card
-      entity: binary_sensor.washer_remote_start
+      entity: sensor.washer_current_status
       triggers_update:
-        - binary_sensor.washer_remote_start
         - sensor.washer_current_status
       template: hemma_plain_button_card
-      show_name: true
-      show_icon: true
-      icon: mdi:check-circle
-      name: Remote Start Enabled
+      show_name: false
+      show_icon: false
       tap_action:
         action: none
+      custom_fields:
+        instructions: |
+          [[[
+            return `
+              <div style="text-align: center; padding: 0 0 8px; width: 100%; max-width: 100%;">
+                <div style="font-size: 15px; font-weight: 600; color: #ff6b6b; margin-bottom: 8px; white-space: normal; overflow-wrap: anywhere; word-break: break-word; line-height: 1.35;">
+                  Error Detected
+                </div>
+                <div style="font-size: 14px; color: var(--secondary-text-color); opacity: 0.75; line-height: 1.6; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">
+                  Check the machine panel for the error code and clear the fault before starting again.
+                </div>
+              </div>
+            `;
+          ]]]
       state:
-        - operator: template
-          value: |
-            [[[
-              const status = states['sensor.washer_current_status']?.state;
-              const remoteStart = entity.state;
-              const runningStates = ['running', 'spinning', 'rinsing', 'drying', 'pause'];
-              return remoteStart === 'on' && !runningStates.includes(status);
-            ]]]
+        - value: "error"
           styles:
             card:
               - display: flex !important
@@ -208,76 +279,25 @@
           styles:
             card:
               - display: none !important
+              - height: 0 !important
+              - margin: 0 !important
+              - padding: 0 !important
+              - border: none !important
       styles:
         card:
           - border-radius: 12px
           - box-shadow: none
-          - margin: 24px 0 0
-          - height: 48px
-          - background: rgba(107,203,119,0.1)
-          - border: 1px solid rgba(107,203,119,0.3)
-        grid:
-          - justify-content: center
-        name:
-          - font-size: 14px
-          - font-weight: 600
-          - text-align: center
-          - color: "#6bcb77"
-        icon:
-          - color: "#6bcb77"
-          - width: 20px
-          - height: 20px
-
-    # ── Power: Turn Off (shown when on and not running) ───────────────────────────
-    - type: custom:button-card
-      entity: sensor.washer_current_status
-      triggers_update:
-        - sensor.washer_current_status
-      template: hemma_plain_button_card
-      show_name: true
-      show_icon: true
-      icon: mdi:power
-      show_state: false
-      layout: icon_name_state
-      name: Turn Off
-      tap_action:
-        action: call-service
-        service: select.select_option
-        service_data:
-          entity_id: select.washer_operation
-          option: power_off
-      hold_action:
-        action: none
-      state:
-        - operator: template
-          value: >
-            [[[
-              const status = entity.state;
-              const runningStates = ['running', 'spinning', 'rinsing', 'drying', 'detecting', 'cool_down', 'pause'];
-              return ['power_off', 'sleep'].includes(status) || runningStates.includes(status);
-            ]]]
-          styles:
-            card:
-              - display: none !important
-      styles:
-        card:
-          - border-radius: 12px
-          - box-shadow: none
-          - margin: 12px 0 16px
-          - height: 48px
-          - background: rgba(255,107,107,0.14)
-        grid:
-          - justify-content: center
-        name:
-          - font-size: 14px
-          - font-weight: 700
-          - text-align: center
-          - color: "#ff6b6b"
-        icon:
-          - color: "#ff6b6b"
-          - width: 20px
-          - height: 20px
-
+          - margin: 0 0 24px
+          - height: auto
+          - padding: 12px
+          - background: rgba(255,107,107,0.1)
+          - border: 1px solid rgba(255,107,107,0.3)
+        custom_fields:
+          instructions:
+            - width: 100%
+            - max-width: 100%
+            - min-width: 0
+            - white-space: normal
 
     # ── Controls: delay + start when idle/ready; during wash only Stop ───────────
     - type: vertical-stack
@@ -285,6 +305,12 @@
         # ── Delay Start (hidden while a cycle is active — only Stop is shown then)
         - type: conditional
           conditions:
+            - entity: input_boolean.hemma_washer_delay_start
+              state: "off"
+            - entity: sensor.washer_current_status
+              state_not: power_off
+            - entity: sensor.washer_current_status
+              state_not: error
             - entity: sensor.washer_current_status
               state_not: running
             - entity: sensor.washer_current_status
@@ -320,8 +346,9 @@
                   card:
                     - background: transparent
                     - box-shadow: none
-                    # 16px space below title before delay button (matches dishwasher spacing intent)
-                    - padding: 24px 0 16px
+                    # 24px section gap is handled by previous card margin-bottom.
+                    # Keep only 16px below title before delay button.
+                    - padding: 0 0 16px
                     - height: auto
                     - justify-content: flex-start
                   name:
@@ -334,9 +361,9 @@
                     - text-align: left
 
               - type: custom:button-card
-                entity: input_boolean.hemma_washer_delay_start
+                entity: input_boolean.hemma_washer_delay_start_ui
                 triggers_update:
-                  - input_boolean.hemma_washer_delay_start
+                  - input_boolean.hemma_washer_delay_start_ui
                 template: hemma_plain_button_card
                 show_name: true
                 show_icon: true
@@ -385,7 +412,7 @@
 
               - type: conditional
                 conditions:
-                  - entity: input_boolean.hemma_washer_delay_start
+                  - entity: input_boolean.hemma_washer_delay_start_ui
                     state: "on"
                 card:
                   type: custom:button-card
@@ -429,10 +456,71 @@
                       - width: 20px
                       - height: 20px
 
+              - type: conditional
+                conditions:
+                  - entity: input_boolean.hemma_washer_delay_start_ui
+                    state: "on"
+                card:
+                  type: custom:button-card
+                  entity: binary_sensor.washer_remote_start
+                  triggers_update:
+                    - binary_sensor.washer_remote_start
+                    - input_boolean.hemma_washer_delay_start_ui
+                  template: hemma_plain_button_card
+                  show_name: true
+                  show_icon: true
+                  icon: mdi:play
+                  show_state: false
+                  layout: icon_name_state
+                  name: Start with Delay
+                  tap_action:
+                    action: call-service
+                    service: script.start_washing_machine_with_delay
+                  hold_action:
+                    action: none
+                  double_tap_action:
+                    action: none
+                  state:
+                    - value: "on"
+                      styles:
+                        card:
+                          - opacity: 1
+                          - pointer-events: auto
+                    - operator: default
+                      styles:
+                        card:
+                          - opacity: 0.5
+                          - pointer-events: none
+                  styles:
+                    card:
+                      - border-radius: 12px
+                      - box-shadow: none
+                      - margin: 0 0 16px
+                      - height: 48px
+                      - background: rgba(107,203,119,0.14)
+                      - border: 1px solid rgba(107,203,119,0.28)
+                    grid:
+                      - justify-content: center
+                    name:
+                      - font-size: 14px
+                      - font-weight: 700
+                      - text-align: center
+                      - color: "#6bcb77"
+                    icon:
+                      - color: "#6bcb77"
+                      - width: 20px
+                      - height: 20px
+
         # ── Start button: green chip when binary_sensor.washer_remote_start is on (Start Now / Start with Delay).
         #    Neutral dimmed chip = remote start off or unavailable — use the machine’s Remote Start, not “disabled” by delay.
         - type: conditional
           conditions:
+            - entity: input_boolean.hemma_washer_delay_start
+              state: "off"
+            - entity: sensor.washer_current_status
+              state_not: power_off
+            - entity: sensor.washer_current_status
+              state_not: error
             - entity: sensor.washer_current_status
               state_not: running
             - entity: sensor.washer_current_status
@@ -463,29 +551,28 @@
             layout: icon_name_state
             name: |
               [[[
-                const delayOn = states['input_boolean.hemma_washer_delay_start']?.state === 'on';
-                return delayOn ? 'Start with Delay' : 'Start Now';
+                return 'Start Now';
               ]]]
             tap_action:
               action: call-service
-              service: script.start_washer
+              service: script.start_washing_machine
             hold_action:
               action: none
             double_tap_action:
               action: none
             state:
-              # Must use explicit entity.state === 'on' (not operator: default after template) — some button-card
-              # versions skip default and you only see base/theme styling (looks white).
-              - operator: template
-                value: "[[[ return entity?.state === 'on'; ]]]"
+              # Same pattern as Delay Start: value "on" vs dimmed base (avoids template + theme override issues).
+              - value: "on"
                 styles:
                   card:
                     - border-radius: 12px
                     - box-shadow: none
                     - margin: 24px 0 16px
                     - height: 48px
-                    - background: "rgba(107,203,119,0.14) !important"
-                    - border: "1px solid rgba(107,203,119,0.28) !important"
+                    - background: "rgba(107,203,119,0.22) !important"
+                    - border: "1px solid rgba(107,203,119,0.45) !important"
+                    - opacity: "1 !important"
+                    - pointer-events: auto
                   grid:
                     - justify-content: center
                   name:
@@ -499,61 +586,99 @@
                     - color: "#6bcb77 !important"
                     - width: 20px
                     - height: 20px
-              # Remote start off, unavailable, unknown — not tappable
-              - operator: default
-                styles:
-                  card:
-                    - border-radius: 12px
-                    - box-shadow: none
-                    - margin: 24px 0 16px
-                    - height: 48px
-                    - background: rgba(255,255,255,0.08)
-                    - border: 1px solid rgba(255,255,255,0.20)
-                    - opacity: 0.5
-                    - pointer-events: none
-                  grid:
-                    - justify-content: center
-                  name:
-                    - font-size: 14px
-                    - font-weight: 700
-                    - text-align: center
-                    - color: "var(--secondary-text-color) !important"
-                  icon:
-                    - color: "var(--secondary-text-color) !important"
-                    - width: 20px
-                    - height: 20px
+            # Remote start off / unavailable: dimmed, not tappable (no state row matches).
             styles:
               card:
                 - border-radius: 12px
                 - box-shadow: none
                 - margin: 24px 0 16px
                 - height: 48px
-                - background: rgba(107,203,119,0.14)
-                - border: 1px solid rgba(107,203,119,0.28)
+                - background: rgba(255,255,255,0.08)
+                - border: 1px solid rgba(255,255,255,0.20)
+                - opacity: 0.5
+                - pointer-events: none
               grid:
                 - justify-content: center
               name:
                 - font-size: 14px
                 - font-weight: 700
                 - text-align: center
-                - color: "#6bcb77 !important"
+                - color: "#cfd6dd"
               label:
-                - color: "#6bcb77 !important"
+                - color: "#cfd6dd"
               icon:
-                - color: "#6bcb77 !important"
+                - color: "#cfd6dd"
                 - width: 20px
                 - height: 20px
-            card_mod:
-              style: |
-                ha-card {
-                  --primary-text-color: #6bcb77 !important;
-                }
+
+        # ── Stop button (when delay-start is armed) ─────────────────
+        - type: conditional
+          conditions:
+            - entity: input_boolean.hemma_washer_delay_start
+              state: "on"
+            - entity: sensor.washer_current_status
+              state_not: power_off
+            - entity: sensor.washer_current_status
+              state_not: error
+            - entity: sensor.washer_current_status
+              state_not: running
+            - entity: sensor.washer_current_status
+              state_not: spinning
+            - entity: sensor.washer_current_status
+              state_not: rinsing
+            - entity: sensor.washer_current_status
+              state_not: drying
+            - entity: sensor.washer_current_status
+              state_not: detecting
+            - entity: sensor.washer_current_status
+              state_not: cool_down
+            - entity: sensor.washer_current_status
+              state_not: pause
+          card:
+            type: custom:button-card
+            entity: sensor.washer_current_status
+            triggers_update:
+              - sensor.washer_current_status
+              - input_boolean.hemma_washer_delay_start
+            template: hemma_plain_button_card
+            show_name: true
+            show_icon: true
+            icon: mdi:stop
+            show_state: false
+            layout: icon_name_state
+            name: Stop Delay Start
+            tap_action:
+              action: call-service
+              service: input_boolean.turn_off
+              service_data:
+                entity_id: input_boolean.hemma_washer_delay_start
+            styles:
+              card:
+                - border-radius: 12px
+                - box-shadow: none
+                - margin: 0 0 24px
+                - padding-bottom: 0
+                - height: 48px
+                - background: rgba(255,107,107,0.14)
+              grid:
+                - justify-content: center
+              name:
+                - font-size: 14px
+                - font-weight: 700
+                - text-align: center
+                - color: "#ff6b6b"
+              icon:
+                - color: "#ff6b6b"
+                - width: 20px
+                - height: 20px
 
         # ── Stop button (when running) ──────────────────────────
         - type: conditional
           conditions:
             - entity: sensor.washer_current_status
               state_not: power_off
+            - entity: sensor.washer_current_status
+              state_not: error
             - entity: sensor.washer_current_status
               state_not: sleep
             - entity: sensor.washer_current_status
@@ -571,7 +696,7 @@
             icon: mdi:stop
             show_state: false
             layout: icon_name_state
-            name: Stop
+            name: Stop Programme
             tap_action:
               action: call-service
               service: select.select_option
@@ -582,7 +707,7 @@
               card:
                 - border-radius: 12px
                 - box-shadow: none
-                - margin: 0
+                - margin: 0 0 24px
                 - padding-bottom: 0
                 - height: 48px
                 - background: rgba(255,107,107,0.14)

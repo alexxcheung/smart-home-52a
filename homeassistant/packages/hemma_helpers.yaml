@@ -37,6 +37,10 @@ input_boolean:
     name: Washer Delay Start
     initial: off
 
+  hemma_washer_delay_start_ui:
+    name: Washer Delay Start UI
+    initial: off
+
 input_number:
   hemma_thermostat_target_temperature:
     name: Thermostat Target Temperature
@@ -167,6 +171,24 @@ template:
 
 # Automations for presence state transitions
 automation:
+  # -------------------------
+  # Washer Delay Start
+  # -------------------------
+  - id: hemma_washer_delay_start_run
+    alias: "Washer - Run delayed start"
+    trigger:
+      - trigger: time
+        at: input_datetime.hemma_washer_start_at
+    condition:
+      - condition: state
+        entity_id: input_boolean.hemma_washer_delay_start
+        state: "on"
+    action:
+      - action: script.start_washing_machine
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.hemma_washer_delay_start
+
   # -------------------------
   # Alex Presence Automations
   # -------------------------

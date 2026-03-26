@@ -16,12 +16,16 @@ hemma_washer:
     - sensor.washer_total_time
     - switch.washer_power
     - binary_sensor.washer_remote_start
+    - input_boolean.hemma_washer_delay_start
+    - input_datetime.hemma_washer_start_at
 
   state_display: >
     [[[ 
       const status = states['sensor.washer_current_status']?.state ?? '';
       const remaining = states['sensor.washer_remaining_time']?.state;
       const total = states['sensor.washer_total_time']?.state;
+      const delayOn = states['input_boolean.hemma_washer_delay_start']?.state === 'on';
+      const startAt = states['input_datetime.hemma_washer_start_at']?.state;
       
       // Running states
       const runningStates = ['running', 'spinning', 'rinsing', 'drying', 'detecting', 'cool_down'];
@@ -35,6 +39,20 @@ hemma_washer:
           return `${total} min total`;
         }
         return status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ');
+      }
+
+      // Delay-start armed: show countdown to scheduled start.
+      if (delayOn && startAt && startAt !== 'unknown' && startAt !== 'unavailable') {
+        const parts = startAt.split(':').map((v) => parseInt(v, 10));
+        if (parts.length >= 2 && !Number.isNaN(parts[0]) && !Number.isNaN(parts[1])) {
+          const now = new Date();
+          const target = new Date(now);
+          target.setHours(parts[0], parts[1], 0, 0);
+          let diffMin = Math.ceil((target - now) / 60000);
+          if (diffMin < 0) diffMin += 24 * 60;
+          if (diffMin <= 0) return 'Starts soon';
+          return `Starts in ${diffMin} min`;
+        }
       }
       
       // Status labels
