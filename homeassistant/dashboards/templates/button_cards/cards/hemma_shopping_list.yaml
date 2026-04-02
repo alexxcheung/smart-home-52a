@@ -1,0 +1,80 @@
+hemma_shopping_list:
+  template: hemma_plain_button_card
+  show_icon: false
+  show_name: false
+  show_state: false
+
+  triggers_update: all
+
+  tap_action:
+    action: navigate
+    navigation_path: /todo
+
+  custom_fields:
+    content: >
+      [[[
+        const allTodos = Object.values(states || {})
+          .filter((s) => (s?.entity_id || '').startsWith('todo.'))
+          .sort((a, b) => {
+            const an = (a.attributes?.friendly_name || a.entity_id || '').toLowerCase();
+            const bn = (b.attributes?.friendly_name || b.entity_id || '').toLowerCase();
+            return an.localeCompare(bn);
+          });
+
+        const asCount = (st) => {
+          const n = Number((st ?? '').toString().trim());
+          return Number.isFinite(n) ? Math.max(0, Math.round(n)) : null;
+        };
+
+        const totalLists = allTodos.length;
+        const totalActive = allTodos.reduce((sum, t) => sum + (asCount(t.state) ?? 0), 0);
+        const status = totalLists
+          ? `${totalLists} lists · ${totalActive} active items`
+          : 'No to-do lists found';
+
+        const rows = allTodos.length
+          ? allTodos.map((t) => {
+              const name = t.attributes?.friendly_name || t.entity_id.replace(/^todo\./, '');
+              const count = asCount(t.state);
+              const countText = count === null ? '—' : `${count}`;
+              return `
+                <div class="shopping-item">
+                  <span class="text">${name}</span>
+                  <span class="count">${countText}</span>
+                </div>
+              `;
+            }).join('')
+          : `<div class="shopping-empty">No active lists</div>`;
+
+        return `
+          <div class="shopping-wrap">
+            <div class="shopping-title">List</div>
+            <div class="shopping-status">${status}</div>
+            <div class="shopping-items">${rows}</div>
+            <div class="shopping-hint">Tap to open default list</div>
+          </div>
+        `;
+      ]]]
+
+  styles:
+    card:
+      - background: rgba(255,255,255,0.06)
+      - backdrop-filter: blur(20px)
+      - border-radius: 30px
+      - border: 1px solid rgba(255,255,255,0.15)
+      - box-shadow: none
+      - cursor: pointer
+    custom_fields:
+      content:
+        - width: 100%
+
+  extra_styles: |
+    .shopping-wrap { display: flex; flex-direction: column; width: 100%; padding: 16px; box-sizing: border-box; }
+    .shopping-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.45; }
+    .shopping-status { margin-top: 8px; font-size: 14px; font-weight: 600; opacity: 0.8; }
+    .shopping-items { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .shopping-item { display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 8px; min-width: 0; }
+    .shopping-item .text { font-size: 12px; line-height: 1.25; opacity: 0.82; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .shopping-item .count { font-size: 12px; line-height: 1.2; opacity: 0.7; font-variant-numeric: tabular-nums; }
+    .shopping-empty { font-size: 12px; opacity: 0.5; }
+    .shopping-hint { margin-top: 22px; font-size: 11px; opacity: 0.35; text-align: center; }

@@ -87,7 +87,7 @@
   - action: light.turn_on
     metadata: {}
     data:
-      brightness_pct: 20
+      brightness_pct: 13
     target:
       device_id: a950fdccc6d8772059470ea8b6ff717a
       area_id: front_door
@@ -124,6 +124,18 @@
       area_id:
       - front_door
       - xuan_guan
+  - delay:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+  - action: light.turn_off
+    metadata: {}
+    target:
+      area_id:
+      - front_door
+      - xuan_guan
+    data: {}
   mode: single
 - id: '1756832264041'
   alias: Someone leave home and turn off devices
@@ -164,6 +176,7 @@
       - living_room
       - study_room
       - xuan_guan
+      - front_door
   mode: single
 - id: '1756832408013'
   alias: Late night and turn off the entrance lights
@@ -190,14 +203,20 @@
       - xuan_guan
   mode: single
 - id: '1757681212746'
-  alias: Wake up early
+  alias: Wake up early and go work
   description: ''
   triggers:
   - trigger: time
-    at: 06:30:00
+    at: 07:00:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
   conditions:
   - condition: sun
-    before: sunset
+    before: sunrise
   actions:
   - action: light.turn_on
     metadata: {}
@@ -211,6 +230,8 @@
     - trigger: sun
       event: sunrise
       offset: 0
+    - trigger: time_pattern
+      hours: '1'
   - action: light.turn_off
     metadata: {}
     data: {}
@@ -307,14 +328,13 @@
   - action: climate.set_temperature
     metadata: {}
     data:
-      temperature: 20
+      temperature: 18
     target:
       entity_id:
       - climate.radiator_thermostat_x_hallway
       - climate.radiator_thermostat_x_living_room
       - climate.radiator_thermostat_x_study_room
   mode: single
-
 - id: '1771400000001'
   alias: Hemma Theme - Switch to Dark at Sunset
   description: Switch dashboard theme to dark mode when sun sets
@@ -328,7 +348,6 @@
       name: Hemma
       mode: dark
   mode: single
-
 - id: '1771400000002'
   alias: Hemma Theme - Switch to Light at Sunrise
   description: Switch dashboard theme to light mode when sun rises
@@ -342,7 +361,6 @@
       name: Hemma
       mode: light
   mode: single
-
 - id: '1771400000003'
   alias: Hemma Theme - Set on HA Start
   description: Set theme mode based on current sun position when HA starts
@@ -354,5 +372,6 @@
   - action: frontend.set_theme
     data:
       name: Hemma
-      mode: "{{ 'dark' if states('sun.sun') == 'below_horizon' else 'light' }}"
+      mode: '{{ ''dark'' if states(''sun.sun'') == ''below_horizon'' else ''light''
+        }}'
   mode: single
