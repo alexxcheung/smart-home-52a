@@ -13,7 +13,7 @@ inset: >
   auto var(--hemma-entity-right-inset-current, var(--hemma-entity-right-inset-desktop, var(--hemma-rail-left, var(--page-gutter, 8vw))))
        var(--hemma-entity-bottom-current, var(--hemma-entity-bottom-desktop, 20px))
        var(--hemma-entity-left-inset-current, var(--hemma-entity-left-inset-desktop, 0px))
-padding: 20px var(--hemma-entity-shadow-pad-right-current, var(--hemma-entity-shadow-pad-right-desktop, 0px)) 40px var(--hemma-entity-scroll-pad-left-current, var(--hemma-entity-scroll-pad-left-desktop, var(--hemma-rail-left, var(--page-gutter, 8vw))))
+padding: 20px var(--hemma-entity-scroll-pad-right-current, var(--hemma-entity-scroll-pad-right-desktop, 16px)) 40px var(--hemma-entity-scroll-pad-left-current, var(--hemma-entity-scroll-pad-left-desktop, var(--hemma-rail-left, var(--page-gutter, 8vw))))
 align-content: end
 box-sizing: border-box
 overflow-x: auto

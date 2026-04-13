@@ -15,7 +15,7 @@ button_card_templates: !include_dir_merge_named /config/dashboards/templates/but
 kiosk_mode:
   # Default: hide header + sidebar
   hide_header: false
-  hide_sidebar: false
+  hide_sidebar: true
   hide_dialog_light_settings_actions: true
   hide_dialog_logbook: true
 
@@ -132,17 +132,8 @@ views:
   - type: custom:grid-layout
     title: Info
     path: info
-    layout: !include /config/dashboards/templates/includes/hemma_info_layout.yaml
-    card_mod:
-      style: |
-        #root > *:first-child {
-          overflow: visible !important;
-          pointer-events: none !important;
-          z-index: 50 !important;
-        }
-        #root > *:first-child * {
-          pointer-events: auto !important;
-        }
+    layout: !include /config/dashboards/templates/hemma_info/hemma_info_layout.yaml
+    card_mod: !include /config/dashboards/templates/hemma_info/hemma_info_view_card_mod.yaml
     cards:
       # NAV BAR - spans all columns with zero height so it doesn't consume a grid row
       - type: custom:button-card
@@ -169,51 +160,8 @@ views:
           image_ext: jpg
           image_ext_night: png
           image_position: center center
-      # Octopus Agile - compact summary card; tap to open full rates popup
-      - type: custom:button-card
-        template: hemma_octopus_agile_rate
-        entity: event.octopus_energy_electricity_20l3765434_2000057767569_current_day_rates
-        variables:
-          next_day_entity: event.octopus_energy_electricity_20l3765434_2000057767569_next_day_rates
-          cost_entity: sensor.octopus_energy_electricity_20l3765434_2000057767569_current_accumulative_cost
-      # Dummy card A
-      - type: custom:button-card
-        show_name: true
-        show_icon: false
-        name: Dummy Card A
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 30px
-            - border: 1px solid rgba(255,255,255,0.15)
-            - box-shadow: none
-            - height: 300px
-            - display: flex
-            - align-items: center
-            - justify-content: center
-          name:
-            - font-size: 16px
-            - opacity: 0.5
-      # Dummy card B
-      - type: custom:button-card
-        show_name: true
-        show_icon: false
-        name: Dummy Card B
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 30px
-            - border: 1px solid rgba(255,255,255,0.15)
-            - box-shadow: none
-            - height: 300px
-            - display: flex
-            - align-items: center
-            - justify-content: center
-          name:
-            - font-size: 16px
-            - opacity: 0.5
+      # Categories: Daily Pulse strip (shopping + 1 dummy) → Atmosphere titles → Energy strip (Octopus)
+      - !include /config/dashboards/templates/hemma_info/hemma_info_body.yaml
       # MOBILE / TABLET NAVBAR - placed last so it doesn't consume an early grid cell
       - !include /config/dashboards/templates/includes/hemma_navbar_mobile.yaml
 

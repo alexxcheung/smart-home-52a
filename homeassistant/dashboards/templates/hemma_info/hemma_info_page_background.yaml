@@ -1,0 +1,165 @@
+# Full-viewport page background using the same logic as hemma_room:
+# /local/hemma/rooms/{image}.{ext} by day, {image}-night.{ext} when sun.sun is below_horizon.
+# Place immediately after hemma_nav_shell. On grid views, use view_layout: grid-column 1/-1,
+# height 0, overflow visible (same as nav) so the card does not occupy a real grid cell.
+hemma_info_page_background:
+  class: hemma-room
+  template:
+    - hemma_default
+
+  entity: sun.sun
+
+  triggers_update:
+    - sun.sun
+    - '[[[ return variables.image ]]]'
+    - '[[[ return variables.image_night ]]]'
+    - '[[[ return variables.image_ext ]]]'
+    - '[[[ return variables.image_ext_night ]]]'
+    - '[[[ return variables.image_position ]]]'
+
+  variables:
+    image: info
+    image_night:
+    image_ext: jpg
+    # If night art uses a different format (e.g. info.jpg + info-night.png), set this.
+    image_ext_night:
+    image_position: center center
+
+  show_name: false
+  show_icon: false
+  show_state: false
+  tap_action: { action: none }
+  hold_action: { action: none }
+  double_tap_action: { action: none }
+
+  styles:
+    card:
+      - position: fixed
+      - inset: "0"
+      - width: 100%
+      - max-width: 100%
+      - height: 100dvh
+      - padding: "0"
+      - margin: "0"
+      - border: none
+      - border-radius: "0"
+      - box-shadow: none !important
+      - overflow: hidden
+      - pointer-events: none
+      - background: transparent
+      - transform: translateZ(0)
+      - will-change: transform
+      - --hero-img-filter: blur(4px)
+      - --hero-img-scale: 1.08
+      - --hero-img: >
+          [[[
+            const base = variables.image || 'info';
+            const extDay = variables.image_ext || 'jpg';
+            const extNight = variables.image_ext_night || extDay;
+            const sunState = states['sun.sun']?.state;
+            const isDark = sunState === 'below_horizon';
+            const picked = isDark ? (variables.image_night || `${base}-night`) : base;
+            const ext = isDark ? extNight : extDay;
+            const url = `/local/hemma/rooms/${picked}.${ext}`;
+            return `url("${url}")`;
+          ]]]
+      - --hero-img-pos: >
+          [[[
+            return variables.image_position || 'center center';
+          ]]]
+    custom_fields:
+      preload:
+        - display: none
+        - width: 0
+        - height: 0
+        - opacity: 0
+        - overflow: hidden
+        - position: fixed
+        - pointer-events: none
+
+  custom_fields:
+    preload: |
+      [[[
+        const base = variables.image || 'info';
+        const extDay = variables.image_ext || 'jpg';
+        const extNight = variables.image_ext_night || extDay;
+        const night = variables.image_night || `${base}-night`;
+        const dayUrl = `/local/hemma/rooms/${base}.${extDay}`;
+        const nightUrl = `/local/hemma/rooms/${night}.${extNight}`;
+        return `
+          <img src="${dayUrl}" alt="" />
+          <img src="${nightUrl}" alt="" />
+        `;
+      ]]]
+
+  extra_styles: |
+    :host {
+      pointer-events: none !important;
+      z-index: -1;
+      position: relative;
+      --hero-img-blur-current: var(--hero-img-blur, 4px);
+      --hero-img-scale-current: var(--hero-img-scale, 1.08);
+      --hero-img-filter-from: blur(var(--hero-img-blur-current))
+        saturate(var(--hero-img-saturate-from, 1.0))
+        brightness(var(--hero-img-brightness-from, .97));
+    }
+    :host ha-card {
+      position: fixed !important;
+      inset: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 100dvh !important;
+      pointer-events: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      overflow: hidden !important;
+      isolation: isolate !important;
+    }
+    /* Same layering as hemma_shared (room hero) */
+    :host ha-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: -2;
+      background-image: var(--hero-img);
+      background-position: var(--hero-img-pos, center center);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      opacity: 1;
+      filter: var(--hero-img-filter);
+      transform: scale(var(--hero-img-scale-current, 1.08)) !important;
+      transform-origin: center;
+      transition: opacity .35s ease, filter .35s ease, transform .35s ease;
+      will-change: opacity, filter, transform;
+      animation: hemmaInfoBgSwap .35s ease;
+    }
+    :host ha-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background: var(--hero-tint, rgba(56,56,56,0.50));
+    }
+    @keyframes hemmaInfoBgSwap {
+      from {
+        opacity: 0;
+        filter: var(--hero-img-filter-from, var(--hero-img-filter));
+      }
+      to {
+        opacity: 1;
+        filter: var(--hero-img-filter);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      :host ha-card::after {
+        transition: none;
+        animation: none;
+      }
+    }

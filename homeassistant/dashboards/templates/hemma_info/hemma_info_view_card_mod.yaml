@@ -1,0 +1,38 @@
+# Info view — clip horizontal overflow on the grid root; nav overlay on first child
+# (Wide cards / inner min-content can otherwise widen ancestors past the viewport.)
+style: |
+  #root {
+    overflow-x: clip !important;
+    overflow-y: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overscroll-behavior-x: none !important;
+  }
+  #root > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  #root > *:first-child {
+    overflow: visible !important;
+    pointer-events: none !important;
+    z-index: 50 !important;
+  }
+  #root > *:first-child * {
+    pointer-events: auto !important;
+  }
+  /* Strips: min-content grid columns must not widen the info column past the viewport */
+  hui-card.hemma-info-strip {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  #root hui-card.hemma-info-section-title ha-card {
+    --ha-card-background: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }

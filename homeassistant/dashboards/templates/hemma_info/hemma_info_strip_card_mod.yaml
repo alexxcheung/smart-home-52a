@@ -1,0 +1,14 @@
+# Info strip chrome only — no overflow/scrollbar rules here.
+# Scroll behaviour and scrollbar hiding live in each row's layout YAML
+# (scrollbar-width: none / -ms-overflow-style: none), matching the entity row pattern.
+style: |
+  ha-card {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin: 0 0 28px 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
