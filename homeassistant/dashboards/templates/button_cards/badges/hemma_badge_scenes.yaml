@@ -163,11 +163,11 @@ hemma_badge_scenes:
       const room = variables.room;
       const selectId = `input_text.hemma_${room}_scene`;
       const raw = states[selectId]?.state;
-      const subtitle = (raw && raw !== 'unknown' && raw !== '') ? raw : 'Tap to set';
+      const hasScene = raw && raw !== 'unknown' && raw !== '';
       return `
         <div class="mp-wrap">
           <div class="mp-title">Scenes</div>
-          <div class="mp-sub">${subtitle}</div>
+          ${hasScene ? `<div class="mp-sub">${raw}</div>` : ''}
         </div>
       `;
     ]]]
