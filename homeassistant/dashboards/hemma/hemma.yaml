@@ -258,6 +258,10 @@ views:
               icon: speaker
             tap_action:
               action: more-info # Tap the name/card for volume
+
+      # Scene picker pop-up (must be last on this view; hash #hemma-scenes-living-room)
+      - !include /config/dashboards/templates/button_cards/cards/hemma_scenes/hemma_scenes_living_room_bubble_popup.yml
+
   # ------------------------------------------------------
   # KITCHEN
   # ------------------------------------------------------
@@ -297,8 +301,9 @@ views:
             entity: sensor.bosch_dishwasher_operation_state
             name: Dishwasher
 
-      # Bubble Card pop-up (must be last on this view; hash #hemma-dishwasher)
+      # Bubble Card pop-ups (must be last on this view)
       - !include /config/dashboards/templates/button_cards/cards/hemma_dishwasher/hemma_dishwasher_bubble_popup.yml
+      - !include /config/dashboards/templates/button_cards/cards/hemma_scenes/hemma_scenes_kitchen_bubble_popup.yml
 
   # ------------------------------------------------------
   # HALLWAY
@@ -368,9 +373,10 @@ views:
             entity: humidifier.probreeze_dehumidifier
             name: Dehumidifier
 
-      # Bubble Card pop-up (must be last on this view; hash #hemma-washer then #hemma-dehumidifier)
+      # Bubble Card pop-ups (must be last on this view)
       - !include /config/dashboards/templates/button_cards/cards/hemma_washer/hemma_washer_bubble_popup.yml
       - !include /config/dashboards/templates/button_cards/cards/hemma_dehumidifier/hemma_dehumidifier_bubble_popup.yml
+      - !include /config/dashboards/templates/button_cards/cards/hemma_scenes/hemma_scenes_hallway_bubble_popup.yml
 
   # ------------------------------------------------------
   # BEDROOM
@@ -429,6 +435,9 @@ views:
             name: Floor lightstrip
             variables:
               icon: light
+
+      # Scene picker pop-up (must be last on this view; hash #hemma-scenes-bedroom)
+      - !include /config/dashboards/templates/button_cards/cards/hemma_scenes/hemma_scenes_bedroom_bubble_popup.yml
 
   # ------------------------------------------------------
   # Study
@@ -517,6 +526,9 @@ views:
             template: hemma_printer
             entity: sensor.hp_officejet_pro_9720e_series
             name: Printer
+
+      # Scene picker pop-up (must be last on this view; hash #hemma-scenes-study)
+      - !include /config/dashboards/templates/button_cards/cards/hemma_scenes/hemma_scenes_study_bubble_popup.yml
 
   # ------------------------------------------------------
   # Dehumidifier — full controls (native view; tap tile on Home to open)

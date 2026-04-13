@@ -1,0 +1,326 @@
+# hemma_scenes/hemma_scenes_living_room_bubble_popup.yml
+# Lovelace fragment (.yml keeps it out of button_card_templates merge).
+# Open: badge navigates → '#hemma-scenes-living-room'
+# Must be placed LAST on the Living Room view (Bubble Card README).
+
+type: vertical-stack
+cards:
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#hemma-scenes-living-room'
+    name: Living Room — Scenes
+    icon: mdi:palette
+    button_type: name
+    show_state: false
+    force_icon: false
+    show_header: true
+    close_by_clicking_outside: true
+    width_desktop: 380px
+    margin_top_mobile: '0px'
+    margin_top_desktop: '0px'
+    bg_color: '#1c1c1c'
+    bg_opacity: '55'
+    bg_blur: '20'
+    shadow_opacity: '55'
+    styles: |
+      :host {
+        --bubble-backdrop-background-color: rgba(0, 0, 0, 0.45) !important;
+        --bubble-pop-up-background-color: var(--ha-card-background) !important;
+        --bubble-pop-up-main-background-color: var(--ha-card-background) !important;
+        --hemma-bubble-popup-inset-block: max(24px, 5vh);
+        --hemma-bubble-popup-inset-inline: max(16px, 3vw);
+        --hemma-bubble-popup-max-height: calc(
+          100dvh - 2 * var(--hemma-bubble-popup-inset-block)
+          - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+        );
+      }
+      .bubble-pop-up:not(.editor) {
+        top: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-top, 0px)) !important;
+        bottom: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-bottom, 0px)) !important;
+        left: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        right: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        margin: auto !important;
+        height: fit-content !important;
+        max-height: var(--hemma-bubble-popup-max-height) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        border-radius: var(--bubble-pop-up-border-radius, 42px) !important;
+        overflow: hidden !important;
+        transition: transform 0.3s ease, opacity 0.3s ease !important;
+      }
+      .bubble-pop-up:not(.editor).is-popup-closed { opacity: 0 !important; pointer-events: none !important; }
+      .bubble-pop-up:not(.editor).is-popup-opened { opacity: 1 !important; pointer-events: auto !important; }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-background {
+        border-radius: inherit !important;
+        background-color: var(--ha-card-background) !important;
+        backdrop-filter: blur(20px) saturate(1.1) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(1.1) !important;
+      }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-container {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        padding-bottom: 24px !important;
+      }
+      @media only screen and (min-width: 600px) and (max-width: 767px) {
+        .bubble-pop-up:not(.editor) {
+          margin-left: 0 !important; margin-right: 0 !important;
+          left: calc(50% - min(380px, calc(100vw - 2 * var(--hemma-bubble-popup-inset-inline))) / 2) !important;
+          right: auto !important;
+          width: min(380px, calc(100vw - 2 * var(--hemma-bubble-popup-inset-inline))) !important;
+        }
+      }
+      @media only screen and (min-width: 768px) {
+        .bubble-pop-up:not(.editor) {
+          margin-left: 0 !important; margin-right: 0 !important;
+          left: calc(var(--mdc-drawer-width, 0px) / 2 + 50% - min(380px, calc(100vw - var(--mdc-drawer-width, 0px) - 2 * var(--hemma-bubble-popup-inset-inline))) / 2) !important;
+          right: auto !important;
+          width: min(380px, calc(100vw - var(--mdc-drawer-width, 0px) - 2 * var(--hemma-bubble-popup-inset-inline))) !important;
+        }
+      }
+
+  - type: vertical-stack
+    cards:
+      - type: grid
+        columns: 1
+        square: false
+        cards:
+          - type: custom:button-card
+            name: Focus
+            label: Bright · 6000K
+            show_label: true
+            show_icon: true
+            icon: mdi:white-balance-sunny
+            styles:
+              card:
+                - background: rgba(147,197,253,0.10)
+                - backdrop-filter: blur(20px)
+                - border-radius: 16px
+                - border: 1px solid rgba(255,255,255,0.12)
+                - box-shadow: none
+                - padding: 14px 16px
+                - touch-action: manipulation
+              icon:
+                - color: '#93c5fd'
+                - width: 28px
+                - height: 28px
+                - align-self: center
+              name:
+                - font-size: 14px
+                - font-weight: '700'
+                - color: var(--primary-text-color)
+                - text-align: left
+                - justify-self: start
+              label:
+                - font-size: 11px
+                - opacity: '0.5'
+                - color: var(--primary-text-color)
+                - text-align: left
+                - justify-self: start
+              grid:
+                - grid-template-areas: '"i n" "i l"'
+                - grid-template-columns: min-content 1fr
+                - grid-template-rows: auto auto
+                - column-gap: 14px
+                - row-gap: 2px
+                - align-items: center
+                - justify-items: start
+            tap_action:
+              action: call-service
+              service: script.hemma_activate_room_scene
+              service_data:
+                scene_id: scene.living_room_focus
+                scene_name: Focus
+                select_entity: input_text.hemma_living_room_scene
+
+          - type: custom:button-card
+            name: Cinema
+            label: Ambient · 2000K
+            show_label: true
+            show_icon: true
+            icon: mdi:movie-open
+            styles:
+              card:
+                - background: rgba(192,132,252,0.10)
+                - backdrop-filter: blur(20px)
+                - border-radius: 16px
+                - border: 1px solid rgba(255,255,255,0.12)
+                - box-shadow: none
+                - padding: 14px 16px
+                - touch-action: manipulation
+              icon:
+                - color: '#c084fc'
+                - width: 28px
+                - height: 28px
+                - align-self: center
+              name:
+                - font-size: 14px
+                - font-weight: '700'
+                - color: var(--primary-text-color)
+                - text-align: left
+                - justify-self: start
+              label:
+                - font-size: 11px
+                - opacity: '0.5'
+                - color: var(--primary-text-color)
+                - text-align: left
+                - justify-self: start
+              grid:
+                - grid-template-areas: '"i n" "i l"'
+                - grid-template-columns: min-content 1fr
+                - grid-template-rows: auto auto
+                - column-gap: 14px
+                - row-gap: 2px
+                - align-items: center
+                - justify-items: start
+            tap_action:
+              action: call-service
+              service: script.hemma_activate_room_scene
+              service_data:
+                scene_id: scene.living_room_cinema
+                scene_name: Cinema
+                select_entity: input_text.hemma_living_room_scene
+
+          - type: custom:button-card
+            name: Relax
+            label: Dim · 2200K
+            show_label: true
+            show_icon: true
+            icon: mdi:candle
+            styles:
+              card:
+                - background: rgba(251,191,36,0.10)
+                - backdrop-filter: blur(20px)
+                - border-radius: 16px
+                - border: 1px solid rgba(255,255,255,0.12)
+                - box-shadow: none
+                - padding: 14px 16px
+                - touch-action: manipulation
+              icon:
+                - color: '#fbbf24'
+                - width: 28px
+                - height: 28px
+                - align-self: center
+              name:
+                - font-size: 14px
+                - font-weight: '700'
+                - color: var(--primary-text-color)
+                - text-align: left
+                - justify-self: start
+              label:
+                - font-size: 11px
+                - opacity: '0.5'
+                - color: var(--primary-text-color)
+                - text-align: left
+                - justify-self: start
+              grid:
+                - grid-template-areas: '"i n" "i l"'
+                - grid-template-columns: min-content 1fr
+                - grid-template-rows: auto auto
+                - column-gap: 14px
+                - row-gap: 2px
+                - align-items: center
+                - justify-items: start
+            tap_action:
+              action: call-service
+              service: script.hemma_activate_room_scene
+              service_data:
+                scene_id: scene.living_room_relax
+                scene_name: Relax
+                select_entity: input_text.hemma_living_room_scene
+
+          - type: custom:button-card
+            name: Night
+            label: Ultra-low · 2000K
+            show_label: true
+            show_icon: true
+            icon: mdi:weather-night
+            styles:
+              card:
+                - background: rgba(248,113,113,0.10)
+                - backdrop-filter: blur(20px)
+                - border-radius: 16px
+                - border: 1px solid rgba(255,255,255,0.12)
+                - box-shadow: none
+                - padding: 14px 16px
+                - touch-action: manipulation
+              icon:
+                - color: '#f87171'
+                - width: 28px
+                - height: 28px
+                - align-self: center
+              name:
+                - font-size: 14px
+                - font-weight: '700'
+                - color: var(--primary-text-color)
+                - text-align: left
+                - justify-self: start
+              label:
+                - font-size: 11px
+                - opacity: '0.5'
+                - color: var(--primary-text-color)
+                - text-align: left
+                - justify-self: start
+              grid:
+                - grid-template-areas: '"i n" "i l"'
+                - grid-template-columns: min-content 1fr
+                - grid-template-rows: auto auto
+                - column-gap: 14px
+                - row-gap: 2px
+                - align-items: center
+                - justify-items: start
+            tap_action:
+              action: call-service
+              service: script.hemma_activate_room_scene
+              service_data:
+                scene_id: scene.living_room_night
+                scene_name: Night
+                select_entity: input_text.hemma_living_room_scene
+
+          - type: custom:button-card
+            name: Away
+            label: All off
+            show_label: true
+            show_icon: true
+            icon: mdi:home-export-outline
+            styles:
+              card:
+                - background: rgba(148,163,184,0.10)
+                - backdrop-filter: blur(20px)
+                - border-radius: 16px
+                - border: 1px solid rgba(255,255,255,0.12)
+                - box-shadow: none
+                - padding: 14px 16px
+                - touch-action: manipulation
+              icon:
+                - color: '#94a3b8'
+                - width: 28px
+                - height: 28px
+                - align-self: center
+              name:
+                - font-size: 14px
+                - font-weight: '700'
+                - color: var(--primary-text-color)
+                - text-align: left
+                - justify-self: start
+              label:
+                - font-size: 11px
+                - opacity: '0.5'
+                - color: var(--primary-text-color)
+                - text-align: left
+                - justify-self: start
+              grid:
+                - grid-template-areas: '"i n" "i l"'
+                - grid-template-columns: min-content 1fr
+                - grid-template-rows: auto auto
+                - column-gap: 14px
+                - row-gap: 2px
+                - align-items: center
+                - justify-items: start
+            tap_action:
+              action: call-service
+              service: script.hemma_activate_room_scene
+              service_data:
+                scene_id: scene.living_room_away
+                scene_name: Away
+                select_entity: input_text.hemma_living_room_scene
