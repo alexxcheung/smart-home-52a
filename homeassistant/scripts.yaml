@@ -1,6 +1,34 @@
 # Scripts used by Hemma dashboard and other automations.
 # Start uses home_connect.set_program_and_options with program + delay in one call (reference format).
 
+# Activate a room scene and record the name in an input_text helper so the
+# scene badge subtitle updates reactively (scene entities stay in 'scening'
+# state and never fire state_changed on repeat calls; input_text does).
+hemma_activate_room_scene:
+  alias: "Hemma Activate Room Scene"
+  fields:
+    scene_id:
+      description: "Scene entity ID to activate (e.g. scene.living_room_focus)"
+      selector:
+        entity:
+          domain: scene
+    scene_name:
+      description: "Short display name to store (e.g. Focus)"
+    select_entity:
+      description: "input_text entity to update (e.g. input_text.hemma_living_room_scene)"
+      selector:
+        entity:
+          domain: input_text
+  sequence:
+    - action: scene.turn_on
+      target:
+        entity_id: "{{ scene_id }}"
+    - action: input_text.set_value
+      target:
+        entity_id: "{{ select_entity }}"
+      data:
+        value: "{{ scene_name }}"
+
 # Thermostat: sync target temp from climate entity and toggle overlay
 hemma_thermostat_open_overlay:
   alias: "Hemma Thermostat Open Overlay"

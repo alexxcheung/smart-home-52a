@@ -1,0 +1,197 @@
+hemma_badge_scenes:
+  template: [hemma_badge_base]
+
+  variables:
+    enabled: false
+    room: null
+    room_label: Room
+
+  icon: mdi:palette
+
+  tap_action:
+    action: fire-dom-event
+    browser_mod:
+      service: browser_mod.popup
+      data:
+        title: "[[[ return (variables.room_label || 'Room') + ' — Scenes' ]]]"
+        style: |
+          --popup-max-width: 380px;
+          ha-dialog { --mdc-dialog-max-width: 380px !important; }
+          .mdc-dialog {
+            position: fixed !important;
+            inset: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          .mdc-dialog .mdc-dialog__container {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
+          }
+          .mdc-dialog .mdc-dialog__surface {
+            max-width: 380px !important;
+            width: 380px !important;
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            transform: none !important;
+            margin: auto !important;
+          }
+        content: >
+          [[[
+            const room = variables.room;
+            const defs = [
+              {
+                scene: `scene.${room}_focus`,
+                name: 'Focus',
+                label: 'Bright · 6000K',
+                icon: 'mdi:white-balance-sunny',
+                color: '#93c5fd',
+                bg: 'rgba(147,197,253,0.10)'
+              },
+              ...(room === 'study' ? [{
+                scene: 'scene.study_work',
+                name: 'Work',
+                label: 'Desk · 3000K',
+                icon: 'mdi:laptop',
+                color: '#86efac',
+                bg: 'rgba(134,239,172,0.10)'
+              }] : []),
+              ...(room === 'living_room' ? [{
+                scene: 'scene.living_room_cinema',
+                name: 'Cinema',
+                label: 'Ambient · 2000K',
+                icon: 'mdi:movie-open',
+                color: '#c084fc',
+                bg: 'rgba(192,132,252,0.10)'
+              }] : []),
+              {
+                scene: `scene.${room}_relax`,
+                name: 'Relax',
+                label: 'Dim · 2200K',
+                icon: 'mdi:candle',
+                color: '#fbbf24',
+                bg: 'rgba(251,191,36,0.10)'
+              },
+              {
+                scene: `scene.${room}_night`,
+                name: 'Night',
+                label: 'Ultra-low · 2000K',
+                icon: 'mdi:weather-night',
+                color: '#f87171',
+                bg: 'rgba(248,113,113,0.10)'
+              },
+              {
+                scene: `scene.${room}_away`,
+                name: 'Away',
+                label: 'All off',
+                icon: 'mdi:home-export-outline',
+                color: '#94a3b8',
+                bg: 'rgba(148,163,184,0.10)'
+              }
+            ];
+            return {
+              type: 'grid',
+              columns: 1,
+              square: false,
+              cards: defs.map(d => ({
+                type: 'custom:button-card',
+                name: d.name,
+                label: d.label,
+                show_label: true,
+                show_icon: true,
+                icon: d.icon,
+                styles: {
+                  card: [
+                    { background: d.bg },
+                    { 'backdrop-filter': 'blur(20px)' },
+                    { 'border-radius': '16px' },
+                    { border: '1px solid rgba(255,255,255,0.12)' },
+                    { 'box-shadow': 'none' },
+                    { cursor: 'pointer' },
+                    { padding: '14px 16px' },
+                    { 'touch-action': 'manipulation' }
+                  ],
+                  icon: [
+                    { color: d.color },
+                    { width: '28px' },
+                    { height: '28px' },
+                    { 'align-self': 'center' }
+                  ],
+                  name: [
+                    { 'font-size': '14px' },
+                    { 'font-weight': '700' },
+                    { color: 'var(--primary-text-color)' },
+                    { 'text-align': 'left' },
+                    { 'justify-self': 'start' }
+                  ],
+                  label: [
+                    { 'font-size': '11px' },
+                    { opacity: '0.5' },
+                    { color: 'var(--primary-text-color)' },
+                    { 'text-align': 'left' },
+                    { 'justify-self': 'start' }
+                  ],
+                  grid: [
+                    { 'grid-template-areas': '"i n" "i l"' },
+                    { 'grid-template-columns': 'min-content 1fr' },
+                    { 'grid-template-rows': 'auto auto' },
+                    { 'column-gap': '14px' },
+                    { 'row-gap': '2px' },
+                    { 'align-items': 'center' },
+                    { 'justify-items': 'start' }
+                  ]
+                },
+                tap_action: {
+                  action: 'call-service',
+                  service: 'script.hemma_activate_room_scene',
+                  service_data: {
+                    scene_id: d.scene,
+                    scene_name: d.name,
+                    select_entity: `input_text.hemma_${room}_scene`
+                  }
+                }
+              }))
+            };
+          ]]]
+
+  name: >
+    [[[
+      const room = variables.room;
+      const selectId = `input_text.hemma_${room}_scene`;
+      const raw = states[selectId]?.state;
+      const subtitle = (raw && raw !== 'unknown' && raw !== '') ? raw : 'Tap to set';
+      return `
+        <div class="mp-wrap">
+          <div class="mp-title">Scenes</div>
+          <div class="mp-sub">${subtitle}</div>
+        </div>
+      `;
+    ]]]
+
+  styles:
+    card:
+      - display: >
+          [[[
+            const ev = variables?.enabled;
+            const enabled = (ev === undefined || ev === null) ? false :
+              (typeof ev === 'boolean') ? ev :
+              (typeof ev === 'number') ? ev !== 0 :
+              !['false','0','no','off','disabled'].includes(String(ev).trim().toLowerCase());
+            return enabled ? 'inline-grid' : 'none';
+          ]]]
+    icon:
+      - color: rgba(255,255,255,0.75)
+
+  extra_styles: >
+    [[[
+      const ev = variables?.enabled;
+      const enabled = (ev === undefined || ev === null) ? false :
+        (typeof ev === 'boolean') ? ev :
+        (typeof ev === 'number') ? ev !== 0 :
+        !['false','0','no','off','disabled'].includes(String(ev).trim().toLowerCase());
+      return `:host{display:${enabled ? 'inline-block' : 'none'} !important;}`;
+    ]]]

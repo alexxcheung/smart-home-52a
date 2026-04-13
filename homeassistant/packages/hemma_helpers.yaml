@@ -126,6 +126,32 @@ input_select:
     initial: Daily
     icon: mdi:weather-partly-cloudy
 
+input_text:
+  hemma_living_room_scene:
+    name: Living Room Active Scene
+    initial: ""
+    icon: mdi:palette
+
+  hemma_kitchen_scene:
+    name: Kitchen Active Scene
+    initial: ""
+    icon: mdi:palette
+
+  hemma_hallway_scene:
+    name: Hallway Active Scene
+    initial: ""
+    icon: mdi:palette
+
+  hemma_bedroom_scene:
+    name: Bedroom Active Scene
+    initial: ""
+    icon: mdi:palette
+
+  hemma_study_scene:
+    name: Study Active Scene
+    initial: ""
+    icon: mdi:palette
+
 # Template sensors that mirror input_select with friendly_name attribute
 template:
   - sensor:

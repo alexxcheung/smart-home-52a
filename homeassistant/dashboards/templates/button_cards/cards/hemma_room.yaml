@@ -39,6 +39,10 @@ hemma_room:
     show_humidity: false
     humidity_sensor:
 
+    show_scene: false
+    scene_room: null
+    scene_room_label: Room
+
     show_temp: false
     temp_sensor:
 
@@ -407,6 +411,14 @@ hemma_room:
             entity: '[[[ return variables.humidity_sensor ]]]'
             variables:
               enabled: '[[[ return variables.show_humidity ]]]'
+
+          - type: custom:button-card
+            template: hemma_badge_scenes
+            entity: '[[[ return variables.scene_room ? `input_text.hemma_${variables.scene_room}_scene` : "" ]]]'
+            variables:
+              enabled: '[[[ return variables.show_scene ]]]'
+              room: '[[[ return variables.scene_room ]]]'
+              room_label: '[[[ return variables.scene_room_label ]]]'
 
     badges_media:
       card:

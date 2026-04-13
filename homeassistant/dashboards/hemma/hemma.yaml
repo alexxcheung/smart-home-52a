@@ -15,7 +15,7 @@ button_card_templates: !include_dir_merge_named /config/dashboards/templates/but
 kiosk_mode:
   # Default: hide header + sidebar
   hide_header: false
-  hide_sidebar: true
+  hide_sidebar: false
   hide_dialog_light_settings_actions: true
   hide_dialog_logbook: true
 
@@ -195,6 +195,10 @@ views:
           show_quality: false # Set to true if you add an Air Quality sensor later
           quality_sensor: sensor.none
 
+          show_scene: true
+          scene_room: living_room
+          scene_room_label: Living Room
+
           # Weather
           show_weather: true
           weather_mode: room
@@ -217,7 +221,7 @@ views:
             variables:
               temp_sensor: sensor.radiator_thermostat_x_living_room_temperature
               thermostat_toggle_helper: input_boolean.hemma_thermostat_overlay
-      
+
           # Light
           - type: custom:button-card
             template: hemma_light  
@@ -274,6 +278,10 @@ views:
           image: kitchen
           image_position: center center
 
+          show_scene: true
+          scene_room: kitchen
+          scene_room_label: Kitchen
+
       # MOBILE NAVBAR
       - !include /config/dashboards/templates/includes/hemma_navbar_mobile.yaml
 
@@ -321,6 +329,10 @@ views:
 
           show_quality: false
           quality_sensor: sensor.YOUR_AIR_QUALITY
+
+          show_scene: true
+          scene_room: hallway
+          scene_room_label: Hallway
 
           show_weather: true
           weather_mode: room
@@ -389,6 +401,10 @@ views:
           show_quality: true
           quality_sensor: sensor.YOUR_BEDROOM_AIR_QUALITY
 
+          show_scene: true
+          scene_room: bedroom
+          scene_room_label: Bedroom
+
           show_weather: true
           weather_mode: room
           temp_unit: 'C'
@@ -444,6 +460,10 @@ views:
           show_quality: false
           quality_sensor: sensor.YOUR_BEDROOM_AIR_QUALITY
 
+          show_scene: true
+          scene_room: study
+          scene_room_label: Study
+
           show_weather: true
           weather_mode: room
           temp_unit: 'C'
@@ -469,7 +489,7 @@ views:
             variables:
               temp_sensor: sensor.radiator_thermostat_x_study_temperature
               thermostat_toggle_helper: input_boolean.hemma_thermostat_overlay
-          
+
           # Light
           - type: custom:button-card
             template: hemma_light  

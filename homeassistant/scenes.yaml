@@ -1,0 +1,212 @@
+# Hemma — Room Scenes
+# 5 rooms × 4 basic scenes: Focus / Relax / Night / Away
+#
+# Scene entity_ids are generated from names (slugified):
+#   "Living Room Focus" → scene.living_room_focus
+#
+# NOTE: Kitchen and Hallway use placeholder light entity IDs.
+#       Replace light.kitchen_ceiling / light.hallway_ceiling
+#       with your actual entity IDs before activating those scenes.
+
+# ─────────────── Living Room ───────────────
+- name: Living Room Focus
+  entities:
+    light.sofa_light:
+      state: on
+      brightness_pct: 100
+      color_temp_kelvin: 6000
+    light.floor_light:
+      state: on
+      brightness_pct: 100
+      color_temp_kelvin: 6000
+
+- name: Living Room Relax
+  entities:
+    light.sofa_light:
+      state: on
+      brightness_pct: 30
+      color_temp_kelvin: 2200
+    light.floor_light:
+      state: on
+      brightness_pct: 30
+      color_temp_kelvin: 2200
+
+- name: Living Room Night
+  entities:
+    light.sofa_light:
+      state: on
+      brightness_pct: 5
+      color_temp_kelvin: 2000
+    light.floor_light:
+      state: on
+      brightness_pct: 5
+      color_temp_kelvin: 2000
+
+- name: Living Room Cinema
+  entities:
+    light.sofa_light:
+      state: off
+    light.floor_light:
+      state: on
+      brightness_pct: 8
+      color_temp_kelvin: 2000
+
+- name: Living Room Away
+  entities:
+    light.sofa_light:
+      state: off
+    light.floor_light:
+      state: off
+
+# ─────────────── Kitchen ───────────────
+# TODO: Replace light.kitchen_ceiling with your actual kitchen light entity ID(s)
+- name: Kitchen Focus
+  entities:
+    light.kitchen_ceiling:
+      state: on
+      brightness_pct: 100
+      color_temp_kelvin: 6000
+
+- name: Kitchen Relax
+  entities:
+    light.kitchen_ceiling:
+      state: on
+      brightness_pct: 30
+      color_temp_kelvin: 2200
+
+- name: Kitchen Night
+  entities:
+    light.kitchen_ceiling:
+      state: on
+      brightness_pct: 5
+      color_temp_kelvin: 2000
+
+- name: Kitchen Away
+  entities:
+    light.kitchen_ceiling:
+      state: off
+
+# ─────────────── Hallway ───────────────
+# TODO: Replace light.hallway_ceiling with your actual hallway light entity ID(s)
+- name: Hallway Focus
+  entities:
+    light.hallway_ceiling:
+      state: on
+      brightness_pct: 100
+      color_temp_kelvin: 6000
+
+- name: Hallway Relax
+  entities:
+    light.hallway_ceiling:
+      state: on
+      brightness_pct: 30
+      color_temp_kelvin: 2200
+
+- name: Hallway Night
+  entities:
+    light.hallway_ceiling:
+      state: on
+      brightness_pct: 5
+      color_temp_kelvin: 2000
+
+- name: Hallway Away
+  entities:
+    light.hallway_ceiling:
+      state: off
+
+# ─────────────── Bedroom ───────────────
+- name: Bedroom Focus
+  entities:
+    light.hue_lightstrip_plus_1:
+      state: on
+      brightness_pct: 100
+      color_temp_kelvin: 6000
+
+- name: Bedroom Relax
+  entities:
+    light.hue_lightstrip_plus_1:
+      state: on
+      brightness_pct: 30
+      color_temp_kelvin: 2200
+
+- name: Bedroom Night
+  entities:
+    light.hue_lightstrip_plus_1:
+      state: on
+      brightness_pct: 5
+      color_temp_kelvin: 2000
+
+- name: Bedroom Away
+  entities:
+    light.hue_lightstrip_plus_1:
+      state: off
+
+# ─────────────── Study ───────────────
+- name: Study Focus
+  entities:
+    light.alex_desk_light:
+      state: on
+      brightness_pct: 100
+      color_temp_kelvin: 6000
+    light.sammy_desk_light:
+      state: on
+      brightness_pct: 100
+      color_temp_kelvin: 6000
+    light.study_floor_light:
+      state: on
+      brightness_pct: 100
+      color_temp_kelvin: 6000
+
+- name: Study Relax
+  entities:
+    light.alex_desk_light:
+      state: on
+      brightness_pct: 30
+      color_temp_kelvin: 2200
+    light.sammy_desk_light:
+      state: on
+      brightness_pct: 30
+      color_temp_kelvin: 2200
+    light.study_floor_light:
+      state: on
+      brightness_pct: 30
+      color_temp_kelvin: 2200
+
+- name: Study Night
+  entities:
+    light.alex_desk_light:
+      state: on
+      brightness_pct: 5
+      color_temp_kelvin: 2000
+    light.sammy_desk_light:
+      state: on
+      brightness_pct: 5
+      color_temp_kelvin: 2000
+    light.study_floor_light:
+      state: on
+      brightness_pct: 5
+      color_temp_kelvin: 2000
+
+- name: Study Work
+  entities:
+    light.alex_desk_light:
+      state: on
+      brightness_pct: 80
+      color_temp_kelvin: 3000
+    light.sammy_desk_light:
+      state: on
+      brightness_pct: 80
+      color_temp_kelvin: 3000
+    light.study_floor_light:
+      state: on
+      brightness_pct: 50
+      color_temp_kelvin: 3000
+
+- name: Study Away
+  entities:
+    light.alex_desk_light:
+      state: off
+    light.sammy_desk_light:
+      state: off
+    light.study_floor_light:
+      state: off
