@@ -183,7 +183,7 @@ cards:
                 select_entity: input_text.hemma_living_room_scene
 
           - type: custom:button-card
-            name: Movie Night
+            name: Movie
             label: Ambient · 2000K
             show_label: true
             show_icon: true
@@ -226,8 +226,8 @@ cards:
               action: call-service
               service: script.hemma_activate_room_scene
               service_data:
-                scene_id: scene.living_room_movie_night
-                scene_name: Movie Night
+                scene_id: scene.living_room_movie
+                scene_name: Movie
                 select_entity: input_text.hemma_living_room_scene
 
           - type: custom:button-card
