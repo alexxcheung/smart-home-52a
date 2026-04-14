@@ -1,0 +1,198 @@
+# hemma_security_bubble_popup.yml
+# Lovelace fragment (.yml keeps it out of button_card_templates merge).
+# Open: hemma_badge_security navigates → '#hemma-security'
+# Must be placed LAST on the Home view (Bubble Card README).
+#
+# Tiles call input_select.select_option directly.
+# Automations in packages/hemma_helpers.yaml handle the actual device actions.
+
+type: vertical-stack
+cards:
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#hemma-security'
+    name: Home Security
+    icon: mdi:shield-home
+    button_type: name
+    show_state: false
+    force_icon: false
+    show_header: true
+    close_by_clicking_outside: true
+    width_desktop: 380px
+    margin_top_mobile: '0px'
+    margin_top_desktop: '0px'
+    bg_color: '#1c1c1c'
+    bg_opacity: '55'
+    bg_blur: '20'
+    shadow_opacity: '55'
+    styles: |
+      :host {
+        --bubble-backdrop-background-color: rgba(0, 0, 0, 0.45) !important;
+        --bubble-pop-up-background-color: var(--ha-card-background) !important;
+        --bubble-pop-up-main-background-color: var(--ha-card-background) !important;
+        --hemma-bubble-popup-inset-block: max(24px, 5vh);
+        --hemma-bubble-popup-inset-inline: max(16px, 3vw);
+        --hemma-bubble-popup-max-height: calc(
+          100dvh - 2 * var(--hemma-bubble-popup-inset-block)
+          - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+        );
+      }
+      .bubble-pop-up:not(.editor) {
+        top: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-top, 0px)) !important;
+        bottom: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-bottom, 0px)) !important;
+        left: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        right: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        margin: auto !important;
+        height: fit-content !important;
+        max-height: var(--hemma-bubble-popup-max-height) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        border-radius: var(--bubble-pop-up-border-radius, 42px) !important;
+        overflow: hidden !important;
+        transition: transform 0.3s ease, opacity 0.3s ease !important;
+      }
+      .bubble-pop-up:not(.editor).is-popup-closed { opacity: 0 !important; pointer-events: none !important; }
+      .bubble-pop-up:not(.editor).is-popup-opened { opacity: 1 !important; pointer-events: auto !important; }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-background {
+        border-radius: inherit !important;
+        background-color: var(--ha-card-background) !important;
+        backdrop-filter: blur(20px) saturate(1.1) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(1.1) !important;
+      }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-container {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        padding-bottom: 24px !important;
+      }
+      @media only screen and (min-width: 600px) and (max-width: 767px) {
+        .bubble-pop-up:not(.editor) {
+          margin-left: 0 !important; margin-right: 0 !important;
+          left: calc(50% - min(380px, calc(100vw - 2 * var(--hemma-bubble-popup-inset-inline))) / 2) !important;
+          right: auto !important;
+          width: min(380px, calc(100vw - 2 * var(--hemma-bubble-popup-inset-inline))) !important;
+        }
+      }
+      @media only screen and (min-width: 768px) {
+        .bubble-pop-up:not(.editor) {
+          margin-left: 0 !important; margin-right: 0 !important;
+          left: calc(var(--mdc-drawer-width, 0px) / 2 + 50% - min(380px, calc(100vw - var(--mdc-drawer-width, 0px) - 2 * var(--hemma-bubble-popup-inset-inline))) / 2) !important;
+          right: auto !important;
+          width: min(380px, calc(100vw - var(--mdc-drawer-width, 0px) - 2 * var(--hemma-bubble-popup-inset-inline))) !important;
+        }
+      }
+
+  - type: vertical-stack
+    cards:
+      - type: grid
+        columns: 1
+        square: false
+        cards:
+
+          # ── Home (Normal) ──────────────────────────────────────
+          - type: custom:button-card
+            name: Home
+            label: Normal mode
+            show_label: true
+            show_icon: true
+            icon: mdi:shield-home
+            styles:
+              card: [{ background: 'rgba(148,163,184,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }, { margin-top: 16px }]
+              icon: [{ color: '#94a3b8' }, { width: 28px }, { height: 28px }, { align-self: center }]
+              name: [{ font-size: 14px }, { font-weight: '700' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              label: [{ font-size: 11px }, { opacity: '0.5' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              grid: [{ grid-template-areas: '"i n" "i l"' }, { grid-template-columns: 'min-content 1fr' }, { column-gap: 14px }, { row-gap: 2px }, { align-items: center }, { justify-items: start }]
+            tap_action:
+              action: call-service
+              service: input_select.select_option
+              service_data: { entity_id: input_select.hemma_security_state, option: Home }
+
+          # ── Vacation ───────────────────────────────────────────
+          - type: custom:button-card
+            name: Vacation
+            label: Full arm · frost protect · presence sim
+            show_label: true
+            show_icon: true
+            icon: mdi:airplane
+            styles:
+              card: [{ background: 'rgba(96,165,250,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }]
+              icon: [{ color: '#60a5fa' }, { width: 28px }, { height: 28px }, { align-self: center }]
+              name: [{ font-size: 14px }, { font-weight: '700' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              label: [{ font-size: 11px }, { opacity: '0.5' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              grid: [{ grid-template-areas: '"i n" "i l"' }, { grid-template-columns: 'min-content 1fr' }, { column-gap: 14px }, { row-gap: 2px }, { align-items: center }, { justify-items: start }]
+            tap_action:
+              action: call-service
+              service: input_select.select_option
+              service_data: { entity_id: input_select.hemma_security_state, option: Vacation }
+
+          # ── Guest / Party ──────────────────────────────────────
+          - type: custom:button-card
+            name: Guest
+            label: Motion paused · front door unlocked
+            show_label: true
+            show_icon: true
+            icon: mdi:account-group
+            styles:
+              card: [{ background: 'rgba(167,139,250,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }]
+              icon: [{ color: '#a78bfa' }, { width: 28px }, { height: 28px }, { align-self: center }]
+              name: [{ font-size: 14px }, { font-weight: '700' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              label: [{ font-size: 11px }, { opacity: '0.5' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              grid: [{ grid-template-areas: '"i n" "i l"' }, { grid-template-columns: 'min-content 1fr' }, { column-gap: 14px }, { row-gap: 2px }, { align-items: center }, { justify-items: start }]
+            tap_action:
+              action: call-service
+              service: input_select.select_option
+              service_data: { entity_id: input_select.hemma_security_state, option: Guest }
+
+          # ── Pet Home ───────────────────────────────────────────
+          - type: custom:button-card
+            name: Pet Home
+            label: Perimeter only · PIR bypassed
+            show_label: true
+            show_icon: true
+            icon: mdi:paw
+            styles:
+              card: [{ background: 'rgba(249,115,22,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }]
+              icon: [{ color: '#fb923c' }, { width: 28px }, { height: 28px }, { align-self: center }]
+              name: [{ font-size: 14px }, { font-weight: '700' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              label: [{ font-size: 11px }, { opacity: '0.5' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              grid: [{ grid-template-areas: '"i n" "i l"' }, { grid-template-columns: 'min-content 1fr' }, { column-gap: 14px }, { row-gap: 2px }, { align-items: center }, { justify-items: start }]
+            tap_action:
+              action: call-service
+              service: input_select.select_option
+              service_data: { entity_id: input_select.hemma_security_state, option: Pet Home }
+
+          # ── Focus / Home Office ────────────────────────────────
+          - type: custom:button-card
+            name: Focus
+            label: Do Not Disturb · silent doorbell
+            show_label: true
+            show_icon: true
+            icon: mdi:do-not-disturb
+            styles:
+              card: [{ background: 'rgba(244,63,94,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }]
+              icon: [{ color: '#f43f5e' }, { width: 28px }, { height: 28px }, { align-self: center }]
+              name: [{ font-size: 14px }, { font-weight: '700' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              label: [{ font-size: 11px }, { opacity: '0.5' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              grid: [{ grid-template-areas: '"i n" "i l"' }, { grid-template-columns: 'min-content 1fr' }, { column-gap: 14px }, { row-gap: 2px }, { align-items: center }, { justify-items: start }]
+            tap_action:
+              action: call-service
+              service: input_select.select_option
+              service_data: { entity_id: input_select.hemma_security_state, option: Focus }
+
+          # ── Bypass / Maintenance ───────────────────────────────
+          - type: custom:button-card
+            name: Bypass
+            label: Disarmed · auto-revert in 2 hrs
+            show_label: true
+            show_icon: true
+            icon: mdi:shield-off-outline
+            styles:
+              card: [{ background: 'rgba(251,191,36,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }, { margin-bottom: 16px }]
+              icon: [{ color: '#fbbf24' }, { width: 28px }, { height: 28px }, { align-self: center }]
+              name: [{ font-size: 14px }, { font-weight: '700' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              label: [{ font-size: 11px }, { opacity: '0.5' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              grid: [{ grid-template-areas: '"i n" "i l"' }, { grid-template-columns: 'min-content 1fr' }, { column-gap: 14px }, { row-gap: 2px }, { align-items: center }, { justify-items: start }]
+            tap_action:
+              action: call-service
+              service: input_select.select_option
+              service_data: { entity_id: input_select.hemma_security_state, option: Bypass }

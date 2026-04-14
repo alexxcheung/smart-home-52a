@@ -1,0 +1,71 @@
+hemma_badge_security:
+  template: [hemma_badge_base]
+
+  variables:
+    enabled: false
+
+  # entity is hardcoded to input_select.hemma_security_state in hemma_room.yaml
+  tap_action:
+    action: navigate
+    navigation_path: '#hemma-security'
+
+  icon: >
+    [[[
+      const state = entity?.state;
+      const icons = {
+        'Vacation':  'mdi:airplane',
+        'Guest':     'mdi:account-group',
+        'Pet Home':  'mdi:paw',
+        'Focus':     'mdi:do-not-disturb',
+        'Bypass':    'mdi:shield-off-outline',
+      };
+      return icons[state] || 'mdi:shield-home';
+    ]]]
+
+  name: >
+    [[[
+      const state = entity?.state;
+      const hasState = state && state !== 'unknown' && state !== 'unavailable';
+      const subtitle = (hasState && state !== 'Home') ? state : '';
+      return `
+        <div class="mp-wrap">
+          <div class="mp-title">Security</div>
+          ${subtitle ? `<div class="mp-sub">${subtitle}</div>` : ''}
+        </div>
+      `;
+    ]]]
+
+  styles:
+    card:
+      - display: >
+          [[[
+            const ev = variables?.enabled;
+            const enabled = (ev === undefined || ev === null) ? false :
+              (typeof ev === 'boolean') ? ev :
+              (typeof ev === 'number') ? ev !== 0 :
+              !['false','0','no','off','disabled'].includes(String(ev).trim().toLowerCase());
+            return enabled ? 'inline-grid' : 'none';
+          ]]]
+    icon:
+      - color: >
+          [[[
+            const state = entity?.state;
+            const colours = {
+              'Vacation':  '#60a5fa',
+              'Guest':     '#a78bfa',
+              'Pet Home':  '#fb923c',
+              'Focus':     '#f43f5e',
+              'Bypass':    '#fbbf24',
+            };
+            return colours[state] || 'rgba(255,255,255,0.75)';
+          ]]]
+
+  extra_styles: >
+    [[[
+      const ev = variables?.enabled;
+      const enabled = (ev === undefined || ev === null) ? false :
+        (typeof ev === 'boolean') ? ev :
+        (typeof ev === 'number') ? ev !== 0 :
+        !['false','0','no','off','disabled'].includes(String(ev).trim().toLowerCase());
+      return `:host{display:${enabled ? 'inline-block' : 'none'} !important;}`;
+    ]]]

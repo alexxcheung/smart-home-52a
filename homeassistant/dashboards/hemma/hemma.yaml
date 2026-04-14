@@ -91,6 +91,9 @@ views:
           # Temperature Unit (affects comfort labels like "Cool", "Warm", etc.)
           temp_unit: 'C'                                  # 'F' for Fahrenheit, 'C' for Celsius
 
+          # Security State Badge
+          show_security: true
+
       # MOBILE NAVBAR
       - !include /config/dashboards/templates/includes/hemma_navbar_mobile.yaml
 
@@ -123,8 +126,11 @@ views:
             variables:
               icon: light
 
-      # Weather forecast Bubble (must be last on Home view; hash #hemma-weather-forecast)
+      # Weather forecast Bubble (hash #hemma-weather-forecast)
       - !include /config/dashboards/templates/button_cards/cards/hemma_weather/hemma_weather_bubble_popup.yml
+
+      # Security state Bubble (must be last on Home view; hash #hemma-security)
+      - !include /config/dashboards/templates/button_cards/cards/hemma_security_bubble_popup.yml
 
   # ------------------------------------------------------
   # INFO

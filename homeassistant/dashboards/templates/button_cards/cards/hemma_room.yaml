@@ -43,6 +43,8 @@ hemma_room:
     scene_room: null
     scene_room_label: Room
 
+    show_security: false
+
     show_temp: false
     temp_sensor:
 
@@ -419,6 +421,12 @@ hemma_room:
               enabled: '[[[ return variables.show_scene ]]]'
               room: '[[[ return variables.scene_room ]]]'
               room_label: '[[[ return variables.scene_room_label ]]]'
+
+          - type: custom:button-card
+            template: hemma_badge_security
+            entity: input_select.hemma_security_state
+            variables:
+              enabled: '[[[ return variables.show_security ]]]'
 
     badges_media:
       card:
