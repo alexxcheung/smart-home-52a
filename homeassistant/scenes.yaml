@@ -57,7 +57,7 @@
       state: off
     light.floor_light:
       state: on
-      brightness_pct: 2
+      brightness_pct: 1
       color_temp_kelvin: 1800
 
 - name: Living Room Away
@@ -94,7 +94,7 @@
   entities:
     light.kitchen_ceiling:
       state: on
-      brightness_pct: 2
+      brightness_pct: 1
       color_temp_kelvin: 1800
 
 - name: Kitchen Away
@@ -129,7 +129,7 @@
   entities:
     light.hallway_ceiling:
       state: on
-      brightness_pct: 2
+      brightness_pct: 1
       color_temp_kelvin: 1800
 
 - name: Hallway Away
@@ -162,9 +162,7 @@
 - name: Bedroom Sleep
   entities:
     light.hue_lightstrip_plus_1:
-      state: on
-      brightness_pct: 2
-      color_temp_kelvin: 1800
+      state: off
 
 - name: Bedroom Away
   entities:
@@ -240,7 +238,7 @@
       state: off
     light.study_floor_light:
       state: on
-      brightness_pct: 2
+      brightness_pct: 1
       color_temp_kelvin: 1800
 
 - name: Study Away
