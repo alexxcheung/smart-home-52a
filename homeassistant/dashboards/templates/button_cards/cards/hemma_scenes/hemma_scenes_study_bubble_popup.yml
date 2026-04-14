@@ -99,6 +99,23 @@ cards:
               service: script.hemma_activate_room_scene
               service_data: { scene_id: scene.study_focus, scene_name: Focus, select_entity: input_text.hemma_study_scene }
 
+
+          - type: custom:button-card
+            name: Reading
+            label: Bright · 4000K
+            show_label: true
+            show_icon: true
+            icon: mdi:book-open-variant
+            styles:
+              card: [{ background: 'rgba(252,211,77,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }]
+              icon: [{ color: '#fcd34d' }, { width: 28px }, { height: 28px }, { align-self: center }]
+              name: [{ font-size: 14px }, { font-weight: '700' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              label: [{ font-size: 11px }, { opacity: '0.5' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
+              grid: [{ grid-template-areas: '"i n" "i l"' }, { grid-template-columns: 'min-content 1fr' }, { column-gap: 14px }, { row-gap: 2px }, { align-items: center }, { justify-items: start }]
+            tap_action:
+              action: call-service
+              service: script.hemma_activate_room_scene
+              service_data: { scene_id: scene.study_reading, scene_name: Reading, select_entity: input_text.hemma_study_scene }
           - type: custom:button-card
             name: Work
             label: Desk · 3000K

@@ -42,6 +42,17 @@
       brightness_pct: 5
       color_temp_kelvin: 2000
 
+- name: Living Room Reading
+  entities:
+    light.sofa_light:
+      state: on
+      brightness_pct: 100
+      color_temp_kelvin: 4000
+    light.floor_light:
+      state: on
+      brightness_pct: 70
+      color_temp_kelvin: 4000
+
 - name: Living Room Cinema
   entities:
     light.sofa_light:
@@ -145,6 +156,13 @@
       brightness_pct: 100
       color_temp_kelvin: 6000
 
+- name: Bedroom Reading
+  entities:
+    light.hue_lightstrip_plus_1:
+      state: on
+      brightness_pct: 80
+      color_temp_kelvin: 4000
+
 - name: Bedroom Relax
   entities:
     light.hue_lightstrip_plus_1:
@@ -184,6 +202,21 @@
       state: on
       brightness_pct: 100
       color_temp_kelvin: 6000
+
+- name: Study Reading
+  entities:
+    light.alex_desk_light:
+      state: on
+      brightness_pct: 100
+      color_temp_kelvin: 4000
+    light.sammy_desk_light:
+      state: on
+      brightness_pct: 100
+      color_temp_kelvin: 4000
+    light.study_floor_light:
+      state: on
+      brightness_pct: 60
+      color_temp_kelvin: 4000
 
 - name: Study Relax
   entities:
