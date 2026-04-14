@@ -29,7 +29,7 @@ hemma_badge_security:
       const hasState = state && state !== 'unknown' && state !== 'unavailable';
       return `
         <div class="mp-wrap">
-          <div class="mp-title">Security</div>
+          <div class="mp-title">State</div>
           ${hasState ? `<div class="mp-sub">${state}</div>` : ''}
         </div>
       `;
