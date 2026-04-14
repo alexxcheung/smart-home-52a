@@ -1,5 +1,5 @@
 # Hemma — Room Scenes
-# 5 rooms × 4 basic scenes: Focus / Relax / Night / Away
+# 5 rooms × 5 basic scenes: Focus / Relax / Night / Sleep / Away
 #
 # Scene entity_ids are generated from names (slugified):
 #   "Living Room Focus" → scene.living_room_focus
@@ -51,6 +51,15 @@
       brightness_pct: 8
       color_temp_kelvin: 2000
 
+- name: Living Room Sleep
+  entities:
+    light.sofa_light:
+      state: off
+    light.floor_light:
+      state: on
+      brightness_pct: 2
+      color_temp_kelvin: 1800
+
 - name: Living Room Away
   entities:
     light.sofa_light:
@@ -81,6 +90,13 @@
       brightness_pct: 5
       color_temp_kelvin: 2000
 
+- name: Kitchen Sleep
+  entities:
+    light.kitchen_ceiling:
+      state: on
+      brightness_pct: 2
+      color_temp_kelvin: 1800
+
 - name: Kitchen Away
   entities:
     light.kitchen_ceiling:
@@ -109,6 +125,13 @@
       brightness_pct: 5
       color_temp_kelvin: 2000
 
+- name: Hallway Sleep
+  entities:
+    light.hallway_ceiling:
+      state: on
+      brightness_pct: 2
+      color_temp_kelvin: 1800
+
 - name: Hallway Away
   entities:
     light.hallway_ceiling:
@@ -135,6 +158,13 @@
       state: on
       brightness_pct: 5
       color_temp_kelvin: 2000
+
+- name: Bedroom Sleep
+  entities:
+    light.hue_lightstrip_plus_1:
+      state: on
+      brightness_pct: 2
+      color_temp_kelvin: 1800
 
 - name: Bedroom Away
   entities:
@@ -201,6 +231,17 @@
       state: on
       brightness_pct: 50
       color_temp_kelvin: 3000
+
+- name: Study Sleep
+  entities:
+    light.alex_desk_light:
+      state: off
+    light.sammy_desk_light:
+      state: off
+    light.study_floor_light:
+      state: on
+      brightness_pct: 2
+      color_temp_kelvin: 1800
 
 - name: Study Away
   entities:
