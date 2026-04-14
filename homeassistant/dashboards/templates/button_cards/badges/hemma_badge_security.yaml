@@ -26,11 +26,10 @@ hemma_badge_security:
     [[[
       const state = entity?.state;
       const hasState = state && state !== 'unknown' && state !== 'unavailable';
-      const subtitle = (hasState && state !== 'Home') ? state : '';
       return `
         <div class="mp-wrap">
           <div class="mp-title">Security</div>
-          ${subtitle ? `<div class="mp-sub">${subtitle}</div>` : ''}
+          ${hasState ? `<div class="mp-sub">${state}</div>` : ''}
         </div>
       `;
     ]]]
