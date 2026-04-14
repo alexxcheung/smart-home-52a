@@ -391,6 +391,12 @@ hemma_room:
 
         cards:
           - type: custom:button-card
+            template: hemma_badge_security
+            entity: input_select.hemma_security_state
+            variables:
+              enabled: '[[[ return variables.show_security ]]]'
+
+          - type: custom:button-card
             template: hemma_badge_presence
             entity: '[[[ return variables.presence_entity_1 ]]]'
             variables:
@@ -421,12 +427,6 @@ hemma_room:
               enabled: '[[[ return variables.show_scene ]]]'
               room: '[[[ return variables.scene_room ]]]'
               room_label: '[[[ return variables.scene_room_label ]]]'
-
-          - type: custom:button-card
-            template: hemma_badge_security
-            entity: input_select.hemma_security_state
-            variables:
-              enabled: '[[[ return variables.show_security ]]]'
 
     badges_media:
       card:
