@@ -100,6 +100,7 @@ cards:
                 - box-shadow: none
                 - padding: 14px 16px
                 - touch-action: manipulation
+                - margin-top: 16px
               icon:
                 - color: '#93c5fd'
                 - width: 28px
@@ -292,6 +293,7 @@ cards:
                 - box-shadow: none
                 - padding: 14px 16px
                 - touch-action: manipulation
+                - margin-bottom: 16px
               icon:
                 - color: '#94a3b8'
                 - width: 28px

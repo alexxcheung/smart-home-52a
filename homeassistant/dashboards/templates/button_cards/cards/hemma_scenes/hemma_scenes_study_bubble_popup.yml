@@ -89,7 +89,7 @@ cards:
             show_icon: true
             icon: mdi:white-balance-sunny
             styles:
-              card: [{ background: 'rgba(147,197,253,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }]
+              card: [{ background: 'rgba(147,197,253,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }, { margin-top: '16px' }]
               icon: [{ color: '#93c5fd' }, { width: 28px }, { height: 28px }, { align-self: center }]
               name: [{ font-size: 14px }, { font-weight: '700' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
               label: [{ font-size: 11px }, { opacity: '0.5' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
@@ -156,7 +156,7 @@ cards:
             show_icon: true
             icon: mdi:home-export-outline
             styles:
-              card: [{ background: 'rgba(148,163,184,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }]
+              card: [{ background: 'rgba(148,163,184,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }, { margin-bottom: '16px' }]
               icon: [{ color: '#94a3b8' }, { width: 28px }, { height: 28px }, { align-self: center }]
               name: [{ font-size: 14px }, { font-weight: '700' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
               label: [{ font-size: 11px }, { opacity: '0.5' }, { color: var(--primary-text-color) }, { text-align: left }, { justify-self: start }]
