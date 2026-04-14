@@ -167,7 +167,7 @@ cards:
             label: Do Not Disturb · silent doorbell
             show_label: true
             show_icon: true
-            icon: mdi:do-not-disturb
+            icon: mdi:bell-sleep
             styles:
               card: [{ background: 'rgba(244,63,94,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }]
               icon: [{ color: '#f43f5e' }, { width: 28px }, { height: 28px }, { align-self: center }]
