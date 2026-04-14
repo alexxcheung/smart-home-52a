@@ -13,6 +13,7 @@ hemma_badge_security:
     [[[
       const state = entity?.state;
       const icons = {
+        'Sleep':     'mdi:moon-waning-crescent',
         'Vacation':  'mdi:airplane',
         'Guest':     'mdi:account-group',
         'Pet Home':  'mdi:paw',
@@ -50,6 +51,7 @@ hemma_badge_security:
           [[[
             const state = entity?.state;
             const colours = {
+              'Sleep':     '#818cf8',
               'Vacation':  '#60a5fa',
               'Guest':     '#a78bfa',
               'Pet Home':  '#fb923c',

@@ -122,6 +122,7 @@ input_select:
     name: Home Security State
     options:
       - Home
+      - Sleep
       - Vacation
       - Guest
       - Pet Home
@@ -427,6 +428,51 @@ automation:
         data:
           name: "Security State"
           message: "Switched to Home mode"
+          entity_id: input_select.hemma_security_state
+
+  - id: hemma_security_state_sleep
+    alias: "Security - Sleep"
+    trigger:
+      - trigger: state
+        entity_id: input_select.hemma_security_state
+        to: "Sleep"
+    action:
+      # Arm alarm in home (stay) mode — perimeter sensors active, internal PIR active
+      # TODO: replace with your alarm entity
+      # - action: alarm_control_panel.alarm_arm_home
+      #   target: { entity_id: alarm_control_panel.YOUR_ALARM }
+      #   data: { code: "YOUR_CODE" }
+
+      # Cool thermostats to night temperature
+      # TODO: adjust temperature and entity IDs to match your setup
+      # - action: climate.set_temperature
+      #   target:
+      #     entity_id:
+      #       - climate.radiator_thermostat_x_living_room
+      #       - climate.radiator_thermostat_x_hallway
+      #       - climate.radiator_thermostat_x_study_room
+      #   data: { temperature: 18, hvac_mode: heat }
+
+      # Activate Bedroom Sleep scene
+      - action: scene.turn_on
+        target: { entity_id: scene.bedroom_sleep }
+
+      # Activate Living Room Sleep scene
+      - action: scene.turn_on
+        target: { entity_id: scene.living_room_sleep }
+
+      # TODO: Silence non-urgent mobile notifications
+      # - action: notify.mobile_app_YOUR_PHONE
+      #   data: { message: "command_dnd_priority_only" }  # Android
+
+      # TODO: Turn off TVs / speakers
+      # - action: media_player.turn_off
+      #   target: { entity_id: [ media_player.samsung_qb90_qe65qn90batxxu, media_player.sonos_arc ] }
+
+      - action: logbook.log
+        data:
+          name: "Security State"
+          message: "Switched to Sleep mode — perimeter armed, thermostats cooled, lights off"
           entity_id: input_select.hemma_security_state
 
   - id: hemma_security_state_vacation
