@@ -4,7 +4,7 @@ hemma_badge_security:
   variables:
     enabled: false
 
-  # entity is hardcoded to input_select.hemma_security_state in hemma_room.yaml
+  # entity is hardcoded to input_select.hemma_home_state in hemma_room.yaml
   tap_action:
     action: navigate
     navigation_path: '#hemma-security'

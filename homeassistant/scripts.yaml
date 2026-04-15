@@ -13,7 +13,7 @@ hemma_security_presence_simulation:
     - repeat:
         while:
           - condition: state
-            entity_id: input_select.hemma_security_state
+            entity_id: input_select.hemma_home_state
             state: "Vacation"
         sequence:
           # Only simulate between 18:00 and 23:00

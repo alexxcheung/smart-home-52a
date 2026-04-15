@@ -118,7 +118,7 @@ input_select:
     initial: away
     icon: mdi:account
 
-  hemma_security_state:
+  hemma_home_state:
     name: Home Security State
     options:
       - Home
@@ -406,14 +406,14 @@ automation:
 
   # ============================================================================
   # SECURITY STATE AUTOMATIONS
-  # Triggered whenever input_select.hemma_security_state changes.
+  # Triggered whenever input_select.hemma_home_state changes.
   # Each mode block has TODO comments — fill in your actual entity IDs.
   # ============================================================================
-  - id: hemma_security_state_home
+  - id: hemma_home_state_home
     alias: "Security - Home (Normal)"
     trigger:
       - trigger: state
-        entity_id: input_select.hemma_security_state
+        entity_id: input_select.hemma_home_state
         to: "Home"
     action:
       # TODO: Disarm alarm panel
@@ -428,13 +428,13 @@ automation:
         data:
           name: "Security State"
           message: "Switched to Home mode"
-          entity_id: input_select.hemma_security_state
+          entity_id: input_select.hemma_home_state
 
-  - id: hemma_security_state_sleep
+  - id: hemma_home_state_sleep
     alias: "Security - Sleep"
     trigger:
       - trigger: state
-        entity_id: input_select.hemma_security_state
+        entity_id: input_select.hemma_home_state
         to: "Sleep"
     action:
       # Arm alarm in home (stay) mode — perimeter sensors active, internal PIR active
@@ -473,13 +473,13 @@ automation:
         data:
           name: "Security State"
           message: "Switched to Sleep mode — perimeter armed, thermostats cooled, lights off"
-          entity_id: input_select.hemma_security_state
+          entity_id: input_select.hemma_home_state
 
-  - id: hemma_security_state_vacation
+  - id: hemma_home_state_vacation
     alias: "Security - Vacation"
     trigger:
       - trigger: state
-        entity_id: input_select.hemma_security_state
+        entity_id: input_select.hemma_home_state
         to: "Vacation"
     action:
       # TODO: Arm alarm panel (away mode)
@@ -509,13 +509,13 @@ automation:
         data:
           name: "Security State"
           message: "Switched to Vacation mode — frost protection + presence simulation active"
-          entity_id: input_select.hemma_security_state
+          entity_id: input_select.hemma_home_state
 
-  - id: hemma_security_state_vacation_end
+  - id: hemma_home_state_vacation_end
     alias: "Security - Vacation ended (cancel simulation)"
     trigger:
       - trigger: state
-        entity_id: input_select.hemma_security_state
+        entity_id: input_select.hemma_home_state
         from: "Vacation"
     action:
       - action: script.turn_off
@@ -528,11 +528,11 @@ automation:
             - light.floor_light
             - light.hue_lightstrip_plus_1
 
-  - id: hemma_security_state_guest
+  - id: hemma_home_state_guest
     alias: "Security - Guest / Party"
     trigger:
       - trigger: state
-        entity_id: input_select.hemma_security_state
+        entity_id: input_select.hemma_home_state
         to: "Guest"
     action:
       # TODO: Disable internal motion sensor automations
@@ -550,13 +550,13 @@ automation:
         data:
           name: "Security State"
           message: "Switched to Guest mode — motion automations paused"
-          entity_id: input_select.hemma_security_state
+          entity_id: input_select.hemma_home_state
 
-  - id: hemma_security_state_pet_home
+  - id: hemma_home_state_pet_home
     alias: "Security - Pet Home"
     trigger:
       - trigger: state
-        entity_id: input_select.hemma_security_state
+        entity_id: input_select.hemma_home_state
         to: "Pet Home"
     action:
       # TODO: Arm perimeter sensors only (doors + windows), bypass PIR motion sensors
@@ -572,13 +572,13 @@ automation:
         data:
           name: "Security State"
           message: "Switched to Pet Home mode — perimeter armed, PIR bypassed"
-          entity_id: input_select.hemma_security_state
+          entity_id: input_select.hemma_home_state
 
-  - id: hemma_security_state_focus
+  - id: hemma_home_state_focus
     alias: "Security - Focus / Home Office"
     trigger:
       - trigger: state
-        entity_id: input_select.hemma_security_state
+        entity_id: input_select.hemma_home_state
         to: "Focus"
     action:
       # TODO: Set doorbell to silent chime mode
@@ -594,13 +594,13 @@ automation:
         data:
           name: "Security State"
           message: "Switched to Focus mode — Do Not Disturb active"
-          entity_id: input_select.hemma_security_state
+          entity_id: input_select.hemma_home_state
 
-  - id: hemma_security_state_bypass
+  - id: hemma_home_state_bypass
     alias: "Security - Bypass / Maintenance"
     trigger:
       - trigger: state
-        entity_id: input_select.hemma_security_state
+        entity_id: input_select.hemma_home_state
         to: "Bypass"
     action:
       # TODO: Disarm alarm
@@ -615,13 +615,13 @@ automation:
       # Auto-revert to Home after 2 hours
       - delay: "02:00:00"
       - action: input_select.select_option
-        target: { entity_id: input_select.hemma_security_state }
+        target: { entity_id: input_select.hemma_home_state }
         data: { option: Home }
       - action: logbook.log
         data:
           name: "Security State"
           message: "Bypass window ended — reverted to Home mode"
-          entity_id: input_select.hemma_security_state
+          entity_id: input_select.hemma_home_state
 
   # Sync dehumidifier target humidity to input_number (device → UI and on start)
   - id: hemma_dehumidifier_sync_target

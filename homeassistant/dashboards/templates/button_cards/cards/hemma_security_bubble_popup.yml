@@ -105,7 +105,7 @@ cards:
             tap_action:
               action: call-service
               service: input_select.select_option
-              service_data: { entity_id: input_select.hemma_security_state, option: Home }
+              service_data: { entity_id: input_select.hemma_home_state, option: Home }
 
           # ── Sleep ─────────────────────────────────────────────
           - type: custom:button-card
@@ -123,7 +123,7 @@ cards:
             tap_action:
               action: call-service
               service: input_select.select_option
-              service_data: { entity_id: input_select.hemma_security_state, option: Sleep }
+              service_data: { entity_id: input_select.hemma_home_state, option: Sleep }
 
           # ── Vacation ───────────────────────────────────────────
           - type: custom:button-card
@@ -141,7 +141,7 @@ cards:
             tap_action:
               action: call-service
               service: input_select.select_option
-              service_data: { entity_id: input_select.hemma_security_state, option: Vacation }
+              service_data: { entity_id: input_select.hemma_home_state, option: Vacation }
 
           # ── Guest / Party ──────────────────────────────────────
           - type: custom:button-card
@@ -159,7 +159,7 @@ cards:
             tap_action:
               action: call-service
               service: input_select.select_option
-              service_data: { entity_id: input_select.hemma_security_state, option: Guest }
+              service_data: { entity_id: input_select.hemma_home_state, option: Guest }
 
           # ── Pet Home ───────────────────────────────────────────
           - type: custom:button-card
@@ -177,7 +177,7 @@ cards:
             tap_action:
               action: call-service
               service: input_select.select_option
-              service_data: { entity_id: input_select.hemma_security_state, option: Pet Home }
+              service_data: { entity_id: input_select.hemma_home_state, option: Pet Home }
 
           # ── Focus / Home Office ────────────────────────────────
           - type: custom:button-card
@@ -195,7 +195,7 @@ cards:
             tap_action:
               action: call-service
               service: input_select.select_option
-              service_data: { entity_id: input_select.hemma_security_state, option: Focus }
+              service_data: { entity_id: input_select.hemma_home_state, option: Focus }
 
           # ── Bypass / Maintenance ───────────────────────────────
           - type: custom:button-card
@@ -213,4 +213,4 @@ cards:
             tap_action:
               action: call-service
               service: input_select.select_option
-              service_data: { entity_id: input_select.hemma_security_state, option: Bypass }
+              service_data: { entity_id: input_select.hemma_home_state, option: Bypass }

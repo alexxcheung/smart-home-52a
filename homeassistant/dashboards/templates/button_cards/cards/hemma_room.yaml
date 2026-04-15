@@ -392,7 +392,7 @@ hemma_room:
         cards:
           - type: custom:button-card
             template: hemma_badge_security
-            entity: input_select.hemma_security_state
+            entity: input_select.hemma_home_state
             variables:
               enabled: '[[[ return variables.show_security ]]]'
 
