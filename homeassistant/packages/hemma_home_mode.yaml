@@ -1,0 +1,266 @@
+# packages/hemma_home_mode.yaml
+# ============================================================================
+# Hemma Home Mode — state tracking, automations, and presence simulation
+#
+# ENTITIES CREATED:
+#   - input_select.hemma_home_state: current home mode (Home/Sleep/Vacation/…)
+#
+# SCRIPTS CREATED:
+#   - script.hemma_security_presence_simulation: Vacation light randomiser
+#
+# AUTOMATIONS: one per mode, triggered by input_select state changes.
+#   Fill in the # TODO: sections with your actual entity IDs.
+# ============================================================================
+
+input_select:
+  hemma_home_state:
+    name: Home Mode
+    options:
+      - Home
+      - Sleep
+      - Vacation
+      - Guest
+      - Pet Home
+      - Focus
+      - Bypass
+    initial: Home
+    icon: mdi:home
+
+# ---------------------------------------------------------------------------
+# Presence simulation script (used by Vacation mode)
+# Randomly toggles Living Room + Bedroom lights between 18:00–23:00 to make
+# the house look occupied. Runs in a loop; stopped when leaving Vacation mode.
+# ---------------------------------------------------------------------------
+script:
+  hemma_security_presence_simulation:
+    alias: "Home Mode - Vacation Presence Simulation"
+    mode: single
+    sequence:
+      - repeat:
+          while:
+            - condition: state
+              entity_id: input_select.hemma_home_state
+              state: "Vacation"
+          sequence:
+            # Only simulate between 18:00 and 23:00
+            - condition: template
+              value_template: >
+                {{ now().hour >= 18 and now().hour < 23 }}
+            # Pick a random light action
+            - variables:
+                light_entity: >
+                  {{ ['light.sofa_light', 'light.floor_light', 'light.hue_lightstrip_plus_1'] | random }}
+                action: "{{ ['turn_on', 'turn_off'] | random }}"
+            - action: "light.{{ action }}"
+              target:
+                entity_id: "{{ light_entity }}"
+            # Wait a random interval (5–25 minutes) before next toggle
+            - delay:
+                minutes: "{{ range(5, 25) | random }}"
+
+# ---------------------------------------------------------------------------
+# Mode automations
+# ---------------------------------------------------------------------------
+automation:
+
+  - id: hemma_home_state_home
+    alias: "Home Mode - Home (Normal)"
+    trigger:
+      - trigger: state
+        entity_id: input_select.hemma_home_state
+        to: "Home"
+    action:
+      # TODO: Disarm alarm panel
+      # - action: alarm_control_panel.alarm_disarm
+      #   target: { entity_id: alarm_control_panel.YOUR_ALARM }
+      #   data: { code: "YOUR_CODE" }
+
+      # TODO: Re-enable motion sensor automations
+      # TODO: Restore heating to normal schedule
+      - action: logbook.log
+        data:
+          name: "Home Mode"
+          message: "Switched to Home mode"
+          entity_id: input_select.hemma_home_state
+
+  - id: hemma_home_state_sleep
+    alias: "Home Mode - Sleep"
+    trigger:
+      - trigger: state
+        entity_id: input_select.hemma_home_state
+        to: "Sleep"
+    action:
+      # TODO: Arm alarm in home/stay mode
+      # - action: alarm_control_panel.alarm_arm_home
+      #   target: { entity_id: alarm_control_panel.YOUR_ALARM }
+      #   data: { code: "YOUR_CODE" }
+
+      # TODO: Cool thermostats to 18 °C for sleeping
+      # - action: climate.set_temperature
+      #   target:
+      #     entity_id:
+      #       - climate.radiator_thermostat_x_living_room
+      #       - climate.radiator_thermostat_x_hallway
+      #       - climate.radiator_thermostat_x_study_room
+      #   data: { temperature: 18, hvac_mode: heat }
+
+      # Activate sleep scenes (already work without further config)
+      - action: scene.turn_on
+        target: { entity_id: scene.bedroom_sleep }
+      - action: scene.turn_on
+        target: { entity_id: scene.living_room_sleep }
+
+      # TODO: Silence non-urgent mobile notifications
+      # - action: notify.mobile_app_YOUR_PHONE
+      #   data: { message: "command_dnd_priority_only" }  # Android
+
+      # TODO: Turn off TVs / speakers
+      # - action: media_player.turn_off
+      #   target: { entity_id: [ media_player.samsung_qb90_qe65qn90batxxu, media_player.sonos_arc ] }
+
+      - action: logbook.log
+        data:
+          name: "Home Mode"
+          message: "Switched to Sleep mode"
+          entity_id: input_select.hemma_home_state
+
+  - id: hemma_home_state_vacation
+    alias: "Home Mode - Vacation"
+    trigger:
+      - trigger: state
+        entity_id: input_select.hemma_home_state
+        to: "Vacation"
+    action:
+      # TODO: Arm alarm (away mode)
+      # - action: alarm_control_panel.alarm_arm_away
+      #   target: { entity_id: alarm_control_panel.YOUR_ALARM }
+      #   data: { code: "YOUR_CODE" }
+
+      # TODO: Frost protection — set thermostats to 12 °C
+      # - action: climate.set_temperature
+      #   target:
+      #     entity_id:
+      #       - climate.radiator_thermostat_x_living_room
+      #       - climate.radiator_thermostat_x_hallway
+      #       - climate.radiator_thermostat_x_study_room
+      #   data: { temperature: 12, hvac_mode: heat }
+
+      # TODO: Turn off non-essential smart plugs
+      # - action: switch.turn_off
+      #   target: { entity_id: [ switch.YOUR_PLUG_1, switch.YOUR_PLUG_2 ] }
+
+      - action: script.turn_on
+        target: { entity_id: script.hemma_security_presence_simulation }
+      - action: logbook.log
+        data:
+          name: "Home Mode"
+          message: "Switched to Vacation mode — presence simulation active"
+          entity_id: input_select.hemma_home_state
+
+  - id: hemma_home_state_vacation_end
+    alias: "Home Mode - Vacation ended (cancel simulation)"
+    trigger:
+      - trigger: state
+        entity_id: input_select.hemma_home_state
+        from: "Vacation"
+    action:
+      - action: script.turn_off
+        target: { entity_id: script.hemma_security_presence_simulation }
+      - action: light.turn_off
+        target:
+          entity_id:
+            - light.sofa_light
+            - light.floor_light
+            - light.hue_lightstrip_plus_1
+
+  - id: hemma_home_state_guest
+    alias: "Home Mode - Guest / Party"
+    trigger:
+      - trigger: state
+        entity_id: input_select.hemma_home_state
+        to: "Guest"
+    action:
+      # TODO: Disable internal motion automations
+      # - action: automation.turn_off
+      #   target: { entity_id: automation.YOUR_MOTION_LIGHT_AUTOMATION }
+
+      # TODO: Set front door lock to passage mode for 4 hours
+      # - action: lock.unlock
+      #   target: { entity_id: lock.YOUR_FRONT_DOOR }
+
+      # TODO: Mute doorbell person-detected notifications
+      # - action: notify.mobile_app_YOUR_PHONE
+      #   data: { message: "command_dnd_priority_only" }
+      - action: logbook.log
+        data:
+          name: "Home Mode"
+          message: "Switched to Guest mode"
+          entity_id: input_select.hemma_home_state
+
+  - id: hemma_home_state_pet_home
+    alias: "Home Mode - Pet Home"
+    trigger:
+      - trigger: state
+        entity_id: input_select.hemma_home_state
+        to: "Pet Home"
+    action:
+      # TODO: Arm perimeter only (bypass PIR)
+      # - action: alarm_control_panel.alarm_arm_home
+      #   target: { entity_id: alarm_control_panel.YOUR_ALARM }
+      #   data: { code: "YOUR_CODE" }
+
+      # TODO: Keep climate comfortable for pets (20 °C)
+      # - action: climate.set_temperature
+      #   target: { entity_id: climate.radiator_thermostat_x_living_room }
+      #   data: { temperature: 20, hvac_mode: heat }
+      - action: logbook.log
+        data:
+          name: "Home Mode"
+          message: "Switched to Pet Home mode"
+          entity_id: input_select.hemma_home_state
+
+  - id: hemma_home_state_focus
+    alias: "Home Mode - Focus / Home Office"
+    trigger:
+      - trigger: state
+        entity_id: input_select.hemma_home_state
+        to: "Focus"
+    action:
+      # TODO: Set doorbell to silent chime
+      # - action: select.select_option
+      #   target: { entity_id: select.YOUR_DOORBELL_CHIME }
+      #   data: { option: "Silent" }
+
+      # TODO: Mute non-critical notifications
+      - action: logbook.log
+        data:
+          name: "Home Mode"
+          message: "Switched to Focus mode — Do Not Disturb active"
+          entity_id: input_select.hemma_home_state
+
+  - id: hemma_home_state_bypass
+    alias: "Home Mode - Bypass / Maintenance"
+    trigger:
+      - trigger: state
+        entity_id: input_select.hemma_home_state
+        to: "Bypass"
+    action:
+      # TODO: Disarm alarm
+      # - action: alarm_control_panel.alarm_disarm
+      #   target: { entity_id: alarm_control_panel.YOUR_ALARM }
+      #   data: { code: "YOUR_CODE" }
+
+      # TODO: Unlock back / side door
+      # - action: lock.unlock
+      #   target: { entity_id: lock.YOUR_BACK_DOOR }
+
+      # Auto-revert to Home after 2 hours
+      - delay: "02:00:00"
+      - action: input_select.select_option
+        target: { entity_id: input_select.hemma_home_state }
+        data: { option: Home }
+      - action: logbook.log
+        data:
+          name: "Home Mode"
+          message: "Bypass window ended — reverted to Home mode"
+          entity_id: input_select.hemma_home_state

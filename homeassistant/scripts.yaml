@@ -4,34 +4,6 @@
 # Activate a room scene and record the name in an input_text helper so the
 # scene badge subtitle updates reactively (scene entities stay in 'scening'
 # state and never fire state_changed on repeat calls; input_text does).
-# Vacation presence simulation — randomly toggles Living Room + Bedroom lights
-# in the evening to deter burglars. Runs in a loop until script.turn_off is called.
-hemma_security_presence_simulation:
-  alias: "Security - Vacation Presence Simulation"
-  mode: single
-  sequence:
-    - repeat:
-        while:
-          - condition: state
-            entity_id: input_select.hemma_home_state
-            state: "Vacation"
-        sequence:
-          # Only simulate between 18:00 and 23:00
-          - condition: template
-            value_template: >
-              {{ now().hour >= 18 and now().hour < 23 }}
-          # Pick a random light action
-          - variables:
-              light_entity: >
-                {{ ['light.sofa_light', 'light.floor_light', 'light.hue_lightstrip_plus_1'] | random }}
-              action: "{{ ['turn_on', 'turn_off'] | random }}"
-          - action: "light.{{ action }}"
-            target:
-              entity_id: "{{ light_entity }}"
-          # Wait a random interval (5–25 minutes) before next toggle
-          - delay:
-              minutes: "{{ range(5, 25) | random }}"
-
 hemma_activate_room_scene:
   alias: "Hemma Activate Room Scene"
   fields:
