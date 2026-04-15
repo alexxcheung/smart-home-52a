@@ -11,8 +11,8 @@ cards:
   - type: custom:bubble-card
     card_type: pop-up
     hash: '#hemma-security'
-    name: Home Security
-    icon: mdi:shield-home
+            name: Home Security
+            icon: mdi:home
     button_type: name
     show_state: false
     force_icon: false
@@ -95,7 +95,7 @@ cards:
             label: Normal mode
             show_label: true
             show_icon: true
-            icon: mdi:shield-home
+            icon: mdi:home
             styles:
               card: [{ background: 'rgba(148,163,184,0.10)' }, { backdrop-filter: blur(20px) }, { border-radius: 16px }, { border: '1px solid rgba(255,255,255,0.12)' }, { box-shadow: none }, { padding: 14px 16px }, { touch-action: manipulation }, { margin-top: 16px }]
               icon: [{ color: '#94a3b8' }, { width: 28px }, { height: 28px }, { align-self: center }]

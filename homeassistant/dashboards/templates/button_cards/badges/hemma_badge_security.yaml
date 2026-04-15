@@ -20,7 +20,7 @@ hemma_badge_security:
         'Focus':     'mdi:bell-sleep',
         'Bypass':    'mdi:shield-off-outline',
       };
-      return icons[state] || 'mdi:shield-home';
+      return icons[state] || 'mdi:home';
     ]]]
 
   name: >
