@@ -11,8 +11,8 @@ cards:
   - type: custom:bubble-card
     card_type: pop-up
     hash: '#hemma-security'
-            name: Home Security
-            icon: mdi:home
+    name: Home Security
+    icon: mdi:home
     button_type: name
     show_state: false
     force_icon: false
