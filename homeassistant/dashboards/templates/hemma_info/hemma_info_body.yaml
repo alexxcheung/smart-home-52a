@@ -545,7 +545,7 @@ cards:
               const lines = entries.map((obj) => {
                 const ts = new Date(obj.last_changed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const name = obj.attributes?.friendly_name || obj.entity_id;
-                return `<div style="font-size:12px;opacity:0.9;color:var(--primary-text-color);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ts} - ${name} -> ${stateLabel(obj.state)}</div>`;
+                return `<div style="font-size:12px;font-weight:400;opacity:0.9;color:var(--primary-text-color);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="font-weight:700;">${ts}</span> - ${name} -> ${stateLabel(obj.state)}</div>`;
               }).join('');
 
               const empty = `<div style="font-size:12px;opacity:0.5;margin-top:8px;">No recent device updates</div>`;

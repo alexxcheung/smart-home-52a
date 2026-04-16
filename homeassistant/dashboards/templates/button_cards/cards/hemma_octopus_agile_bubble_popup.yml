@@ -1,0 +1,146 @@
+type: vertical-stack
+cards:
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#hemma-octopus-agile'
+    name: Octopus Agile Rates Today and Tomorrow
+    icon: mdi:flash
+    button_type: name
+    show_state: false
+    force_icon: false
+    show_header: true
+    close_by_clicking_outside: true
+    width_desktop: 520px
+    margin_top_mobile: '0px'
+    margin_top_desktop: '0px'
+    bg_color: '#1c1c1c'
+    bg_opacity: '55'
+    bg_blur: '20'
+    shadow_opacity: '55'
+    styles: |
+      :host {
+        --bubble-backdrop-background-color: rgba(0, 0, 0, 0.45) !important;
+        --bubble-pop-up-background-color: var(--ha-card-background) !important;
+        --bubble-pop-up-main-background-color: var(--ha-card-background) !important;
+        --hemma-bubble-popup-inset-block: max(24px, 5vh);
+        --hemma-bubble-popup-inset-inline: max(16px, 3vw);
+        --hemma-bubble-popup-max-height: calc(
+          100dvh - 2 * var(--hemma-bubble-popup-inset-block)
+          - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+        );
+      }
+      .bubble-pop-up:not(.editor) {
+        top: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-top, 0px)) !important;
+        bottom: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-bottom, 0px)) !important;
+        left: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        right: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        margin: auto !important;
+        height: fit-content !important;
+        max-height: var(--hemma-bubble-popup-max-height) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        border-radius: var(--bubble-pop-up-border-radius, 42px) !important;
+        overflow: hidden !important;
+        transition: transform 0.3s ease, opacity 0.3s ease !important;
+      }
+      .bubble-pop-up:not(.editor).is-popup-closed { opacity: 0 !important; pointer-events: none !important; }
+      .bubble-pop-up:not(.editor).is-popup-opened { opacity: 1 !important; pointer-events: auto !important; }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-background {
+        border-radius: inherit !important;
+        background-color: var(--ha-card-background) !important;
+        backdrop-filter: blur(20px) saturate(1.1) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(1.1) !important;
+      }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-container {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        padding-bottom: 24px !important;
+      }
+
+  - type: custom:button-card
+    template: hemma_plain_button_card
+    entity: event.octopus_energy_electricity_20l3765434_2000057767569_current_day_rates
+    triggers_update:
+      - event.octopus_energy_electricity_20l3765434_2000057767569_current_day_rates
+      - event.octopus_energy_electricity_20l3765434_2000057767569_next_day_rates
+      - sensor.5_minute_clock
+    tap_action:
+      action: none
+    custom_fields:
+      list: >
+        [[[
+          const todayRates = entity?.attributes?.rates ?? [];
+          const tomorrowEntity = states['event.octopus_energy_electricity_20l3765434_2000057767569_next_day_rates'];
+          const tomorrowRates = tomorrowEntity?.attributes?.rates ?? [];
+          const now = new Date();
+          const toPence = (slot) => (slot.value_inc_vat * 100).toFixed(1);
+          const fmt = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+          const BAR_MIN = 0;
+          const BAR_MAX = 0.35;
+          const barColor = (v) => {
+            if (v <= 0.10) return '#6bcb77';
+            if (v <= 0.18) return '#ffd166';
+            if (v <= 0.25) return '#f4a261';
+            return '#ff6b6b';
+          };
+          const renderRow = (slot) => {
+            const isCurrent = now >= new Date(slot.start) && now < new Date(slot.end);
+            const v = slot.value_inc_vat;
+            const displayPence = toPence(slot);
+            const pct = v <= 0 ? 0 : Math.max(4, Math.min(100, Math.round(((v - BAR_MIN) / (BAR_MAX - BAR_MIN)) * 100)));
+            const color = barColor(v);
+            const highlight = isCurrent ? 'background:rgba(255,255,255,0.08);border-radius:8px;' : '';
+            return `
+              <div class="rrow" style="${highlight}text-align:left">
+                <span class="rtime" style="text-align:left">${fmt(slot.start)}</span>
+                <div class="rbar-wrap"><div class="rbar" style="width:${pct}%;background:${color};"></div></div>
+                <span class="rpence" style="color:${color};text-align:right">${displayPence}p</span>
+                ${isCurrent ? '<span class="rnow">NOW</span>' : '<span></span>'}
+              </div>`;
+          };
+          const section = (label, rates) => !rates.length ? '' : `
+            <div class="rsection" style="text-align:left">
+              <div class="rsection-label" style="text-align:left">${label}</div>
+              ${rates.map(renderRow).join('')}
+            </div>`;
+          const remainingToday = todayRates.filter(r => new Date(r.end) > now);
+          return `
+            <div class="popup-wrap" style="text-align:left">
+              <div class="popup-header" style="text-align:left">
+                <span class="popup-title" style="text-align:left">⚡ Agile Rates</span>
+                <div class="legend">
+                  <span style="color:#6bcb77">▮</span> &lt;10p
+                  <span style="color:#ffd166">▮</span> 10-18p
+                  <span style="color:#f4a261">▮</span> 18-25p
+                  <span style="color:#ff6b6b">▮</span> &gt;25p
+                </div>
+              </div>
+              <div class="rlist" style="text-align:left;">
+                ${section('Today', remainingToday)}
+                ${tomorrowRates.length ? section('Tomorrow', tomorrowRates) : '<div class="rsection" style="text-align:left"><div class="rsection-label" style="text-align:left">Tomorrow</div><div style="font-size:12px;opacity:0.4;padding:8px 6px;text-align:left">Rates not yet published - usually available after 4pm</div></div>'}
+              </div>
+            </div>`;
+        ]]]
+    styles:
+      card:
+        - background: transparent
+        - box-shadow: none
+        - border: none
+      custom_fields:
+        list:
+          - width: 100%
+    extra_styles: |
+      .popup-wrap { display: block; width: 100%; padding: 16px; box-sizing: border-box; }
+      .popup-header { position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 4px; }
+      .popup-title { font-size: 15px; font-weight: 700; }
+      .legend { font-size: 10px; opacity: 0.6; display: flex; gap: 6px; align-items: center; }
+      .rlist { display: block; }
+      .rsection { margin-bottom: 8px; }
+      .rsection-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; padding: 8px 4px 4px; }
+      .rrow { display: grid; grid-template-columns: 48px 1fr 40px 32px; align-items: center; gap: 8px; padding: 5px 6px; }
+      .rtime { font-size: 12px; font-weight: 500; opacity: 0.7; font-variant-numeric: tabular-nums; }
+      .rbar-wrap { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+      .rbar { height: 100%; border-radius: 3px; }
+      .rpence { font-size: 12px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+      .rnow { font-size: 9px; font-weight: 700; background: white; color: black; border-radius: 4px; padding: 1px 4px; text-align: center; }

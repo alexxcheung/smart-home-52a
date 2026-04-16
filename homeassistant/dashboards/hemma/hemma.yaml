@@ -172,6 +172,8 @@ views:
       - !include /config/dashboards/templates/includes/hemma_navbar_mobile.yaml
       # System log Bubble (must be last on Info view; hash #hemma-system-log)
       - !include /config/dashboards/templates/button_cards/cards/hemma_system_log_bubble_popup.yml
+      # Octopus Agile Bubble (hash #hemma-octopus-agile)
+      - !include /config/dashboards/templates/button_cards/cards/hemma_octopus_agile_bubble_popup.yml
 
   # ------------------------------------------------------
   # LIVING ROOM
