@@ -1,0 +1,158 @@
+type: vertical-stack
+cards:
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#hemma-system-log'
+    name: Device Log
+    icon: mdi:clipboard-text-clock-outline
+    button_type: name
+    show_state: false
+    force_icon: false
+    show_header: true
+    close_by_clicking_outside: true
+    width_desktop: 520px
+    margin_top_mobile: '0px'
+    margin_top_desktop: '0px'
+    bg_color: '#1c1c1c'
+    bg_opacity: '55'
+    bg_blur: '20'
+    shadow_opacity: '55'
+    styles: |
+      :host {
+        --bubble-backdrop-background-color: rgba(0, 0, 0, 0.45) !important;
+        --bubble-pop-up-background-color: var(--ha-card-background) !important;
+        --bubble-pop-up-main-background-color: var(--ha-card-background) !important;
+        --hemma-bubble-popup-inset-block: max(24px, 5vh);
+        --hemma-bubble-popup-inset-inline: max(16px, 3vw);
+        --hemma-bubble-popup-max-height: calc(
+          100dvh - 2 * var(--hemma-bubble-popup-inset-block)
+          - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+        );
+      }
+      .bubble-pop-up:not(.editor) {
+        top: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-top, 0px)) !important;
+        bottom: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-bottom, 0px)) !important;
+        left: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        right: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        margin: auto !important;
+        height: fit-content !important;
+        max-height: var(--hemma-bubble-popup-max-height) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        border-radius: var(--bubble-pop-up-border-radius, 42px) !important;
+        overflow: hidden !important;
+        transition: transform 0.3s ease, opacity 0.3s ease !important;
+      }
+      .bubble-pop-up:not(.editor).is-popup-closed { opacity: 0 !important; pointer-events: none !important; }
+      .bubble-pop-up:not(.editor).is-popup-opened { opacity: 1 !important; pointer-events: auto !important; }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-background {
+        border-radius: inherit !important;
+        background-color: var(--ha-card-background) !important;
+        backdrop-filter: blur(20px) saturate(1.1) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(1.1) !important;
+      }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-container {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+        padding-bottom: 24px !important;
+      }
+      @media only screen and (min-width: 600px) and (max-width: 767px) {
+        .bubble-pop-up:not(.editor) {
+          margin-left: 0 !important; margin-right: 0 !important;
+          left: calc(50% - min(520px, calc(100vw - 2 * var(--hemma-bubble-popup-inset-inline))) / 2) !important;
+          right: auto !important;
+          width: min(520px, calc(100vw - 2 * var(--hemma-bubble-popup-inset-inline))) !important;
+        }
+      }
+      @media only screen and (min-width: 768px) {
+        .bubble-pop-up:not(.editor) {
+          margin-left: 0 !important; margin-right: 0 !important;
+          left: calc(var(--mdc-drawer-width, 0px) / 2 + 50% - min(520px, calc(100vw - var(--mdc-drawer-width, 0px) - 2 * var(--hemma-bubble-popup-inset-inline))) / 2) !important;
+          right: auto !important;
+          width: min(520px, calc(100vw - var(--mdc-drawer-width, 0px) - 2 * var(--hemma-bubble-popup-inset-inline))) !important;
+        }
+      }
+
+  - type: custom:button-card
+    template: hemma_plain_button_card
+    tap_action:
+      action: none
+    triggers_update: all
+    custom_fields:
+      content: |
+        [[[
+          const includeDomains = new Set([
+            'alarm_control_panel',
+            'binary_sensor',
+            'climate',
+            'cover',
+            'fan',
+            'humidifier',
+            'input_boolean',
+            'input_select',
+            'light',
+            'lock',
+            'media_player',
+            'switch'
+          ]);
+
+          const stateLabel = (state) => {
+            if (state === 'on') return 'On';
+            if (state === 'off') return 'Off';
+            return String(state).replace(/_/g, ' ');
+          };
+
+          const rows = Object.values(states)
+            .filter((obj) => {
+              const [domain] = String(obj.entity_id || '').split('.');
+              if (!includeDomains.has(domain)) return false;
+              return !['unknown', 'unavailable'].includes(String(obj.state));
+            })
+            .sort((a, b) => new Date(b.last_changed) - new Date(a.last_changed))
+            .slice(0, 100)
+            .map((obj) => {
+              const ts = new Date(obj.last_changed).toLocaleString([], {
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+              const name = obj.attributes?.friendly_name || obj.entity_id;
+              return `
+                <div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+                  <div style="text-align:left;min-width:0;flex:1;">
+                    <div style="font-size:14px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+                    <div style="font-size:13px;opacity:0.72;margin-top:3px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">State -> ${stateLabel(obj.state)}</div>
+                  </div>
+                  <div style="font-size:12px;opacity:0.58;line-height:1.2;white-space:nowrap;text-align:right;">${ts}</div>
+                </div>
+              `;
+            }).join('');
+
+          const empty = `<div style="font-size:13px;opacity:0.6;padding-top:6px;">No recent device updates found.</div>`;
+
+          return `
+            <div style="padding:16px 16px 4px;box-sizing:border-box;">
+              <div style="font-size:12px;font-weight:700;opacity:0.5;text-transform:uppercase;letter-spacing:0.08em;">Recent state updates</div>
+            </div>
+            <div style="padding:0 16px 8px;height:min(62vh,520px);overflow-y:auto;overflow-x:hidden;box-sizing:border-box;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;">
+              ${rows || empty}
+            </div>
+          `;
+        ]]]
+    styles:
+      card:
+        - background: rgba(255,255,255,0.06)
+        - backdrop-filter: blur(20px)
+        - border-radius: 20px
+        - border: 1px solid rgba(255,255,255,0.12)
+        - box-shadow: none
+        - margin-top: 16px
+      custom_fields:
+        content:
+          - pointer-events: auto

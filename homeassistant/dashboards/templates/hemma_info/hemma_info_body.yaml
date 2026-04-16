@@ -506,14 +506,53 @@ cards:
       - type: custom:button-card
         template: hemma_plain_button_card
         tap_action:
-          action: none
+          action: navigate
+          navigation_path: '#hemma-system-log'
+        triggers_update: all
         custom_fields:
           content: |
             [[[
+              const includeDomains = new Set([
+                'alarm_control_panel',
+                'binary_sensor',
+                'climate',
+                'cover',
+                'fan',
+                'humidifier',
+                'input_boolean',
+                'input_select',
+                'light',
+                'lock',
+                'media_player',
+                'switch'
+              ]);
+
+              const entries = Object.values(states)
+                .filter((obj) => {
+                  const [domain] = String(obj.entity_id || '').split('.');
+                  if (!includeDomains.has(domain)) return false;
+                  return !['unknown', 'unavailable'].includes(String(obj.state));
+                })
+                .sort((a, b) => new Date(b.last_changed) - new Date(a.last_changed))
+                .slice(0, 5);
+
+              const stateLabel = (state) => {
+                if (state === 'on') return 'On';
+                if (state === 'off') return 'Off';
+                return String(state).replace(/_/g, ' ');
+              };
+
+              const lines = entries.map((obj) => {
+                const ts = new Date(obj.last_changed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const name = obj.attributes?.friendly_name || obj.entity_id;
+                return `<div style="font-size:12px;opacity:0.9;color:var(--primary-text-color);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ts} - ${name} -> ${stateLabel(obj.state)}</div>`;
+              }).join('');
+
+              const empty = `<div style="font-size:12px;opacity:0.5;margin-top:8px;">No recent device updates</div>`;
+
               return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Update Notifications</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;">2 pending</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:6px;">Core + integration · dummy</div>
+                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Device Log</div>
+                ${lines || empty}
               </div>`;
             ]]]
         styles:
