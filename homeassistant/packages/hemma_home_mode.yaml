@@ -42,10 +42,12 @@ script:
               entity_id: input_select.hemma_home_state
               state: "Vacation"
           sequence:
-            # Only simulate between 18:00 and 23:00
+            # Only simulate from 30 mins before sunset until 23:00
             - condition: template
               value_template: >
-                {{ now().hour >= 18 and now().hour < 23 }}
+                {% set sunset = state_attr('sun.sun', 'next_setting') %}
+                {% set window_start = (as_datetime(sunset) - timedelta(minutes=30)) if sunset else today_at('18:00') %}
+                {{ now() >= window_start and now() < today_at('23:55') }}
             # Pick a random light action
             - variables:
                 light_entity: >
@@ -54,9 +56,9 @@ script:
             - action: "light.{{ action }}"
               target:
                 entity_id: "{{ light_entity }}"
-            # Wait a random interval (5–25 minutes) before next toggle
+            # Wait a random interval (25–60 minutes) before next toggle
             - delay:
-                minutes: "{{ range(5, 25) | random }}"
+                minutes: "{{ range(25, 60) | random }}"
 
 # ---------------------------------------------------------------------------
 # Mode automations
@@ -76,7 +78,23 @@ automation:
       #   data: { code: "YOUR_CODE" }
 
       # TODO: Re-enable motion sensor automations
-      # TODO: Restore heating to normal schedule
+
+      # Restore thermostats to default temperature
+      - action: climate.set_temperature
+        target:
+          entity_id:
+            - climate.radiator_thermostat_x_living_room
+            - climate.radiator_thermostat_x_hallway
+            - climate.radiator_thermostat_x_study_room
+        data:
+          temperature: 18
+          hvac_mode: heat
+
+      # Restore Ring doorbell chime volume
+      - action: number.set_value
+        target: { entity_id: number.door_chime_volume }
+        data: { value: 11 }
+
       - action: logbook.log
         data:
           name: "Home Mode"
@@ -95,20 +113,26 @@ automation:
       #   target: { entity_id: alarm_control_panel.YOUR_ALARM }
       #   data: { code: "YOUR_CODE" }
 
-      # TODO: Cool thermostats to 18 °C for sleeping
-      # - action: climate.set_temperature
-      #   target:
-      #     entity_id:
-      #       - climate.radiator_thermostat_x_living_room
-      #       - climate.radiator_thermostat_x_hallway
-      #       - climate.radiator_thermostat_x_study_room
-      #   data: { temperature: 18, hvac_mode: heat }
+      # Cool thermostats to 15 °C for sleeping
+      - action: climate.set_temperature
+        target:
+          entity_id:
+            - climate.radiator_thermostat_x_living_room
+            - climate.radiator_thermostat_x_hallway
+            - climate.radiator_thermostat_x_study_room
+        data:
+          temperature: 15
+          hvac_mode: heat
 
-      # Activate sleep scenes (already work without further config)
+      # Activate sleep scenes for all rooms
       - action: scene.turn_on
-        target: { entity_id: scene.bedroom_sleep }
-      - action: scene.turn_on
-        target: { entity_id: scene.living_room_sleep }
+        target:
+          entity_id:
+            - scene.living_room_sleep
+            - scene.kitchen_sleep
+            - scene.hallway_sleep
+            - scene.bedroom_sleep
+            - scene.study_sleep
 
       # TODO: Silence non-urgent mobile notifications
       # - action: notify.mobile_app_YOUR_PHONE
@@ -117,6 +141,10 @@ automation:
       # TODO: Turn off TVs / speakers
       # - action: media_player.turn_off
       #   target: { entity_id: [ media_player.samsung_qb90_qe65qn90batxxu, media_player.sonos_arc ] }
+
+      - action: number.set_value
+        target: { entity_id: number.door_chime_volume }
+        data: { value: 0 }
 
       - action: logbook.log
         data:
@@ -136,18 +164,24 @@ automation:
       #   target: { entity_id: alarm_control_panel.YOUR_ALARM }
       #   data: { code: "YOUR_CODE" }
 
-      # TODO: Frost protection — set thermostats to 12 °C
-      # - action: climate.set_temperature
-      #   target:
-      #     entity_id:
-      #       - climate.radiator_thermostat_x_living_room
-      #       - climate.radiator_thermostat_x_hallway
-      #       - climate.radiator_thermostat_x_study_room
-      #   data: { temperature: 12, hvac_mode: heat }
+      # Frost protection — set all thermostats to 12 °C
+      - action: climate.set_temperature
+        target:
+          entity_id:
+            - climate.radiator_thermostat_x_living_room
+            - climate.radiator_thermostat_x_hallway
+            - climate.radiator_thermostat_x_study_room
+        data:
+          temperature: 12
+          hvac_mode: heat
 
       # TODO: Turn off non-essential smart plugs
       # - action: switch.turn_off
       #   target: { entity_id: [ switch.YOUR_PLUG_1, switch.YOUR_PLUG_2 ] }
+
+      - action: number.set_value
+        target: { entity_id: number.door_chime_volume }
+        data: { value: 0 }
 
       - action: script.turn_on
         target: { entity_id: script.hemma_security_presence_simulation }
@@ -191,6 +225,11 @@ automation:
       # TODO: Mute doorbell person-detected notifications
       # - action: notify.mobile_app_YOUR_PHONE
       #   data: { message: "command_dnd_priority_only" }
+
+      - action: number.set_value
+        target: { entity_id: number.door_chime_volume }
+        data: { value: 11 }
+
       - action: logbook.log
         data:
           name: "Home Mode"
@@ -209,10 +248,30 @@ automation:
       #   target: { entity_id: alarm_control_panel.YOUR_ALARM }
       #   data: { code: "YOUR_CODE" }
 
-      # TODO: Keep climate comfortable for pets (20 °C)
-      # - action: climate.set_temperature
-      #   target: { entity_id: climate.radiator_thermostat_x_living_room }
-      #   data: { temperature: 20, hvac_mode: heat }
+      # Keep climate comfortable for pets (20 °C)
+      - action: climate.set_temperature
+        target:
+          entity_id:
+            - climate.radiator_thermostat_x_living_room
+            - climate.radiator_thermostat_x_hallway
+            - climate.radiator_thermostat_x_study_room
+        data:
+          temperature: 20
+          hvac_mode: heat
+
+      # Keep some ambient lighting on for pets
+      - action: light.turn_on
+        target:
+          entity_id:
+            - light.sofa_light
+            - light.floor_light
+            - light.hue_lightstrip_plus_1
+        data:
+          brightness_pct: 20
+      - action: number.set_value
+        target: { entity_id: number.door_chime_volume }
+        data: { value: 0 }
+
       - action: logbook.log
         data:
           name: "Home Mode"
@@ -226,12 +285,11 @@ automation:
         entity_id: input_select.hemma_home_state
         to: "Focus"
     action:
-      # TODO: Set doorbell to silent chime
-      # - action: select.select_option
-      #   target: { entity_id: select.YOUR_DOORBELL_CHIME }
-      #   data: { option: "Silent" }
+      # Silence Ring doorbell chime
+      - action: number.set_value
+        target: { entity_id: number.door_chime_volume }
+        data: { value: 0 }
 
-      # TODO: Mute non-critical notifications
       - action: logbook.log
         data:
           name: "Home Mode"
@@ -253,6 +311,10 @@ automation:
       # TODO: Unlock back / side door
       # - action: lock.unlock
       #   target: { entity_id: lock.YOUR_BACK_DOOR }
+
+      - action: number.set_value
+        target: { entity_id: number.door_chime_volume }
+        data: { value: 11 }
 
       # Auto-revert to Home after 2 hours
       - delay: "02:00:00"
