@@ -14,14 +14,9 @@ hemma_badge_scenes:
 
   name: >
     [[[
-      const room = variables.room;
-      const selectId = `input_text.hemma_${room}_scene`;
-      const raw = states[selectId]?.state;
-      const hasScene = raw && raw !== 'unknown' && raw !== '';
       return `
         <div class="mp-wrap">
           <div class="mp-title">Scenes</div>
-          ${hasScene ? `<div class="mp-sub">${raw}</div>` : ''}
         </div>
       `;
     ]]]
