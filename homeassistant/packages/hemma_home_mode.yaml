@@ -17,6 +17,7 @@ input_select:
     name: Home Mode
     options:
       - Home
+      - Away
       - Sleep
       - Vacation
       - Guest
@@ -189,6 +190,43 @@ automation:
         data:
           name: "Home Mode"
           message: "Switched to Vacation mode — presence simulation active"
+          entity_id: input_select.hemma_home_state
+
+  - id: hemma_home_state_away
+    alias: "Home Mode - Away"
+    trigger:
+      - trigger: state
+        entity_id: input_select.hemma_home_state
+        to: "Away"
+    action:
+      # TODO: Arm alarm (away mode)
+      # - action: alarm_control_panel.alarm_arm_away
+      #   target: { entity_id: alarm_control_panel.YOUR_ALARM }
+      #   data: { code: "YOUR_CODE" }
+
+      # Frost protection — set all thermostats to 12 °C
+      - action: climate.set_temperature
+        target:
+          entity_id:
+            - climate.radiator_thermostat_x_living_room
+            - climate.radiator_thermostat_x_hallway
+            - climate.radiator_thermostat_x_study_room
+        data:
+          temperature: 12
+          hvac_mode: heat
+
+      # TODO: Turn off non-essential smart plugs
+      # - action: switch.turn_off
+      #   target: { entity_id: [ switch.YOUR_PLUG_1, switch.YOUR_PLUG_2 ] }
+
+      - action: number.set_value
+        target: { entity_id: number.door_chime_volume }
+        data: { value: 0 }
+
+      - action: logbook.log
+        data:
+          name: "Home Mode"
+          message: "Switched to Away mode"
           entity_id: input_select.hemma_home_state
 
   - id: hemma_home_state_vacation_end

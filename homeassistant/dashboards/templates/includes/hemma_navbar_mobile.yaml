@@ -373,7 +373,7 @@ cards:
             [[[
               const p = window.location.pathname;
               return p.startsWith('/dashboard-hemma/')
-                && !['/dashboard-hemma/home','/dashboard-hemma/scenes','/dashboard-hemma/info'].includes(p);
+                && !['/dashboard-hemma/home','/dashboard-hemma/info'].includes(p);
             ]]]
           popup:
             - label: Living Room
@@ -392,46 +392,6 @@ cards:
               url: /dashboard-hemma/bedroom
               icon: mdi:bed-king
 
-        # Scenes (Dropdown Menu)
-        - label: Scenes
-          icon: mdi:layers
-          icon_selected: mdi:layers
-          tap_action:
-            action: open-popup
-          popup: |
-            [[[
-              const reg = hass.entities;
-
-              const getRegEntry = (id) => {
-                if (!reg) return null;
-                if (Array.isArray(reg)) return reg.find(e => e?.entity_id === id) || null;
-                return reg[id] || (reg.get ? reg.get(id) : null) || null;
-              };
-
-              const isHidden = (id) => {
-                const e = getRegEntry(id);
-                // Different HA versions expose slightly different fields
-                return !!(e && (e.hidden || e.hidden_by || e.disabled || e.disabled_by));
-              };
-
-              const scenes = Object.values(hass.states || {})
-                .filter(e => e?.entity_id?.startsWith('scene.'))
-                // Keep only scenes that are NOT hidden/disabled in HA
-                .filter(s => !isHidden(s.entity_id))
-                .slice()
-                .sort((a,b) => (a.attributes?.friendly_name || a.entity_id)
-                  .localeCompare(b.attributes?.friendly_name || b.entity_id));
-
-              return scenes.map(s => ({
-                label: s.attributes?.friendly_name || s.entity_id.replace('scene.',''),
-                icon: s.attributes?.icon || 'mdi:layers',
-                tap_action: {
-                  action: 'call-service',
-                  service: 'scene.turn_on',
-                  service_data: { entity_id: s.entity_id }
-                }
-              }));
-            ]]]
 
   # Phone Landscape
   - type: conditional
@@ -763,7 +723,7 @@ cards:
             [[[
               const p = window.location.pathname;
               return p.startsWith('/dashboard-hemma/')
-                && !['/dashboard-hemma/home','/dashboard-hemma/scenes','/dashboard-hemma/info'].includes(p);
+                && !['/dashboard-hemma/home','/dashboard-hemma/info'].includes(p);
             ]]]
           popup:
             - label: Living Room
@@ -782,44 +742,6 @@ cards:
               url: /dashboard-hemma/bedroom
               icon: mdi:bed-king
 
-        # Scenes (Dropdown Menu)
-        - label: Scenes
-          icon: mdi:layers
-          icon_selected: mdi:layers
-          tap_action:
-            action: open-popup
-          popup: |
-            [[[
-              const reg = hass.entities;
-
-              const getRegEntry = (id) => {
-                if (!reg) return null;
-                if (Array.isArray(reg)) return reg.find(e => e?.entity_id === id) || null;
-                return reg[id] || (reg.get ? reg.get(id) : null) || null;
-              };
-
-              const isHidden = (id) => {
-                const e = getRegEntry(id);
-                return !!(e && (e.hidden || e.hidden_by || e.disabled || e.disabled_by));
-              };
-
-              const scenes = Object.values(hass.states || {})
-                .filter(e => e?.entity_id?.startsWith('scene.'))
-                .filter(s => !isHidden(s.entity_id))
-                .slice()
-                .sort((a,b) => (a.attributes?.friendly_name || a.entity_id)
-                  .localeCompare(b.attributes?.friendly_name || b.entity_id));
-
-              return scenes.map(s => ({
-                label: s.attributes?.friendly_name || s.entity_id.replace('scene.',''),
-                icon: s.attributes?.icon || 'mdi:layers',
-                tap_action: {
-                  action: 'call-service',
-                  service: 'scene.turn_on',
-                  service_data: { entity_id: s.entity_id }
-                }
-              }));
-            ]]]
 
   # Tablet Portrait
   - type: conditional
@@ -1152,7 +1074,7 @@ cards:
             [[[
               const p = window.location.pathname;
               return p.startsWith('/dashboard-hemma/')
-                && !['/dashboard-hemma/home','/dashboard-hemma/scenes','/dashboard-hemma/info'].includes(p);
+                && !['/dashboard-hemma/home','/dashboard-hemma/info'].includes(p);
             ]]]
           popup:
             - label: Living Room
@@ -1171,44 +1093,6 @@ cards:
               url: /dashboard-hemma/bedroom
               icon: mdi:bed-king
 
-        # Scenes (Dropdown Menu)
-        - label: Scenes
-          icon: mdi:layers
-          icon_selected: mdi:layers
-          tap_action:
-            action: open-popup
-          popup: |
-            [[[
-              const reg = hass.entities;
-
-              const getRegEntry = (id) => {
-                if (!reg) return null;
-                if (Array.isArray(reg)) return reg.find(e => e?.entity_id === id) || null;
-                return reg[id] || (reg.get ? reg.get(id) : null) || null;
-              };
-
-              const isHidden = (id) => {
-                const e = getRegEntry(id);
-                return !!(e && (e.hidden || e.hidden_by || e.disabled || e.disabled_by));
-              };
-
-              const scenes = Object.values(hass.states || {})
-                .filter(e => e?.entity_id?.startsWith('scene.'))
-                .filter(s => !isHidden(s.entity_id))
-                .slice()
-                .sort((a,b) => (a.attributes?.friendly_name || a.entity_id)
-                  .localeCompare(b.attributes?.friendly_name || b.entity_id));
-
-              return scenes.map(s => ({
-                label: s.attributes?.friendly_name || s.entity_id.replace('scene.',''),
-                icon: s.attributes?.icon || 'mdi:layers',
-                tap_action: {
-                  action: 'call-service',
-                  service: 'scene.turn_on',
-                  service_data: { entity_id: s.entity_id }
-                }
-              }));
-            ]]]
 
   # Tablet Landscape
   - type: conditional
@@ -1568,41 +1452,3 @@ cards:
           label: Bedroom
           icon: mdi:bed-king
 
-        # Scenes (Dropdown Menu)
-        - label: Scenes
-          icon: mdi:layers
-          icon_selected: mdi:layers
-          tap_action:
-            action: open-popup
-          popup: |
-            [[[
-              const reg = hass.entities;
-
-              const getRegEntry = (id) => {
-                if (!reg) return null;
-                if (Array.isArray(reg)) return reg.find(e => e?.entity_id === id) || null;
-                return reg[id] || (reg.get ? reg.get(id) : null) || null;
-              };
-
-              const isHidden = (id) => {
-                const e = getRegEntry(id);
-                return !!(e && (e.hidden || e.hidden_by || e.disabled || e.disabled_by));
-              };
-
-              const scenes = Object.values(hass.states || {})
-                .filter(e => e?.entity_id?.startsWith('scene.'))
-                .filter(s => !isHidden(s.entity_id))
-                .slice()
-                .sort((a,b) => (a.attributes?.friendly_name || a.entity_id)
-                  .localeCompare(b.attributes?.friendly_name || b.entity_id));
-
-              return scenes.map(s => ({
-                label: s.attributes?.friendly_name || s.entity_id.replace('scene.',''),
-                icon: s.attributes?.icon || 'mdi:layers',
-                tap_action: {
-                  action: 'call-service',
-                  service: 'scene.turn_on',
-                  service_data: { entity_id: s.entity_id }
-                }
-              }));
-            ]]]

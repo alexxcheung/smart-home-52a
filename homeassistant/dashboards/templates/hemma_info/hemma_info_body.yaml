@@ -449,63 +449,6 @@ cards:
       - type: custom:button-card
         template: hemma_plain_button_card
         tap_action:
-          action: none
-        custom_fields:
-          content: |
-            [[[
-              return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Internet Speed</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;">↓ 420 Mbps</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:6px;">↑ 38 Mbps · dummy</div>
-              </div>`;
-            ]]]
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 22px
-            - border: 1px solid rgba(255,255,255,0.12)
-      - type: custom:button-card
-        template: hemma_plain_button_card
-        tap_action:
-          action: none
-        custom_fields:
-          content: |
-            [[[
-              return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Server CPU</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;">14% load</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:6px;">HA host · dummy</div>
-              </div>`;
-            ]]]
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 22px
-            - border: 1px solid rgba(255,255,255,0.12)
-      - type: custom:button-card
-        template: hemma_plain_button_card
-        tap_action:
-          action: none
-        custom_fields:
-          content: |
-            [[[
-              return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Battery Levels</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;">All OK</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:6px;">3 devices · dummy</div>
-              </div>`;
-            ]]]
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 22px
-            - border: 1px solid rgba(255,255,255,0.12)
-      - type: custom:button-card
-        template: hemma_plain_button_card
-        tap_action:
           action: navigate
           navigation_path: '#hemma-system-log'
         triggers_update: all
@@ -553,6 +496,63 @@ cards:
               return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Device Log</div>
                 ${lines || empty}
+              </div>`;
+            ]]]
+        styles:
+          card:
+            - background: rgba(255,255,255,0.06)
+            - backdrop-filter: blur(20px)
+            - border-radius: 22px
+            - border: 1px solid rgba(255,255,255,0.12)
+      - type: custom:button-card
+        template: hemma_plain_button_card
+        tap_action:
+          action: none
+        custom_fields:
+          content: |
+            [[[
+              return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
+                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Internet Speed</div>
+                <div style="font-size:17px;font-weight:600;margin-top:8px;">↓ 420 Mbps</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:6px;">↑ 38 Mbps · dummy</div>
+              </div>`;
+            ]]]
+        styles:
+          card:
+            - background: rgba(255,255,255,0.06)
+            - backdrop-filter: blur(20px)
+            - border-radius: 22px
+            - border: 1px solid rgba(255,255,255,0.12)
+      - type: custom:button-card
+        template: hemma_plain_button_card
+        tap_action:
+          action: none
+        custom_fields:
+          content: |
+            [[[
+              return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
+                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Server CPU</div>
+                <div style="font-size:17px;font-weight:600;margin-top:8px;">14% load</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:6px;">HA host · dummy</div>
+              </div>`;
+            ]]]
+        styles:
+          card:
+            - background: rgba(255,255,255,0.06)
+            - backdrop-filter: blur(20px)
+            - border-radius: 22px
+            - border: 1px solid rgba(255,255,255,0.12)
+      - type: custom:button-card
+        template: hemma_plain_button_card
+        tap_action:
+          action: none
+        custom_fields:
+          content: |
+            [[[
+              return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
+                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Battery Levels</div>
+                <div style="font-size:17px;font-weight:600;margin-top:8px;">All OK</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:6px;">3 devices · dummy</div>
               </div>`;
             ]]]
         styles:
