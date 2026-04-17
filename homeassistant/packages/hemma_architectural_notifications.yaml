@@ -1,0 +1,366 @@
+# packages/hemma_architectural_notifications.yaml
+# ============================================================================
+# Architectural notifications:
+# Sends per-device notifications for home mode, scenes, appliances, media,
+# dehumidifier, and key lights.
+# ============================================================================
+
+input_boolean:
+  hemma_architectural_notifications_enabled:
+    name: Architectural Notifications Enabled
+    initial: true
+    icon: mdi:message-badge
+
+input_button:
+  hemma_send_architectural_status_now:
+    name: Send Architectural Status Now
+    icon: mdi:message-arrow-right-outline
+
+script:
+  hemma_send_device_status_notification:
+    alias: "Hemma - Send Device Status Notification"
+    mode: queued
+    fields:
+      entity_id:
+        description: "Entity id for notification key"
+      label:
+        description: "Short display label"
+      value:
+        description: "State value to send"
+      reason:
+        description: "Reason for this update"
+        example: "State changed"
+    sequence:
+      - variables:
+          notification_key: "{{ entity_id | replace('.', '_') }}"
+          status_message: >-
+            {% if label == 'Home Mode' %}
+              {{ value }} Mode has been switched on.
+            {% elif 'Scene' in label %}
+              {% set room = (label | replace(' Scene', '') | lower) %}
+              {{ value }} scene has turned on in the {{ room }}.
+            {% elif value | lower in ['on', 'off'] %}
+              {{ label }} has been switched {{ value | lower }}.
+            {% elif value | lower in ['program started', 'program finished'] %}
+              {{ label }} {{ value | lower }}.
+            {% else %}
+              {{ label }} is now {{ value }}.
+            {% endif %}
+      - action: persistent_notification.create
+        data:
+          title: "{{ label }} update"
+          message: "{{ status_message }}"
+          notification_id: "hemma_{{ notification_key }}"
+      - action: notify.mobile_app_imalex_17
+        continue_on_error: true
+        data:
+          title: "{{ label }} update"
+          message: "{{ status_message }}"
+      # - action: notify.mobile_app_imsammy_iphone
+      #   continue_on_error: true
+      #   data:
+      #     title: "Hemma: {{ label }} update"
+      #     message: "{{ status_message }}"
+
+automation:
+  - id: hemma_architectural_device_status_notification_updates
+    alias: "Routines - Device Status Notifications"
+    description: Send one notification per tracked device when its state changes
+    trigger:
+      - trigger: state
+        entity_id:
+          - input_select.hemma_home_state
+          - humidifier.probreeze_dehumidifier
+          - input_text.hemma_living_room_scene
+          - input_text.hemma_kitchen_scene
+          - input_text.hemma_hallway_scene
+          - input_text.hemma_bedroom_scene
+          - input_text.hemma_study_scene
+          - media_player.samsung_qb90_qe65qn90batxxu
+          - media_player.sonos_arc
+          - media_player.homepod_living_room
+    condition:
+      - condition: state
+        entity_id: input_boolean.hemma_architectural_notifications_enabled
+        state: "on"
+      - condition: template
+        value_template: "{{ trigger.to_state is not none }}"
+      - condition: template
+        value_template: "{{ trigger.to_state.state not in ['unknown', 'unavailable'] }}"
+      - condition: template
+        value_template: "{{ trigger.from_state is none or trigger.from_state.state != trigger.to_state.state }}"
+    action:
+      - variables:
+          device_label: >-
+            {% if trigger.entity_id == 'input_select.hemma_home_state' %}
+              Home Mode
+            {% elif trigger.entity_id == 'sensor.bosch_dishwasher_operation_state' %}
+              Dishwasher
+            {% elif trigger.entity_id == 'sensor.washer_current_status' %}
+              Washer
+            {% elif trigger.entity_id == 'humidifier.probreeze_dehumidifier' %}
+              Dehumidifier
+            {% elif trigger.entity_id == 'input_text.hemma_living_room_scene' %}
+              Living Room Scene
+            {% elif trigger.entity_id == 'input_text.hemma_kitchen_scene' %}
+              Kitchen Scene
+            {% elif trigger.entity_id == 'input_text.hemma_hallway_scene' %}
+              Hallway Scene
+            {% elif trigger.entity_id == 'input_text.hemma_bedroom_scene' %}
+              Bedroom Scene
+            {% elif trigger.entity_id == 'input_text.hemma_study_scene' %}
+              Study Scene
+            {% else %}
+              {{ trigger.to_state.name or trigger.entity_id }}
+            {% endif %}
+          device_value: >-
+            {% if trigger.entity_id == 'humidifier.probreeze_dehumidifier' %}
+              {{ trigger.to_state.state | title }}{% if state_attr('humidifier.probreeze_dehumidifier', 'current_humidity') is not none %} · {{ state_attr('humidifier.probreeze_dehumidifier', 'current_humidity') }}%{% endif %}{% if state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none %} -> {{ state_attr('humidifier.probreeze_dehumidifier', 'humidity') }}%{% endif %}
+            {% elif trigger.entity_id.startswith('light.') %}
+              {{ trigger.to_state.state | title }}{% if state_attr(trigger.entity_id, 'brightness') is not none %} · {{ ((state_attr(trigger.entity_id, 'brightness') | int * 100) / 255) | round(0) }}%{% endif %}
+            {% elif trigger.entity_id.startswith('media_player.') %}
+              {{ trigger.to_state.state | replace('_', ' ') | title }}
+            {% elif trigger.entity_id.startswith('input_text.hemma_') %}
+              {{ trigger.to_state.state if trigger.to_state.state not in ['', 'unknown', 'unavailable'] else 'Unknown' }}
+            {% else %}
+              {{ trigger.to_state.state | replace('_', ' ') | title }}
+            {% endif %}
+      - action: script.hemma_send_device_status_notification
+        data:
+          entity_id: "{{ trigger.entity_id }}"
+          label: "{{ device_label }}"
+          value: "{{ device_value }}"
+          reason: "State changed"
+    mode: queued
+
+  - id: hemma_architectural_status_notification_manual
+    alias: "Routines - Device Status Notifications (Manual)"
+    description: Send one notification per key device when helper button is pressed
+    trigger:
+      - trigger: state
+        entity_id: input_button.hemma_send_architectural_status_now
+    action:
+      - action: script.hemma_send_device_status_notification
+        data:
+          entity_id: input_select.hemma_home_state
+          label: "Home Mode"
+          value: "{{ states('input_select.hemma_home_state') | title }}"
+          reason: "Manual refresh"
+      - action: script.hemma_send_device_status_notification
+        data:
+          entity_id: sensor.bosch_dishwasher_operation_state
+          label: "Dishwasher"
+          value: "{{ states('sensor.bosch_dishwasher_operation_state') | replace('_', ' ') | title }}"
+          reason: "Manual refresh"
+      - action: script.hemma_send_device_status_notification
+        data:
+          entity_id: sensor.washer_current_status
+          label: "Washer"
+          value: "{{ states('sensor.washer_current_status') | replace('_', ' ') | title }}"
+          reason: "Manual refresh"
+      - action: script.hemma_send_device_status_notification
+        data:
+          entity_id: humidifier.probreeze_dehumidifier
+          label: "Dehumidifier"
+          value: >-
+            {{ states('humidifier.probreeze_dehumidifier') | title }}{% if state_attr('humidifier.probreeze_dehumidifier', 'current_humidity') is not none %} · {{ state_attr('humidifier.probreeze_dehumidifier', 'current_humidity') }}%{% endif %}{% if state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none %} -> {{ state_attr('humidifier.probreeze_dehumidifier', 'humidity') }}%{% endif %}
+          reason: "Manual refresh"
+      - action: script.hemma_send_device_status_notification
+        data:
+          entity_id: input_text.hemma_living_room_scene
+          label: "Living Room Scene"
+          value: "{{ states('input_text.hemma_living_room_scene') if states('input_text.hemma_living_room_scene') not in ['', 'unknown', 'unavailable'] else 'Unknown' }}"
+          reason: "Manual refresh"
+      - action: script.hemma_send_device_status_notification
+        data:
+          entity_id: input_text.hemma_kitchen_scene
+          label: "Kitchen Scene"
+          value: "{{ states('input_text.hemma_kitchen_scene') if states('input_text.hemma_kitchen_scene') not in ['', 'unknown', 'unavailable'] else 'Unknown' }}"
+          reason: "Manual refresh"
+      - action: script.hemma_send_device_status_notification
+        data:
+          entity_id: input_text.hemma_hallway_scene
+          label: "Hallway Scene"
+          value: "{{ states('input_text.hemma_hallway_scene') if states('input_text.hemma_hallway_scene') not in ['', 'unknown', 'unavailable'] else 'Unknown' }}"
+          reason: "Manual refresh"
+      - action: script.hemma_send_device_status_notification
+        data:
+          entity_id: input_text.hemma_bedroom_scene
+          label: "Bedroom Scene"
+          value: "{{ states('input_text.hemma_bedroom_scene') if states('input_text.hemma_bedroom_scene') not in ['', 'unknown', 'unavailable'] else 'Unknown' }}"
+          reason: "Manual refresh"
+      - action: script.hemma_send_device_status_notification
+        data:
+          entity_id: input_text.hemma_study_scene
+          label: "Study Scene"
+          value: "{{ states('input_text.hemma_study_scene') if states('input_text.hemma_study_scene') not in ['', 'unknown', 'unavailable'] else 'Unknown' }}"
+          reason: "Manual refresh"
+    mode: single
+
+  - id: hemma_program_start_end_notifications
+    alias: "Routines - Appliance Program Start/End Notifications"
+    description: Notify when dishwasher or washer programs start and end
+    trigger:
+      - trigger: state
+        entity_id:
+          - sensor.bosch_dishwasher_operation_state
+          - sensor.washer_current_status
+    condition:
+      - condition: state
+        entity_id: input_boolean.hemma_architectural_notifications_enabled
+        state: "on"
+      - condition: template
+        value_template: "{{ trigger.to_state is not none and trigger.to_state.state not in ['unknown', 'unavailable'] }}"
+      - condition: template
+        value_template: "{{ trigger.from_state is not none and trigger.from_state.state != trigger.to_state.state }}"
+    action:
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: >-
+                  {{
+                    trigger.entity_id == 'sensor.bosch_dishwasher_operation_state'
+                    and trigger.to_state.state in ['run']
+                    and trigger.from_state.state not in ['run']
+                  }}
+            sequence:
+              - action: script.hemma_send_device_status_notification
+                data:
+                  entity_id: sensor.bosch_dishwasher_operation_state
+                  label: "Dishwasher"
+                  value: "Program started"
+                  reason: "Program started"
+          - conditions:
+              - condition: template
+                value_template: >-
+                  {{
+                    trigger.entity_id == 'sensor.bosch_dishwasher_operation_state'
+                    and trigger.from_state.state in ['run']
+                    and trigger.to_state.state in ['finished', 'inactive', 'ready']
+                  }}
+            sequence:
+              - action: script.hemma_send_device_status_notification
+                data:
+                  entity_id: sensor.bosch_dishwasher_operation_state
+                  label: "Dishwasher"
+                  value: "Program finished"
+                  reason: "Program ended"
+          - conditions:
+              - condition: template
+                value_template: >-
+                  {{
+                    trigger.entity_id == 'sensor.washer_current_status'
+                    and trigger.to_state.state in ['running', 'spinning', 'rinsing', 'drying', 'detecting', 'cool_down']
+                    and trigger.from_state.state not in ['running', 'spinning', 'rinsing', 'drying', 'detecting', 'cool_down']
+                  }}
+            sequence:
+              - action: script.hemma_send_device_status_notification
+                data:
+                  entity_id: sensor.washer_current_status
+                  label: "Washer"
+                  value: "Program started"
+                  reason: "Program started"
+          - conditions:
+              - condition: template
+                value_template: >-
+                  {{
+                    trigger.entity_id == 'sensor.washer_current_status'
+                    and trigger.from_state.state in ['running', 'spinning', 'rinsing', 'drying', 'detecting', 'cool_down']
+                    and trigger.to_state.state in ['end', 'initial', 'power_off']
+                  }}
+            sequence:
+              - action: script.hemma_send_device_status_notification
+                data:
+                  entity_id: sensor.washer_current_status
+                  label: "Washer"
+                  value: "Program finished"
+                  reason: "Program ended"
+    mode: queued
+
+  - id: hemma_front_door_camera_detection_notifications
+    alias: "Area - Front Door Camera Detection Notifications"
+    description: Notify when front door camera detects someone
+    trigger:
+      - trigger: device
+        device_id: 19aa0b4688f45d61d8f0e337f0e4d023
+        entity_id: 0f636de54f26d61063b0dfc3481a400c
+        domain: switch
+        type: turned_on
+    condition:
+      - condition: state
+        entity_id: input_boolean.hemma_architectural_notifications_enabled
+        state: "on"
+    action:
+      - action: script.hemma_send_device_status_notification
+        data:
+          entity_id: camera.front_door_live_view
+          label: "Front Door Camera"
+          value: "detected someone at the front door"
+          reason: "Person/motion detected"
+    mode: single
+
+  - id: hemma_octopus_agile_price_alert_30_min
+    alias: "Routines - Octopus Agile Price Alert in 1 hour"
+    description: Notify 1 hour before cheap or expensive Agile windows
+    trigger:
+      - trigger: time_pattern
+        minutes: "/30"
+    condition:
+      - condition: state
+        entity_id: input_boolean.hemma_architectural_notifications_enabled
+        state: "on"
+    action:
+      - variables:
+          today_rates: "{{ state_attr('event.octopus_energy_electricity_20l3765434_2000057767569_current_day_rates', 'rates') or [] }}"
+          tomorrow_rates: "{{ state_attr('event.octopus_energy_electricity_20l3765434_2000057767569_next_day_rates', 'rates') or [] }}"
+          all_rates: "{{ (today_rates + tomorrow_rates) | sort(attribute='start') }}"
+          now_ts: "{{ as_timestamp(now()) }}"
+          target_ts: "{{ now_ts + 3600 }}"
+          next_slot: >-
+            {% set ns = namespace(slot=none) %}
+            {% for r in all_rates %}
+              {% set start_ts = as_timestamp(r.start) %}
+              {% if start_ts > now_ts %}
+                {% set ns.slot = r %}
+                {% break %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.slot }}
+          next_start_ts: "{{ as_timestamp(next_slot.start) if next_slot is not none else none }}"
+          minutes_until_next: "{{ ((next_start_ts - now_ts) / 60) | round(0) if next_start_ts is not none else none }}"
+          next_price: "{{ next_slot.value_inc_vat if next_slot is not none else none }}"
+          next_price_pence: "{{ (next_price * 100) | round(1) if next_price is not none else none }}"
+          slot_time: "{{ as_datetime(next_slot.start).strftime('%H:%M') if next_slot is not none else '' }}"
+          is_30_min_window: "{{ minutes_until_next is not none and minutes_until_next >= 59 and minutes_until_next <= 61 }}"
+          is_cheap: "{{ next_price is not none and next_price <= 0.12 }}"
+          is_expensive: "{{ next_price is not none and next_price >= 0.25 }}"
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ is_30_min_window and is_cheap }}"
+            sequence:
+              - action: persistent_notification.create
+                data:
+                  title: "Agile price alert"
+                  message: "Cheap electricity starts in 1 hour at {{ slot_time }} ({{ next_price_pence }}p/kWh)."
+                  notification_id: "agile_price_alert"
+              - action: notify.mobile_app_imalex_17
+                continue_on_error: true
+                data:
+                  title: "Agile price alert"
+                  message: "Cheap electricity starts in 1 hour at {{ slot_time }} ({{ next_price_pence }}p/kWh)."
+          - conditions:
+              - condition: template
+                value_template: "{{ is_30_min_window and is_expensive }}"
+            sequence:
+              - action: persistent_notification.create
+                data:
+                  title: "Agile price alert"
+                  message: "Expensive electricity starts in 1 hour at {{ slot_time }} ({{ next_price_pence }}p/kWh)."
+                  notification_id: "agile_price_alert"
+              - action: notify.mobile_app_imalex_17
+                continue_on_error: true
+                data:
+                  title: "Agile price alert"
+                  message: "Expensive electricity starts in 1 hour at {{ slot_time }} ({{ next_price_pence }}p/kWh)."
+    mode: single
