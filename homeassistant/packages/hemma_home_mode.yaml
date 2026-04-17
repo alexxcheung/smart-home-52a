@@ -199,6 +199,10 @@ automation:
         entity_id: input_select.hemma_home_state
         to: "Away"
     action:
+      - variables:
+          away_lights: "{{ states.light | map(attribute='entity_id') | list }}"
+          away_media_players: "{{ states.media_player | map(attribute='entity_id') | list }}"
+
       # TODO: Arm alarm (away mode)
       # - action: alarm_control_panel.alarm_arm_away
       #   target: { entity_id: alarm_control_panel.YOUR_ALARM }
@@ -215,7 +219,24 @@ automation:
           temperature: 12
           hvac_mode: heat
 
-      # TODO: Turn off non-essential smart plugs
+      # Turn off all lights and media devices when away mode starts
+      - if:
+          - condition: template
+            value_template: "{{ away_lights | count > 0 }}"
+        then:
+          - action: light.turn_off
+            target:
+              entity_id: "{{ away_lights }}"
+      - if:
+          - condition: template
+            value_template: "{{ away_media_players | count > 0 }}"
+        then:
+          - action: media_player.turn_off
+            continue_on_error: true
+            target:
+              entity_id: "{{ away_media_players }}"
+
+      # TODO: Turn off non-essential smart plugs / appliances
       # - action: switch.turn_off
       #   target: { entity_id: [ switch.YOUR_PLUG_1, switch.YOUR_PLUG_2 ] }
 

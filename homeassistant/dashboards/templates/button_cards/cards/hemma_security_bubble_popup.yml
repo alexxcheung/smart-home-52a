@@ -18,6 +18,7 @@ cards:
     force_icon: false
     show_header: true
     close_by_clicking_outside: true
+    close_on_click: true
     width_desktop: 380px
     margin_top_mobile: '0px'
     margin_top_desktop: '0px'

@@ -1,3 +1,6 @@
+# ============================================================================
+# Theme/Core
+# ============================================================================
 - id: '1771400000001'
   alias: Theme/Core - Hemma Theme Switch To Dark At Sunset
   description: Switch dashboard theme to dark mode when sun sets
@@ -38,6 +41,10 @@
       mode: '{{ ''dark'' if states(''sun.sun'') == ''below_horizon'' else ''light''
         }}'
   mode: single
+
+# ============================================================================
+# Routines
+# ============================================================================
 - id: '1771334918614'
   alias: Routines - Sleep Time Temperature
   description: ''
@@ -160,18 +167,11 @@
     entity_id: 5287d46e72d6f9d1a46379d3919092b7
     type: is_home
   actions:
-  - action: light.turn_on
+  - action: scene.turn_on
     metadata: {}
-    data:
-      brightness_pct: 60
-      transition: 2
     target:
-      device_id: d2989a9eeba691de3a1c40a43872458e
-  - action: light.turn_on
-    metadata: {}
+      entity_id: scene.study_work
     data: {}
-    target:
-      device_id: 73c6caa3f46390a4628f1899d7f03c2d
   mode: single
 - id: '1756832013214'
   alias: Routines - Sunset Time
@@ -249,7 +249,7 @@
       - scene.study_night
   mode: single
 - id: '1756832135280'
-  alias: Routines - Welcome Home
+  alias: Routines - Welcome Home with adaptive arrival light
   description: ''
   triggers:
   - device_id: 322cbb275deee7edce6388320b436c40
@@ -272,10 +272,29 @@
     - condition: sun
       before: sunrise
   actions:
+  - variables:
+      is_rainy: >
+        {{ states('weather.forecast_home') in ['rainy', 'pouring', 'lightning-rainy', 'snowy-rainy'] }}
+      base_brightness: >
+        {% set h = now().hour %}
+        {% if h >= 23 or h < 6 %}
+          18
+        {% elif h >= 21 %}
+          28
+        {% else %}
+          40
+        {% endif %}
+      adaptive_brightness: >
+        {% set b = base_brightness | int %}
+        {% if is_rainy %}
+          {{ [b + 10, 55] | min }}
+        {% else %}
+          {{ b }}
+        {% endif %}
   - action: light.turn_on
     metadata: {}
     data:
-      brightness_pct: 19
+      brightness_pct: "{{ adaptive_brightness | int }}"
     target:
       area_id:
       - front_door
@@ -334,6 +353,81 @@
       - xuan_guan
       - front_door
   mode: single
+- id: '1771500000005'
+  alias: Routines - Set Home Mode Away When Everyone Leaves
+  description: Set Home Mode to Away when both tracked people are not home
+  triggers:
+  - device_id: 322cbb275deee7edce6388320b436c40
+    domain: device_tracker
+    entity_id: 5287d46e72d6f9d1a46379d3919092b7
+    type: leaves
+    trigger: device
+    zone: zone.home
+  - device_id: fd7dfa4ede01b45f7c566181765332b8
+    domain: device_tracker
+    entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
+    type: leaves
+    trigger: device
+    zone: zone.home
+  conditions:
+  - condition: and
+    conditions:
+    - condition: device
+      device_id: 322cbb275deee7edce6388320b436c40
+      domain: device_tracker
+      entity_id: 5287d46e72d6f9d1a46379d3919092b7
+      type: is_not_home
+    - condition: device
+      device_id: fd7dfa4ede01b45f7c566181765332b8
+      domain: device_tracker
+      entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
+      type: is_not_home
+  actions:
+  - action: input_select.select_option
+    target:
+      entity_id: input_select.hemma_home_state
+    data:
+      option: Away
+  mode: single
+- id: '1771500000003'
+  alias: Routines - Dehumidifier Auto On Above 70
+  description: Turn on dehumidifier and set target humidity to 60 when humidity is high
+  triggers:
+  - trigger: numeric_state
+    entity_id: humidifier.probreeze_dehumidifier
+    attribute: current_humidity
+    above: 70
+  conditions: []
+  actions:
+  - action: humidifier.turn_on
+    target:
+      entity_id: humidifier.probreeze_dehumidifier
+    data: {}
+  - action: humidifier.set_humidity
+    target:
+      entity_id: humidifier.probreeze_dehumidifier
+    data:
+      humidity: 60
+  mode: single
+- id: '1771500000004'
+  alias: Routines - Dehumidifier Auto Off Below 58
+  description: Turn off dehumidifier when humidity is back down
+  triggers:
+  - trigger: numeric_state
+    entity_id: humidifier.probreeze_dehumidifier
+    attribute: current_humidity
+    below: 58
+  conditions: []
+  actions:
+  - action: humidifier.turn_off
+    target:
+      entity_id: humidifier.probreeze_dehumidifier
+    data: {}
+  mode: single
+
+# ============================================================================
+# Area
+# ============================================================================
 - id: '1757681457615'
   alias: Area - Entrance - Motion Detected Front Door
   description: ''
