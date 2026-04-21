@@ -8,7 +8,7 @@ hemma_activate_room_scene:
   alias: "Hemma Activate Room Scene"
   fields:
     scene_id:
-      description: "Scene entity ID to activate (e.g. scene.living_room_focus)"
+      description: "Scene entity ID to activate (e.g. scene.living_room_focus_scene)"
       selector:
         entity:
           domain: scene

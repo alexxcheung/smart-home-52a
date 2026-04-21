@@ -110,7 +110,7 @@ cards:
             tap_action:
               action: call-service
               service: script.hemma_activate_room_scene
-              service_data: { scene_id: scene.hallway_focus, scene_name: Focus, select_entity: input_text.hemma_hallway_scene }
+              service_data: { scene_id: scene.hallway_focus_scene, scene_name: Focus, select_entity: input_text.hemma_hallway_scene }
 
           - type: custom:button-card
             name: Relax
@@ -127,7 +127,7 @@ cards:
             tap_action:
               action: call-service
               service: script.hemma_activate_room_scene
-              service_data: { scene_id: scene.hallway_relax, scene_name: Relax, select_entity: input_text.hemma_hallway_scene }
+              service_data: { scene_id: scene.hallway_relax_scene, scene_name: Relax, select_entity: input_text.hemma_hallway_scene }
 
           - type: custom:button-card
             name: Night
@@ -144,7 +144,7 @@ cards:
             tap_action:
               action: call-service
               service: script.hemma_activate_room_scene
-              service_data: { scene_id: scene.hallway_night, scene_name: Night, select_entity: input_text.hemma_hallway_scene }
+              service_data: { scene_id: scene.hallway_night_scene, scene_name: Night, select_entity: input_text.hemma_hallway_scene }
 
 
           - type: custom:button-card
@@ -162,7 +162,7 @@ cards:
             tap_action:
               action: call-service
               service: script.hemma_activate_room_scene
-              service_data: { scene_id: scene.hallway_sleep, scene_name: Sleep, select_entity: input_text.hemma_hallway_scene }
+              service_data: { scene_id: scene.hallway_sleep_scene, scene_name: Sleep, select_entity: input_text.hemma_hallway_scene }
           - type: custom:button-card
             name: Away
             label: All off
@@ -178,4 +178,4 @@ cards:
             tap_action:
               action: call-service
               service: script.hemma_activate_room_scene
-              service_data: { scene_id: scene.hallway_away, scene_name: Away, select_entity: input_text.hemma_hallway_scene }
+              service_data: { scene_id: scene.hallway_away_scene, scene_name: Away, select_entity: input_text.hemma_hallway_scene }

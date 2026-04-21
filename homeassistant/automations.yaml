@@ -170,7 +170,7 @@
   - action: scene.turn_on
     metadata: {}
     target:
-      entity_id: scene.study_work
+      entity_id: scene.study_work_scene
     data: {}
   mode: single
 - id: '1756832013214'
@@ -242,11 +242,11 @@
     metadata: {}
     target:
       entity_id:
-      - scene.living_room_night
-      - scene.kitchen_night
-      - scene.hallway_night
-      - scene.bedroom_night
-      - scene.study_night
+      - scene.living_room_night_scene
+      - scene.kitchen_night_scene
+      - scene.hallway_night_scene
+      - scene.bedroom_night_scene
+      - scene.study_night_scene
   mode: single
 - id: '1756832135280'
   alias: Routines - Welcome Home with adaptive arrival light
@@ -312,6 +312,46 @@
       - xuan_guan
     data: {}
   mode: single
+- id: '1771600000001'
+  alias: Home Mode - Set Home After Arrival (10 min)
+  description: When anyone enters the home zone, wait 10 minutes then set Home Mode to Home if at least one person is still home
+  triggers:
+  - device_id: 322cbb275deee7edce6388320b436c40
+    domain: device_tracker
+    entity_id: 5287d46e72d6f9d1a46379d3919092b7
+    type: enters
+    trigger: device
+    zone: zone.home
+  - device_id: fd7dfa4ede01b45f7c566181765332b8
+    domain: device_tracker
+    entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
+    type: enters
+    trigger: device
+    zone: zone.home
+  conditions: []
+  actions:
+  - delay:
+      minutes: 10
+  - if:
+      - condition: or
+        conditions:
+        - condition: device
+          device_id: 322cbb275deee7edce6388320b436c40
+          domain: device_tracker
+          entity_id: 5287d46e72d6f9d1a46379d3919092b7
+          type: is_home
+        - condition: device
+          device_id: fd7dfa4ede01b45f7c566181765332b8
+          domain: device_tracker
+          entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
+          type: is_home
+    then:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.hemma_home_state
+        data:
+          option: Home
+  mode: restart
 - id: '1756832264041'
   alias: Routines - Leave Home Turn Off Devices
   description: ''
@@ -354,7 +394,7 @@
       - front_door
   mode: single
 - id: '1771500000005'
-  alias: Routines - Set Home Mode Away When Everyone Leaves
+  alias: Home Mode - Set Away When Everyone Leaves
   description: Set Home Mode to Away when both tracked people are not home
   triggers:
   - device_id: 322cbb275deee7edce6388320b436c40
@@ -389,15 +429,81 @@
     data:
       option: Away
   mode: single
+
+# ============================================================================
+# Diagnostics
+# ============================================================================
+- id: '1771400000099'
+  alias: Core - Log Every Automation Run
+  description: Writes a Logbook entry whenever any automation runs (excluding this one)
+  triggers:
+  - trigger: event
+    event_type: automation_triggered
+  conditions:
+  - condition: template
+    value_template: >
+      {{ trigger.event.data.name | default('') != 'Core - Log Every Automation Run' }}
+  actions:
+  - action: logbook.log
+    data:
+      name: Automation
+      message: >-
+        {{ trigger.event.data.name | default('(unknown name)') }}
+        · {{ trigger.event.data.entity_id | default('(no entity_id)') }}
+        · source: {{ trigger.event.data.source | default('?') }}
+  mode: parallel
+- id: '1771400000100'
+  alias: Core - Log Scene Activations
+  description: Writes a Logbook entry whenever a scene is activated
+  triggers:
+  - trigger: event
+    event_type: call_service
+    event_data:
+      domain: scene
+      service: turn_on
+  conditions:
+  - condition: template
+    value_template: >
+      {% set e = trigger.event.data.service_data.entity_id | default(none) %}
+      {{ e is string or (e is sequence and e is not string and (e | count) > 0) }}
+  actions:
+  - action: logbook.log
+    data:
+      name: Scene
+      entity_id: >-
+        {% set e = trigger.event.data.service_data.entity_id | default(none) %}
+        {% if e is string %}
+          {{ e }}
+        {% elif e is sequence and e is not string and (e | count) > 0 %}
+          {{ e[0] }}
+        {% endif %}
+      message: >-
+        {% set e = trigger.event.data.service_data.entity_id | default(none) %}
+        {% if e is string %}
+          Activated {{ state_attr(e, 'friendly_name') or e }}
+        {% elif e is sequence and e is not string %}
+          Activated {{ e | join(', ') }}
+        {% else %}
+          Activated (unknown scene)
+        {% endif %}
+  mode: parallel
+
+# ============================================================================
+# Area
+# ============================================================================
+# --- Hallway ---
 - id: '1771500000003'
-  alias: Routines - Dehumidifier Auto On Above 70
-  description: Turn on dehumidifier and set target humidity to 60 when humidity is high
+  alias: Area - Hallway - Dehumidifier Auto On Above 70
+  description: Turn on dehumidifier and set target humidity to 60 when humidity is high and Agile rate is under 20p/kWh
   triggers:
   - trigger: numeric_state
     entity_id: humidifier.probreeze_dehumidifier
     attribute: current_humidity
     above: 70
-  conditions: []
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.octopus_energy_electricity_20l3765434_2000057767569_current_rate
+    below: 0.2
   actions:
   - action: humidifier.turn_on
     target:
@@ -410,7 +516,7 @@
       humidity: 60
   mode: single
 - id: '1771500000004'
-  alias: Routines - Dehumidifier Auto Off Below 58
+  alias: Area - Hallway - Dehumidifier Auto Off Below 58
   description: Turn off dehumidifier when humidity is back down
   triggers:
   - trigger: numeric_state
@@ -424,10 +530,7 @@
       entity_id: humidifier.probreeze_dehumidifier
     data: {}
   mode: single
-
-# ============================================================================
-# Area
-# ============================================================================
+# --- Entrance ---
 - id: '1757681457615'
   alias: Area - Entrance - Motion Detected Front Door
   description: ''

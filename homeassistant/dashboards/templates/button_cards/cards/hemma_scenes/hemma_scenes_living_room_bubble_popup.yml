@@ -143,7 +143,7 @@ cards:
               action: call-service
               service: script.hemma_activate_room_scene
               service_data:
-                scene_id: scene.living_room_focus
+                scene_id: scene.living_room_focus_scene
                 scene_name: Focus
                 select_entity: input_text.hemma_living_room_scene
 
@@ -191,7 +191,7 @@ cards:
               action: call-service
               service: script.hemma_activate_room_scene
               service_data:
-                scene_id: scene.living_room_reading
+                scene_id: scene.living_room_reading_scene
                 scene_name: Reading
                 select_entity: input_text.hemma_living_room_scene
 
@@ -239,7 +239,7 @@ cards:
               action: call-service
               service: script.hemma_activate_room_scene
               service_data:
-                scene_id: scene.living_room_movie
+                scene_id: scene.living_room_movie_scene
                 scene_name: Movie
                 select_entity: input_text.hemma_living_room_scene
 
@@ -287,7 +287,7 @@ cards:
               action: call-service
               service: script.hemma_activate_room_scene
               service_data:
-                scene_id: scene.living_room_relax
+                scene_id: scene.living_room_relax_scene
                 scene_name: Relax
                 select_entity: input_text.hemma_living_room_scene
 
@@ -335,7 +335,7 @@ cards:
               action: call-service
               service: script.hemma_activate_room_scene
               service_data:
-                scene_id: scene.living_room_night
+                scene_id: scene.living_room_night_scene
                 scene_name: Night
                 select_entity: input_text.hemma_living_room_scene
 
@@ -383,7 +383,7 @@ cards:
               action: call-service
               service: script.hemma_activate_room_scene
               service_data:
-                scene_id: scene.living_room_sleep
+                scene_id: scene.living_room_sleep_scene
                 scene_name: Sleep
                 select_entity: input_text.hemma_living_room_scene
 
@@ -432,6 +432,6 @@ cards:
               action: call-service
               service: script.hemma_activate_room_scene
               service_data:
-                scene_id: scene.living_room_away
+                scene_id: scene.living_room_away_scene
                 scene_name: Away
                 select_entity: input_text.hemma_living_room_scene

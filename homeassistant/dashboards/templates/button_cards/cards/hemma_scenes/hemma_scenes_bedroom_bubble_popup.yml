@@ -110,7 +110,7 @@ cards:
             tap_action:
               action: call-service
               service: script.hemma_activate_room_scene
-              service_data: { scene_id: scene.bedroom_focus, scene_name: Focus, select_entity: input_text.hemma_bedroom_scene }
+              service_data: { scene_id: scene.bedroom_focus_scene, scene_name: Focus, select_entity: input_text.hemma_bedroom_scene }
 
 
           - type: custom:button-card
@@ -128,7 +128,7 @@ cards:
             tap_action:
               action: call-service
               service: script.hemma_activate_room_scene
-              service_data: { scene_id: scene.bedroom_reading, scene_name: Reading, select_entity: input_text.hemma_bedroom_scene }
+              service_data: { scene_id: scene.bedroom_reading_scene, scene_name: Reading, select_entity: input_text.hemma_bedroom_scene }
           - type: custom:button-card
             name: Relax
             label: Dim · 2200K
@@ -144,7 +144,7 @@ cards:
             tap_action:
               action: call-service
               service: script.hemma_activate_room_scene
-              service_data: { scene_id: scene.bedroom_relax, scene_name: Relax, select_entity: input_text.hemma_bedroom_scene }
+              service_data: { scene_id: scene.bedroom_relax_scene, scene_name: Relax, select_entity: input_text.hemma_bedroom_scene }
 
           - type: custom:button-card
             name: Night
@@ -161,7 +161,7 @@ cards:
             tap_action:
               action: call-service
               service: script.hemma_activate_room_scene
-              service_data: { scene_id: scene.bedroom_night, scene_name: Night, select_entity: input_text.hemma_bedroom_scene }
+              service_data: { scene_id: scene.bedroom_night_scene, scene_name: Night, select_entity: input_text.hemma_bedroom_scene }
 
 
           - type: custom:button-card
@@ -179,7 +179,7 @@ cards:
             tap_action:
               action: call-service
               service: script.hemma_activate_room_scene
-              service_data: { scene_id: scene.bedroom_sleep, scene_name: Sleep, select_entity: input_text.hemma_bedroom_scene }
+              service_data: { scene_id: scene.bedroom_sleep_scene, scene_name: Sleep, select_entity: input_text.hemma_bedroom_scene }
           - type: custom:button-card
             name: Away
             label: All off
@@ -195,4 +195,4 @@ cards:
             tap_action:
               action: call-service
               service: script.hemma_activate_room_scene
-              service_data: { scene_id: scene.bedroom_away, scene_name: Away, select_entity: input_text.hemma_bedroom_scene }
+              service_data: { scene_id: scene.bedroom_away_scene, scene_name: Away, select_entity: input_text.hemma_bedroom_scene }

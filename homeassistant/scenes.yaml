@@ -2,14 +2,14 @@
 # 5 rooms × 5 basic scenes: Focus / Relax / Night / Sleep / Away
 #
 # Scene entity_ids are generated from names (slugified):
-#   "Living Room Focus" → scene.living_room_focus
+#   "Living Room Focus Scene" → scene.living_room_focus_scene
 #
 # NOTE: Kitchen and Hallway use placeholder light entity IDs.
 #       Replace light.kitchen_ceiling / light.hallway_ceiling
 #       with your actual entity IDs before activating those scenes.
 
 # ─────────────── Living Room ───────────────
-- name: Living Room Focus
+- name: Living Room Focus Scene
   entities:
     light.sofa_light:
       state: on
@@ -20,7 +20,7 @@
       brightness_pct: 100
       color_temp_kelvin: 6000
 
-- name: Living Room Relax
+- name: Living Room Relax Scene
   entities:
     light.sofa_light:
       state: on
@@ -31,7 +31,7 @@
       brightness_pct: 30
       color_temp_kelvin: 2200
 
-- name: Living Room Night
+- name: Living Room Night Scene
   entities:
     light.sofa_light:
       state: on
@@ -42,7 +42,7 @@
       brightness_pct: 5
       color_temp_kelvin: 2000
 
-- name: Living Room Reading
+- name: Living Room Reading Scene
   entities:
     light.sofa_light:
       state: on
@@ -53,7 +53,7 @@
       brightness_pct: 70
       color_temp_kelvin: 4000
 
-- name: Living Room Movie
+- name: Living Room Movie Scene
   entities:
     light.sofa_light:
       state: off
@@ -62,14 +62,14 @@
       brightness_pct: 8
       color_temp_kelvin: 2000
 
-- name: Living Room Sleep
+- name: Living Room Sleep Scene
   entities:
     light.sofa_light:
       state: off
     light.floor_light:
       state: off
 
-- name: Living Room Away
+- name: Living Room Away Scene
   entities:
     light.sofa_light:
       state: off
@@ -78,113 +78,113 @@
 
 # ─────────────── Kitchen ───────────────
 # TODO: Replace light.kitchen_ceiling with your actual kitchen light entity ID(s)
-- name: Kitchen Focus
+- name: Kitchen Focus Scene
   entities:
     light.kitchen_ceiling:
       state: on
       brightness_pct: 100
       color_temp_kelvin: 6000
 
-- name: Kitchen Relax
+- name: Kitchen Relax Scene
   entities:
     light.kitchen_ceiling:
       state: on
       brightness_pct: 30
       color_temp_kelvin: 2200
 
-- name: Kitchen Night
+- name: Kitchen Night Scene
   entities:
     light.kitchen_ceiling:
       state: on
       brightness_pct: 5
       color_temp_kelvin: 2000
 
-- name: Kitchen Sleep
+- name: Kitchen Sleep Scene
   entities:
     light.kitchen_ceiling:
       state: off
 
-- name: Kitchen Away
+- name: Kitchen Away Scene
   entities:
     light.kitchen_ceiling:
       state: off
 
 # ─────────────── Hallway ───────────────
 # TODO: Replace light.hallway_ceiling with your actual hallway light entity ID(s)
-- name: Hallway Focus
+- name: Hallway Focus Scene
   entities:
     light.hallway_ceiling:
       state: on
       brightness_pct: 100
       color_temp_kelvin: 6000
 
-- name: Hallway Relax
+- name: Hallway Relax Scene
   entities:
     light.hallway_ceiling:
       state: on
       brightness_pct: 30
       color_temp_kelvin: 2200
 
-- name: Hallway Night
+- name: Hallway Night Scene
   entities:
     light.hallway_ceiling:
       state: on
       brightness_pct: 5
       color_temp_kelvin: 2000
 
-- name: Hallway Sleep
+- name: Hallway Sleep Scene
   entities:
     light.hallway_ceiling:
       state: on
       brightness_pct: 1
       color_temp_kelvin: 1800
 
-- name: Hallway Away
+- name: Hallway Away Scene
   entities:
     light.hallway_ceiling:
       state: off
 
 # ─────────────── Bedroom ───────────────
-- name: Bedroom Focus
+- name: Bedroom Focus Scene
   entities:
     light.hue_lightstrip_plus_1:
       state: on
       brightness_pct: 100
       color_temp_kelvin: 6000
 
-- name: Bedroom Reading
+- name: Bedroom Reading Scene
   entities:
     light.hue_lightstrip_plus_1:
       state: on
       brightness_pct: 80
       color_temp_kelvin: 4000
 
-- name: Bedroom Relax
+- name: Bedroom Relax Scene
   entities:
     light.hue_lightstrip_plus_1:
       state: on
       brightness_pct: 30
       color_temp_kelvin: 2200
 
-- name: Bedroom Night
+- name: Bedroom Night Scene
   entities:
     light.hue_lightstrip_plus_1:
       state: on
       brightness_pct: 5
       color_temp_kelvin: 2000
 
-- name: Bedroom Sleep
+- name: Bedroom Sleep Scene
   entities:
     light.hue_lightstrip_plus_1:
       state: off
 
-- name: Bedroom Away
+- name: Bedroom Away Scene
   entities:
     light.hue_lightstrip_plus_1:
       state: off
 
 # ─────────────── Study ───────────────
-- name: Study Focus
+- name: Study Focus Scene
   entities:
     light.alex_desk_light:
       state: on
@@ -199,7 +199,7 @@
       brightness_pct: 100
       color_temp_kelvin: 6000
 
-- name: Study Reading
+- name: Study Reading Scene
   entities:
     light.alex_desk_light:
       state: on
@@ -214,7 +214,7 @@
       brightness_pct: 60
       color_temp_kelvin: 4000
 
-- name: Study Relax
+- name: Study Relax Scene
   entities:
     light.alex_desk_light:
       state: on
@@ -229,7 +229,7 @@
       brightness_pct: 30
       color_temp_kelvin: 2200
 
-- name: Study Night
+- name: Study Night Scene
   entities:
     light.alex_desk_light:
       state: on
@@ -244,7 +244,7 @@
       brightness_pct: 5
       color_temp_kelvin: 2000
 
-- name: Study Work
+- name: Study Work Scene
   entities:
     light.alex_desk_light:
       state: on
@@ -259,7 +259,7 @@
       brightness_pct: 50
       color_temp_kelvin: 3000
 
-- name: Study Sleep
+- name: Study Sleep Scene
   entities:
     light.alex_desk_light:
       state: off
@@ -268,7 +268,7 @@
     light.study_floor_light:
       state: off
 
-- name: Study Away
+- name: Study Away Scene
   entities:
     light.alex_desk_light:
       state: off
