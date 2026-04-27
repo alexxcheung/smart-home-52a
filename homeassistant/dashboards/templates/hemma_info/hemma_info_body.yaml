@@ -33,6 +33,8 @@ cards:
       - type: custom:button-card
         template: hemma_shopping_list
       - type: custom:button-card
+        template: hemma_bin_collection
+      - type: custom:button-card
         template: hemma_plain_button_card
         tap_action:
           action: none

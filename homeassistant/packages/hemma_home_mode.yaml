@@ -103,7 +103,7 @@ automation:
       - action: logbook.log
         data:
           name: "Home Mode"
-          message: "Switched to Home mode"
+          message: "Home Mode activated"
           entity_id: input_select.hemma_home_state
 
   - id: hemma_home_state_sleep
@@ -154,7 +154,7 @@ automation:
       - action: logbook.log
         data:
           name: "Home Mode"
-          message: "Switched to Sleep mode"
+          message: "Sleep Mode activated"
           entity_id: input_select.hemma_home_state
 
   - id: hemma_home_state_vacation
@@ -193,7 +193,7 @@ automation:
       - action: logbook.log
         data:
           name: "Home Mode"
-          message: "Switched to Vacation mode — presence simulation active"
+          message: "Vacation Mode activated — presence simulation active"
           entity_id: input_select.hemma_home_state
 
   - id: hemma_home_state_away
@@ -251,7 +251,7 @@ automation:
       - action: logbook.log
         data:
           name: "Home Mode"
-          message: "Switched to Away mode"
+          message: "Away Mode activated"
           entity_id: input_select.hemma_home_state
 
   - id: hemma_home_state_vacation_end
@@ -296,7 +296,7 @@ automation:
       - action: logbook.log
         data:
           name: "Home Mode"
-          message: "Switched to Guest mode"
+          message: "Guest Mode activated"
           entity_id: input_select.hemma_home_state
 
   - id: hemma_home_state_pet_home
@@ -338,7 +338,7 @@ automation:
       - action: logbook.log
         data:
           name: "Home Mode"
-          message: "Switched to Pet Home mode"
+          message: "Pet Home Mode activated"
           entity_id: input_select.hemma_home_state
 
   - id: hemma_home_state_focus
@@ -356,7 +356,7 @@ automation:
       - action: logbook.log
         data:
           name: "Home Mode"
-          message: "Switched to Focus mode — Do Not Disturb active"
+          message: "Focus Mode activated — Do Not Disturb active"
           entity_id: input_select.hemma_home_state
 
   - id: hemma_home_state_bypass

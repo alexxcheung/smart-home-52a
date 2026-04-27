@@ -1,0 +1,135 @@
+hemma_bin_collection:
+  template: hemma_plain_button_card
+  show_icon: false
+  show_name: false
+  show_state: false
+
+  triggers_update: all
+
+  variables:
+    bins:
+      - entity: sensor.bin_household_waste
+        label: Household
+        icon: mdi:trash-can
+        color: "rgba(148, 163, 184, 0.95)"
+      - entity: sensor.bin_recycling
+        label: Recycling
+        icon: mdi:recycle
+        color: "rgba(96, 165, 250, 0.95)"
+      - entity: sensor.bin_food_waste
+        label: Food
+        icon: mdi:food-apple
+        color: "rgba(74, 222, 128, 0.95)"
+      - entity: sensor.bin_garden_waste
+        label: Garden
+        icon: mdi:leaf
+        color: "rgba(250, 204, 21, 0.95)"
+
+  tap_action:
+    action: none
+
+  custom_fields:
+    content: >
+      [[[
+        const bins = (variables && variables.bins) || [];
+
+        const startOfDay = (d) => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
+        const today = startOfDay(new Date());
+        const fmtWeekday = new Intl.DateTimeFormat('en-GB', { weekday: 'short' });
+        const fmtDate    = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short' });
+
+        const parseDate = (s) => {
+          if (!s || s === 'unknown' || s === 'unavailable') return null;
+          // sensor `value_template` outputs YYYY-MM-DD
+          const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+          if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+          const d = new Date(s);
+          return isNaN(d) ? null : d;
+        };
+
+        const relative = (d) => {
+          const days = Math.round((startOfDay(d) - today) / 86400000);
+          if (days === 0) return 'Today';
+          if (days === 1) return 'Tomorrow';
+          if (days > 1 && days < 7) return `In ${days} days`;
+          if (days < 0) return 'Past';
+          return null; // beyond a week → fall back to weekday/date only
+        };
+
+        const enriched = bins.map((b) => {
+          const st = states[b.entity];
+          const date = st ? parseDate(st.state) : null;
+          return { ...b, date };
+        });
+
+        // Sort by date ascending; unknowns sink to the bottom
+        enriched.sort((a, b) => {
+          if (!a.date && !b.date) return 0;
+          if (!a.date) return 1;
+          if (!b.date) return -1;
+          return a.date - b.date;
+        });
+
+        const next = enriched.find((b) => b.date && startOfDay(b.date) >= today);
+
+        const headlineWhen = next && next.date
+          ? (relative(next.date) || fmtWeekday.format(next.date))
+          : 'No data';
+        const headlineWhat = next ? next.label : '—';
+
+        const rows = enriched.map((b) => {
+          const when = b.date
+            ? `${fmtWeekday.format(b.date)} ${fmtDate.format(b.date)}`
+            : '—';
+          const rel  = b.date ? (relative(b.date) || '') : '';
+          const isNext = next && b.entity === next.entity;
+          return `
+            <div class="bin-row${isNext ? ' is-next' : ''}">
+              <span class="bin-dot" style="background:${b.color};"></span>
+              <ha-icon class="bin-icon" icon="${b.icon}" style="color:${b.color};"></ha-icon>
+              <span class="bin-label">${b.label}</span>
+              <span class="bin-when">${when}</span>
+              <span class="bin-rel">${rel}</span>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="bin-wrap">
+            <div class="bin-title">Bin Collection</div>
+            <div class="bin-headline">
+              <span class="bin-headline-when">${headlineWhen}</span>
+              <span class="bin-headline-what">${headlineWhat}</span>
+            </div>
+            <div class="bin-list">${rows}</div>
+          </div>
+        `;
+      ]]]
+
+  styles:
+    card:
+      - background: rgba(255,255,255,0.06)
+      - backdrop-filter: blur(20px)
+      - border-radius: 30px
+      - border: 1px solid rgba(255,255,255,0.15)
+      - box-shadow: none
+    custom_fields:
+      content:
+        - width: 100%
+
+  extra_styles: |
+    .bin-wrap { display: flex; flex-direction: column; width: 100%; padding: 16px 18px; box-sizing: border-box; }
+    .bin-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.45; }
+    .bin-headline { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; min-width: 0; }
+    .bin-headline-when { font-size: 17px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; white-space: nowrap; }
+    .bin-headline-what { font-size: 13px; font-weight: 600; opacity: 0.75; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bin-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .bin-row { display: grid; grid-template-columns: 4px 18px 1fr auto; column-gap: 8px; align-items: center; min-width: 0; padding: 4px 0; opacity: 0.78; }
+    .bin-row.is-next { opacity: 1; }
+    .bin-row.is-next .bin-label { font-weight: 700; }
+    .bin-dot { width: 4px; height: 14px; border-radius: 2px; opacity: 0.7; }
+    .bin-row.is-next .bin-dot { opacity: 1; }
+    .bin-icon { --mdc-icon-size: 16px; }
+    .bin-label { font-size: 12px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bin-when { font-size: 11px; line-height: 1.2; opacity: 0.7; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .bin-rel { display: none; }

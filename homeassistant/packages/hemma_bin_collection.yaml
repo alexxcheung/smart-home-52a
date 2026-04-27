@@ -1,0 +1,145 @@
+# packages/hemma_bin_collection.yaml
+# ============================================================================
+# Wokingham Borough Council bin collection
+#
+# Powered by the Waste Collection Schedule integration:
+#   https://github.com/mampfes/hacs_waste_collection_schedule
+#
+# INSTALL (already done): the integration lives in
+#   /config/custom_components/waste_collection_schedule/
+# To upgrade, re-extract the matching release tarball over that folder.
+#
+# After a HA restart, the source/sensor blocks below register automatically.
+# Address is resolved by case-insensitive substring match on the council's
+# address dropdown, so "52 Langborough Road" is enough to disambiguate the
+# property (RG40 2BT, property id 97149 at time of writing).
+#
+# ENTITIES CREATED (used by the Hemma "Daily Pulse" bin card):
+#   - sensor.bin_household_waste
+#   - sensor.bin_recycling
+#   - sensor.bin_food_waste
+#   - sensor.bin_garden_waste
+#
+# REMINDER NOTIFICATIONS:
+#   At 20:00 the night before any collection, sends a mobile push +
+#   persistent notification listing which bin(s) to put out. Toggle off
+#   via input_boolean.hemma_bin_reminder_enabled.
+# ============================================================================
+
+input_boolean:
+  hemma_bin_reminder_enabled:
+    name: Bin Reminder Enabled
+    initial: true
+    icon: mdi:trash-can-outline
+
+waste_collection_schedule:
+  # Daily refresh is plenty - council schedule changes very rarely.
+  # These are top-level keys (apply to all sources), not source-level.
+  fetch_time: "04:00"
+  random_fetch_time_offset: 60
+  day_switch_time: "06:00"
+  sources:
+    - name: wokingham_gov_uk
+      calendar_title: "Bin Collection"
+      args:
+        postcode: "RG40 2BT"
+        address: "52 Langborough Road"
+  # Sensors live under the integration domain (the legacy
+  # `sensor: platform: waste_collection_schedule` form is deprecated).
+  # `value_template` outputs YYYY-MM-DD so the bin button-card JS can
+  # parse it; `date_template` formats the friendly weekday + date for
+  # the entity's own state attributes.
+  sensors:
+    - name: bin_household_waste
+      details_format: upcoming
+      value_template: "{{ value.date.strftime('%Y-%m-%d') }}"
+      date_template: "{{ value.date.strftime('%A %-d %b') }}"
+      types:
+        - Household waste
+
+    - name: bin_recycling
+      details_format: upcoming
+      value_template: "{{ value.date.strftime('%Y-%m-%d') }}"
+      date_template: "{{ value.date.strftime('%A %-d %b') }}"
+      types:
+        - Recycling
+
+    - name: bin_food_waste
+      details_format: upcoming
+      value_template: "{{ value.date.strftime('%Y-%m-%d') }}"
+      date_template: "{{ value.date.strftime('%A %-d %b') }}"
+      types:
+        - Food waste
+
+    - name: bin_garden_waste
+      details_format: upcoming
+      value_template: "{{ value.date.strftime('%Y-%m-%d') }}"
+      date_template: "{{ value.date.strftime('%A %-d %b') }}"
+      types:
+        - Garden waste
+
+automation:
+  - id: hemma_bin_reminder_evening_before
+    alias: "Bins - Evening-before reminder"
+    description: >-
+      At 20:00 every day, push a notification listing any bins being collected
+      tomorrow. Gated by input_boolean.hemma_bin_reminder_enabled.
+    mode: single
+    trigger:
+      - trigger: time
+        at: "20:00:00"
+    variables:
+      # entity_id -> friendly label (single source of truth for the
+      # condition and the action below)
+      bin_labels:
+        sensor.bin_household_waste: Household waste
+        sensor.bin_recycling: Recycling
+        sensor.bin_food_waste: Food waste
+        sensor.bin_garden_waste: Garden waste
+    condition:
+      - condition: state
+        entity_id: input_boolean.hemma_bin_reminder_enabled
+        state: "on"
+      # Only proceed if at least one bin sensor's state == tomorrow's date
+      - condition: template
+        value_template: >-
+          {% set tomorrow = (now() + timedelta(days=1)).strftime('%Y-%m-%d') %}
+          {{ bin_labels.keys() | map('states') | select('eq', tomorrow) | list | length > 0 }}
+    action:
+      - variables:
+          tomorrow: "{{ (now() + timedelta(days=1)).strftime('%Y-%m-%d') }}"
+          tomorrow_pretty: "{{ (now() + timedelta(days=1)).strftime('%A %-d %b') }}"
+          due_bins: >-
+            {% set ns = namespace(bins=[]) %}
+            {% for entity_id, label in bin_labels.items() %}
+              {% if states(entity_id) == tomorrow %}
+                {% set ns.bins = ns.bins + [label] %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.bins }}
+          due_bins_text: >-
+            {% if due_bins | length == 1 %}
+              {{ due_bins[0] }}
+            {% elif due_bins | length == 2 %}
+              {{ due_bins[0] }} and {{ due_bins[1] }}
+            {% else %}
+              {{ due_bins[:-1] | join(', ') }} and {{ due_bins[-1] }}
+            {% endif %}
+          notif_title: "Bin day tomorrow"
+          notif_message: >-
+            Put out the {{ due_bins_text | trim }} bin{{ 's' if due_bins | length > 1 else '' }} tonight - collection {{ tomorrow_pretty }}.
+      - action: persistent_notification.create
+        data:
+          title: "{{ notif_title }}"
+          message: "{{ notif_message }}"
+          notification_id: "hemma_bin_reminder"
+      - action: notify.mobile_app_imalex_17
+        continue_on_error: true
+        data:
+          title: "{{ notif_title }}"
+          message: "{{ notif_message }}"
+      # - action: notify.mobile_app_imsammy_iphone
+      #   continue_on_error: true
+      #   data:
+      #     title: "{{ notif_title }}"
+      #     message: "{{ notif_message }}"
