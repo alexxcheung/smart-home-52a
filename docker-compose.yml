@@ -14,6 +14,8 @@ services:
       - NET_RAW
     security_opt:
       - apparmor:unconfined  # This removes the security block for Bluetooth
+    devices:
+      - /dev/serial/by-id/usb-SONOFF_SONOFF_Dongle_Lite_MG21_f2815ec4bfa3ef11989f4fbd61ce3355-if00-port0:/dev/ttyUSB1
 
   scrypted:
     container_name: scrypted
