@@ -44,7 +44,7 @@ cards:
               return `<div style="padding:18px 20px;box-sizing:border-box;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Work Calendar</div>
                 <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">No events today</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Dummy</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Sample</div>
               </div>`;
             ]]]
         styles:
@@ -64,7 +64,7 @@ cards:
               return `<div style="padding:18px 20px;box-sizing:border-box;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Next Meeting</div>
                 <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">14:00 · Stand-up</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Dummy</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Sample</div>
               </div>`;
             ]]]
         styles:
@@ -84,7 +84,7 @@ cards:
               return `<div style="padding:18px 20px;box-sizing:border-box;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Commute Time</div>
                 <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">~32 min</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Dummy</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Sample</div>
               </div>`;
             ]]]
         styles:
@@ -104,7 +104,7 @@ cards:
               return `<div style="padding:18px 20px;box-sizing:border-box;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Reminders</div>
                 <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">3 for today</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Scroll test · dummy</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
               </div>`;
             ]]]
         styles:
@@ -124,7 +124,7 @@ cards:
               return `<div style="padding:18px 20px;box-sizing:border-box;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Meal plan</div>
                 <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">Dinner TBD</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Scroll test · dummy</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
               </div>`;
             ]]]
         styles:
@@ -144,7 +144,7 @@ cards:
               return `<div style="padding:18px 20px;box-sizing:border-box;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Parcel ETA</div>
                 <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">14:20–15:20</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Scroll test · dummy</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
               </div>`;
             ]]]
         styles:
@@ -214,7 +214,7 @@ cards:
               return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
                 <ha-icon icon="mdi:air-filter" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
                 <div style="font-size:11px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Living Room AQI</div>
-                <div style="font-size:12px;opacity:0.45;margin-top:4px;">42 · dummy</div>
+                <div style="font-size:12px;opacity:0.45;margin-top:4px;">42 · sample</div>
               </div>`;
             ]]]
         styles:
@@ -233,7 +233,7 @@ cards:
               return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
                 <ha-icon icon="mdi:water-percent" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
                 <div style="font-size:11px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Master Bedroom Humidity</div>
-                <div style="font-size:12px;opacity:0.45;margin-top:4px;">48% · dummy</div>
+                <div style="font-size:12px;opacity:0.45;margin-top:4px;">48% · sample</div>
               </div>`;
             ]]]
         styles:
@@ -252,7 +252,7 @@ cards:
               return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
                 <ha-icon icon="mdi:thermometer" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
                 <div style="font-size:11px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Kitchen Temp</div>
-                <div style="font-size:12px;opacity:0.45;margin-top:4px;">21.5°C · dummy</div>
+                <div style="font-size:12px;opacity:0.45;margin-top:4px;">21.5°C · sample</div>
               </div>`;
             ]]]
         styles:
@@ -271,7 +271,7 @@ cards:
               return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
                 <ha-icon icon="mdi:sun-wireless" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
                 <div style="font-size:11px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Outdoor UV Index</div>
-                <div style="font-size:12px;opacity:0.45;margin-top:4px;">3 · dummy</div>
+                <div style="font-size:12px;opacity:0.45;margin-top:4px;">3 · sample</div>
               </div>`;
             ]]]
         styles:
@@ -329,7 +329,7 @@ cards:
                 <div style="height:36px;margin-top:16px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.04));position:relative;overflow:hidden;">
                   <div style="position:absolute;bottom:0;left:0;right:0;height:55%;background:rgba(96,165,250,0.45);"></div>
                 </div>
-                <div style="font-size:11px;opacity:0.4;margin-top:8px;">Dummy sparkline</div>
+                <div style="font-size:11px;opacity:0.4;margin-top:8px;">Sample sparkline</div>
               </div>`;
             ]]]
         styles:
@@ -348,7 +348,7 @@ cards:
               return `<div style="padding:16px 18px;box-sizing:border-box;min-height:132px;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Daily Energy Cost</div>
                 <div style="font-size:28px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">£4.12</div>
-                <div style="font-size:11px;opacity:0.45;margin-top:2px;">today · dummy</div>
+                <div style="font-size:11px;opacity:0.45;margin-top:2px;">today · sample</div>
                 <div style="height:36px;margin-top:12px;border-radius:8px;background:linear-gradient(90deg,rgba(255,255,255,0.08) 0%,rgba(255,255,255,0.22) 100%);"></div>
               </div>`;
             ]]]
@@ -368,7 +368,7 @@ cards:
               return `<div style="padding:16px 18px;box-sizing:border-box;min-height:132px;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Water Usage</div>
                 <div style="font-size:28px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">128 L</div>
-                <div style="font-size:11px;opacity:0.45;margin-top:2px;">today · dummy</div>
+                <div style="font-size:11px;opacity:0.45;margin-top:2px;">today · sample</div>
                 <div style="height:36px;margin-top:12px;border-radius:8px;background:repeating-linear-gradient(90deg,rgba(96,165,250,0.35) 0 8px,transparent 8px 14px);opacity:0.75;"></div>
               </div>`;
             ]]]
@@ -388,7 +388,7 @@ cards:
               return `<div style="padding:16px 18px;box-sizing:border-box;min-height:132px;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Solar export</div>
                 <div style="font-size:28px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">2.4 kW</div>
-                <div style="font-size:11px;opacity:0.45;margin-top:2px;">to grid · dummy</div>
+                <div style="font-size:11px;opacity:0.45;margin-top:2px;">to grid · sample</div>
                 <div style="height:36px;margin-top:12px;border-radius:8px;background:linear-gradient(90deg,rgba(250,204,21,0.35) 0%,rgba(255,255,255,0.12) 100%);"></div>
               </div>`;
             ]]]
@@ -408,7 +408,7 @@ cards:
               return `<div style="padding:16px 18px;box-sizing:border-box;min-height:132px;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Scroll test</div>
                 <div style="font-size:28px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">End</div>
-                <div style="font-size:11px;opacity:0.45;margin-top:2px;">Energy row · dummy</div>
+                <div style="font-size:11px;opacity:0.45;margin-top:2px;">Energy row · sample</div>
                 <div style="height:36px;margin-top:12px;border-radius:8px;background:rgba(255,255,255,0.1);"></div>
               </div>`;
             ]]]
@@ -506,6 +506,11 @@ cards:
             - backdrop-filter: blur(20px)
             - border-radius: 22px
             - border: 1px solid rgba(255,255,255,0.12)
+      # Powered by the built-in System Monitor integration. Add it via
+      # Settings -> Devices & Services -> Add Integration -> System Monitor
+      # and enable processor_use, memory_use_percent (and optionally
+      # processor_temperature). The card auto-detects entity IDs across
+      # HA versions, falling back to "-" until matching sensors exist.
       - type: custom:button-card
         template: hemma_plain_button_card
         tap_action:
@@ -513,10 +518,39 @@ cards:
         custom_fields:
           content: |
             [[[
+              const pickNum = (candidates) => {
+                for (const eid of candidates) {
+                  const s = states[eid];
+                  if (!s || s.state === 'unknown' || s.state === 'unavailable') continue;
+                  const n = parseFloat(s.state);
+                  if (!isNaN(n)) return n;
+                }
+                return null;
+              };
+              const cpuVal = pickNum([
+                'sensor.system_monitor_processor_use',
+                'sensor.system_monitor_cpu_use',
+                'sensor.processor_use',
+                'sensor.cpu_use',
+              ]);
+              const ramVal = pickNum([
+                'sensor.system_monitor_memory_use_percent',
+                'sensor.system_monitor_memory_usage',
+                'sensor.memory_use_percent',
+              ]);
+              const tempVal = pickNum([
+                'sensor.system_monitor_processor_temperature',
+                'sensor.processor_temperature',
+              ]);
+              const cpu = cpuVal === null ? '-' : `${Math.round(cpuVal)}%`;
+              const ram = ramVal === null ? '-' : `${Math.round(ramVal)}%`;
+              const subtitle = tempVal === null
+                ? `${ram} RAM`
+                : `${ram} RAM &middot; ${Math.round(tempVal)}&deg;C`;
               return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Internet Speed</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;">↓ 420 Mbps</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:6px;">↑ 38 Mbps · dummy</div>
+                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">HA Host</div>
+                <div style="font-size:17px;font-weight:600;margin-top:8px;">${cpu} CPU</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:6px;">${subtitle}</div>
               </div>`;
             ]]]
         styles:
@@ -533,9 +567,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Server CPU</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;">14% load</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:6px;">HA host · dummy</div>
+                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Internet Speed</div>
+                <div style="font-size:17px;font-weight:600;margin-top:8px;">↓ 420 Mbps</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:6px;">↑ 38 Mbps · sample</div>
               </div>`;
             ]]]
         styles:
@@ -554,7 +588,7 @@ cards:
               return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
                 <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Battery Levels</div>
                 <div style="font-size:17px;font-weight:600;margin-top:8px;">All OK</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:6px;">3 devices · dummy</div>
+                <div style="font-size:12px;opacity:0.5;margin-top:6px;">3 devices · sample</div>
               </div>`;
             ]]]
         styles:
