@@ -1,0 +1,168 @@
+# hemma_shopping_list_bubble_popup.yml
+# Lovelace fragment (not a button-card template). Uses .yml so
+# !include_dir_merge_named on button_cards/ (*.yaml only) does not merge
+# this dict into button_card_templates.
+#
+# Lists Bubble pop-up — must be LAST on Info view (Bubble README).
+# Open: navigate → '#hemma-lists'
+#
+# Outer wrapper styles match templates/includes/hemma_bubble_popup_shell.yaml;
+# edit both if you change the shell. Inner cards use HA's built-in
+# `type: todo-list` so each list is fully editable inline (add items,
+# tick items, remove items) without leaving the popup.
+
+type: vertical-stack
+cards:
+  - type: custom:bubble-card
+    card_type: pop-up
+    hash: '#hemma-lists'
+    name: Lists
+    icon: mdi:format-list-checks
+    button_type: name
+    show_state: false
+    force_icon: false
+    show_header: true
+    close_by_clicking_outside: true
+    width_desktop: 520px
+    margin_top_mobile: '0px'
+    margin_top_desktop: '0px'
+    bg_color: '#1c1c1c'
+    bg_opacity: '55'
+    bg_blur: '20'
+    shadow_opacity: '55'
+    styles: |
+      :host {
+        --bubble-backdrop-background-color: rgba(0, 0, 0, 0.45) !important;
+        --bubble-pop-up-background-color: var(--ha-card-background) !important;
+        --bubble-pop-up-main-background-color: var(--ha-card-background) !important;
+        --hemma-bubble-popup-inset-block: max(24px, 5vh);
+        --hemma-bubble-popup-inset-inline: max(16px, 3vw);
+        --hemma-bubble-popup-max-height: calc(
+          100dvh - 2 * var(--hemma-bubble-popup-inset-block)
+          - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+        );
+      }
+      .bubble-pop-up:not(.editor) {
+        top: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-top, 0px)) !important;
+        bottom: calc(var(--hemma-bubble-popup-inset-block) + env(safe-area-inset-bottom, 0px)) !important;
+        left: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        right: max(7px, var(--hemma-bubble-popup-inset-inline)) !important;
+        margin: auto !important;
+        height: fit-content !important;
+        max-height: var(--hemma-bubble-popup-max-height) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        border-radius: var(--bubble-pop-up-border-radius, 42px) !important;
+        overflow: hidden !important;
+        transition: transform 0.3s ease, opacity 0.3s ease !important;
+      }
+      @media only screen and (max-width: 599px) {
+        .bubble-pop-up:not(.editor) {
+          top: 0 !important;
+          bottom: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          width: 100vw !important;
+          max-width: 100vw !important;
+          max-height: 100dvh !important;
+          border-radius: 0 !important;
+        }
+      }
+      .bubble-pop-up:not(.editor).is-popup-closed { opacity: 0 !important; pointer-events: none !important; }
+      .bubble-pop-up:not(.editor).is-popup-opened { opacity: 1 !important; pointer-events: auto !important; }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-background {
+        border-radius: inherit !important;
+        background-color: var(--ha-card-background) !important;
+        backdrop-filter: blur(20px) saturate(1.1) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(1.1) !important;
+      }
+      .bubble-pop-up:not(.editor) .bubble-pop-up-container {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        /* 24px top so the tab bar has clear breathing room below the
+           "Lists" header. Bottom 24px keeps symmetry with the inset. */
+        padding: 36px 12px !important;
+        gap: 12px !important;
+      }
+
+  # ---------------------------------------------------------------------------
+  # Tab bar. The hemma_list_tab template highlights the active tab based on
+  # input_select.hemma_active_list and tapping a tab updates that select.
+  # The horizontal-stack lays out the four list tabs in one row.
+  # ---------------------------------------------------------------------------
+  - type: horizontal-stack
+    cards:
+      - type: custom:button-card
+        template: hemma_list_tab
+        triggers_update:
+          - input_select.hemma_active_list
+          - todo.groceries
+        variables:
+          option: Groceries
+          todo_entity: todo.groceries
+      - type: custom:button-card
+        template: hemma_list_tab
+        triggers_update:
+          - input_select.hemma_active_list
+          - todo.chores
+        variables:
+          option: Chores
+          todo_entity: todo.chores
+      - type: custom:button-card
+        template: hemma_list_tab
+        triggers_update:
+          - input_select.hemma_active_list
+          - todo.work
+        variables:
+          option: Work
+          todo_entity: todo.work
+      - type: custom:button-card
+        template: hemma_list_tab
+        triggers_update:
+          - input_select.hemma_active_list
+          - todo.shopping_list
+        variables:
+          option: Other
+          todo_entity: todo.shopping_list
+
+  # ---------------------------------------------------------------------------
+  # Body: only the conditional matching the active tab renders its todo-list.
+  # The hidden ones aren't laid out at all, so there's no flicker when
+  # switching tabs.
+  # ---------------------------------------------------------------------------
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: input_select.hemma_active_list
+        state: Groceries
+    card:
+      type: todo-list
+      entity: todo.groceries
+
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: input_select.hemma_active_list
+        state: Chores
+    card:
+      type: todo-list
+      entity: todo.chores
+
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: input_select.hemma_active_list
+        state: Work
+    card:
+      type: todo-list
+      entity: todo.work
+
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: input_select.hemma_active_list
+        state: Other
+    card:
+      type: todo-list
+      entity: todo.shopping_list

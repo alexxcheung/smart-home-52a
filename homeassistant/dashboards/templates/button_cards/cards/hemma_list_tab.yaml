@@ -1,0 +1,95 @@
+# A single tab pill for the Lists Bubble pop-up tab bar.
+#
+# Instantiate once per list, e.g.:
+#   - type: custom:button-card
+#     template: hemma_list_tab
+#     triggers_update:
+#       - input_select.hemma_active_list
+#       - todo.groceries
+#     variables:
+#       option: Groceries
+#       todo_entity: todo.groceries
+#
+# `option` must match an option on input_select.hemma_active_list (used for
+# tap + active highlight). The visible tab text comes from the todo entity's
+# friendly_name so it stays in sync when you rename the list in HA.
+#
+# triggers_update should include both the input_select and the matching
+# todo.* entity so the label and pill update when either changes.
+
+hemma_list_tab:
+  template: hemma_plain_button_card
+
+  triggers_update:
+    - input_select.hemma_active_list
+
+  variables:
+    option: ""
+    todo_entity: ""
+
+  tap_action:
+    action: call-service
+    service: input_select.select_option
+    service_data:
+      entity_id: input_select.hemma_active_list
+      option: "[[[ return variables.option; ]]]"
+
+  custom_fields:
+    tab: |
+      [[[
+        const active = states['input_select.hemma_active_list']?.state === variables.option;
+        const ent = variables.todo_entity;
+        const st = ent && states[ent] ? states[ent] : null;
+        const raw = st?.attributes?.friendly_name
+          || st?.attributes?.name
+          || variables.option
+          || '';
+        const esc = (s) => String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+        return `<div class="tab ${active ? 'active' : ''}">${esc(raw)}</div>`;
+      ]]]
+
+  styles:
+    card:
+      - border-radius: 14px
+      - border: none
+      - box-shadow: none
+      - padding: 0
+      - touch-action: manipulation
+      - cursor: pointer
+      - background: |
+          [[[
+            const active = states['input_select.hemma_active_list']?.state === variables.option;
+            return active ? 'rgba(255,255,255,0.16)' : 'transparent';
+          ]]]
+    custom_fields:
+      tab:
+        - width: 100%
+
+  extra_styles: |
+    :host { --button-card-light-color: transparent; }
+    #container {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      height: auto !important;
+    }
+    .tab {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.55;
+      color: var(--primary-text-color);
+      text-align: center;
+      padding: 8px 8px;
+      letter-spacing: 0.01em;
+      line-height: 1.2;
+    }
+    .tab.active {
+      font-weight: 700;
+      opacity: 1;
+    }

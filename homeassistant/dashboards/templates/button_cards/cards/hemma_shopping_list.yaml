@@ -8,7 +8,7 @@ hemma_shopping_list:
 
   tap_action:
     action: navigate
-    navigation_path: /todo
+    navigation_path: '#hemma-lists'
 
   custom_fields:
     content: >
@@ -51,7 +51,7 @@ hemma_shopping_list:
             <div class="shopping-title">List</div>
             <div class="shopping-status">${status}</div>
             <div class="shopping-items">${rows}</div>
-            <div class="shopping-hint">Tap to open default list</div>
+            <div class="shopping-hint">Tap to edit lists</div>
           </div>
         `;
       ]]]

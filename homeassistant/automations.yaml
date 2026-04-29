@@ -405,10 +405,10 @@
   mode: single
 - id: '1771500000005'
   alias: Home Mode - Set Away When Everyone Leaves
-  description: Set Home Mode to Away when both tracked people are not home. Debounced
+  description: 'Set Home Mode to Away when both tracked people are not home. Debounced
     via for: 10 minutes so a brief GPS-jitter not_home glitch does not flip the
     home mode to Away (which would cascade into Home Mode - Away turning off
-    every light in the house).
+    every light in the house).'
   triggers:
   - device_id: 322cbb275deee7edce6388320b436c40
     domain: device_tracker

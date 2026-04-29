@@ -126,6 +126,19 @@ input_select:
     initial: Daily
     icon: mdi:weather-partly-cloudy
 
+  # Tracks which list is active in the Lists Bubble pop-up (#hemma-lists).
+  # Each tab in the popup tab bar selects an option here; conditional cards
+  # below the tab bar render the matching todo-list.
+  hemma_active_list:
+    name: Active List
+    options:
+      - Groceries
+      - Chores
+      - Work
+      - Other
+    initial: Groceries
+    icon: mdi:format-list-checks
+
 input_text:
   hemma_living_room_scene:
     name: Living Room Active Scene
