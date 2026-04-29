@@ -212,7 +212,9 @@
   mode: single
 - id: '1771500000002'
   alias: Routines - Turn On Night Scenes At 10 PM
-  description: Turn on all room night scenes when anyone is home
+  description: Turn on all room night scenes when anyone is home, fading the lights
+    gradually over 30 minutes (transition 1800 s) for a soft wind-down rather than
+    an abrupt change at 22:00.
   triggers:
   - trigger: time
     at: '22:00:00'
@@ -240,6 +242,8 @@
   actions:
   - action: scene.turn_on
     metadata: {}
+    data:
+      transition: 1800
     target:
       entity_id:
       - scene.living_room_night_scene

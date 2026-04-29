@@ -11,8 +11,8 @@ cards:
       content: |
         [[[
           return `<div style="padding:0 2px 0 24px;box-sizing:border-box;max-width:100%;">
-            <div style="font-size:clamp(1.15rem,2vw,1.4rem);font-weight:700;line-height:1.2;color:var(--primary-text-color);">The Daily Pulse</div>
-            <div style="opacity:0.58;font-size:14px;margin-top:6px;line-height:1.35;color:var(--primary-text-color);padding-bottom:12px;box-sizing:border-box;">Groceries & Routine</div>
+            <div style="font-size:clamp(1.275rem,2vw,1.525rem);font-weight:700;line-height:1.2;color:var(--primary-text-color);">The Daily Pulse</div>
+            <div style="opacity:0.58;font-size:16px;margin-top:6px;line-height:1.35;color:var(--primary-text-color);padding-bottom:12px;box-sizing:border-box;">Groceries & Routine</div>
           </div>`;
         ]]]
     styles:
@@ -42,9 +42,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:18px 20px;box-sizing:border-box;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Work Calendar</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">No events today</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Sample</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Work Calendar</div>
+                <div style="font-size:19px;font-weight:600;margin-top:8px;line-height:1.2;">No events today</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Sample</div>
               </div>`;
             ]]]
         styles:
@@ -62,9 +62,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:18px 20px;box-sizing:border-box;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Next Meeting</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">14:00 · Stand-up</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Sample</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Next Meeting</div>
+                <div style="font-size:19px;font-weight:600;margin-top:8px;line-height:1.2;">14:00 · Stand-up</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Sample</div>
               </div>`;
             ]]]
         styles:
@@ -82,9 +82,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:18px 20px;box-sizing:border-box;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Commute Time</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">~32 min</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Sample</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Commute Time</div>
+                <div style="font-size:19px;font-weight:600;margin-top:8px;line-height:1.2;">~32 min</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Sample</div>
               </div>`;
             ]]]
         styles:
@@ -102,9 +102,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:18px 20px;box-sizing:border-box;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Reminders</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">3 for today</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Reminders</div>
+                <div style="font-size:19px;font-weight:600;margin-top:8px;line-height:1.2;">3 for today</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
               </div>`;
             ]]]
         styles:
@@ -122,9 +122,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:18px 20px;box-sizing:border-box;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Meal plan</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">Dinner TBD</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Meal plan</div>
+                <div style="font-size:19px;font-weight:600;margin-top:8px;line-height:1.2;">Dinner TBD</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
               </div>`;
             ]]]
         styles:
@@ -142,9 +142,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:18px 20px;box-sizing:border-box;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Parcel ETA</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">14:20–15:20</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Parcel ETA</div>
+                <div style="font-size:19px;font-weight:600;margin-top:8px;line-height:1.2;">14:20–15:20</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
               </div>`;
             ]]]
         styles:
@@ -162,9 +162,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:18px 20px;box-sizing:border-box;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Scroll test</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;line-height:1.2;">End of strip</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:10px;">Remove when done testing</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Scroll test</div>
+                <div style="font-size:19px;font-weight:600;margin-top:8px;line-height:1.2;">End of strip</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Remove when done testing</div>
               </div>`;
             ]]]
         styles:
@@ -185,8 +185,8 @@ cards:
       content: |
         [[[
           return `<div style="padding:0 2px 0 24px;box-sizing:border-box;max-width:100%;">
-            <div style="font-size:clamp(1.15rem,2vw,1.4rem);font-weight:700;line-height:1.2;color:var(--primary-text-color);">Atmosphere</div>
-            <div style="opacity:0.58;font-size:14px;margin-top:6px;line-height:1.35;color:var(--primary-text-color);padding-bottom:12px;box-sizing:border-box;">Climate & Air Quality</div>
+            <div style="font-size:clamp(1.275rem,2vw,1.525rem);font-weight:700;line-height:1.2;color:var(--primary-text-color);">Atmosphere</div>
+            <div style="opacity:0.58;font-size:16px;margin-top:6px;line-height:1.35;color:var(--primary-text-color);padding-bottom:12px;box-sizing:border-box;">Climate & Air Quality</div>
           </div>`;
         ]]]
     styles:
@@ -213,8 +213,8 @@ cards:
             [[[
               return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
                 <ha-icon icon="mdi:air-filter" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
-                <div style="font-size:11px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Living Room AQI</div>
-                <div style="font-size:12px;opacity:0.45;margin-top:4px;">42 · sample</div>
+                <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Living Room AQI</div>
+                <div style="font-size:14px;opacity:0.45;margin-top:4px;">42 · sample</div>
               </div>`;
             ]]]
         styles:
@@ -232,8 +232,8 @@ cards:
             [[[
               return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
                 <ha-icon icon="mdi:water-percent" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
-                <div style="font-size:11px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Master Bedroom Humidity</div>
-                <div style="font-size:12px;opacity:0.45;margin-top:4px;">48% · sample</div>
+                <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Master Bedroom Humidity</div>
+                <div style="font-size:14px;opacity:0.45;margin-top:4px;">48% · sample</div>
               </div>`;
             ]]]
         styles:
@@ -251,8 +251,8 @@ cards:
             [[[
               return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
                 <ha-icon icon="mdi:thermometer" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
-                <div style="font-size:11px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Kitchen Temp</div>
-                <div style="font-size:12px;opacity:0.45;margin-top:4px;">21.5°C · sample</div>
+                <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Kitchen Temp</div>
+                <div style="font-size:14px;opacity:0.45;margin-top:4px;">21.5°C · sample</div>
               </div>`;
             ]]]
         styles:
@@ -270,8 +270,8 @@ cards:
             [[[
               return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
                 <ha-icon icon="mdi:sun-wireless" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
-                <div style="font-size:11px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Outdoor UV Index</div>
-                <div style="font-size:12px;opacity:0.45;margin-top:4px;">3 · sample</div>
+                <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Outdoor UV Index</div>
+                <div style="font-size:14px;opacity:0.45;margin-top:4px;">3 · sample</div>
               </div>`;
             ]]]
         styles:
@@ -291,8 +291,8 @@ cards:
       content: |
         [[[
           return `<div style="padding:0 2px 0 24px;box-sizing:border-box;max-width:100%;">
-            <div style="font-size:clamp(1.15rem,2vw,1.4rem);font-weight:700;line-height:1.2;color:var(--primary-text-color);">Energy & Utilities</div>
-            <div style="opacity:0.58;font-size:14px;margin-top:6px;line-height:1.35;color:var(--primary-text-color);padding-bottom:12px;box-sizing:border-box;">Cost & Power</div>
+            <div style="font-size:clamp(1.275rem,2vw,1.525rem);font-weight:700;line-height:1.2;color:var(--primary-text-color);">Energy & Utilities</div>
+            <div style="opacity:0.58;font-size:16px;margin-top:6px;line-height:1.35;color:var(--primary-text-color);padding-bottom:12px;box-sizing:border-box;">Cost & Power</div>
           </div>`;
         ]]]
     styles:
@@ -324,12 +324,12 @@ cards:
           content: |
             [[[
               return `<div style="padding:16px 18px;box-sizing:border-box;min-height:132px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Live House Power</div>
-                <div style="font-size:28px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">1.2 kW</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Live House Power</div>
+                <div style="font-size:30px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">1.2 kW</div>
                 <div style="height:36px;margin-top:16px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.04));position:relative;overflow:hidden;">
                   <div style="position:absolute;bottom:0;left:0;right:0;height:55%;background:rgba(96,165,250,0.45);"></div>
                 </div>
-                <div style="font-size:11px;opacity:0.4;margin-top:8px;">Sample sparkline</div>
+                <div style="font-size:12px;opacity:0.4;margin-top:8px;">Sample sparkline</div>
               </div>`;
             ]]]
         styles:
@@ -346,9 +346,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:16px 18px;box-sizing:border-box;min-height:132px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Daily Energy Cost</div>
-                <div style="font-size:28px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">£4.12</div>
-                <div style="font-size:11px;opacity:0.45;margin-top:2px;">today · sample</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Daily Energy Cost</div>
+                <div style="font-size:30px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">£4.12</div>
+                <div style="font-size:12px;opacity:0.45;margin-top:2px;">today · sample</div>
                 <div style="height:36px;margin-top:12px;border-radius:8px;background:linear-gradient(90deg,rgba(255,255,255,0.08) 0%,rgba(255,255,255,0.22) 100%);"></div>
               </div>`;
             ]]]
@@ -366,9 +366,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:16px 18px;box-sizing:border-box;min-height:132px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Water Usage</div>
-                <div style="font-size:28px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">128 L</div>
-                <div style="font-size:11px;opacity:0.45;margin-top:2px;">today · sample</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Water Usage</div>
+                <div style="font-size:30px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">128 L</div>
+                <div style="font-size:12px;opacity:0.45;margin-top:2px;">today · sample</div>
                 <div style="height:36px;margin-top:12px;border-radius:8px;background:repeating-linear-gradient(90deg,rgba(96,165,250,0.35) 0 8px,transparent 8px 14px);opacity:0.75;"></div>
               </div>`;
             ]]]
@@ -386,9 +386,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:16px 18px;box-sizing:border-box;min-height:132px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Solar export</div>
-                <div style="font-size:28px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">2.4 kW</div>
-                <div style="font-size:11px;opacity:0.45;margin-top:2px;">to grid · sample</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Solar export</div>
+                <div style="font-size:30px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">2.4 kW</div>
+                <div style="font-size:12px;opacity:0.45;margin-top:2px;">to grid · sample</div>
                 <div style="height:36px;margin-top:12px;border-radius:8px;background:linear-gradient(90deg,rgba(250,204,21,0.35) 0%,rgba(255,255,255,0.12) 100%);"></div>
               </div>`;
             ]]]
@@ -406,9 +406,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:16px 18px;box-sizing:border-box;min-height:132px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Scroll test</div>
-                <div style="font-size:28px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">End</div>
-                <div style="font-size:11px;opacity:0.45;margin-top:2px;">Energy row · sample</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Scroll test</div>
+                <div style="font-size:30px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">End</div>
+                <div style="font-size:12px;opacity:0.45;margin-top:2px;">Energy row · sample</div>
                 <div style="height:36px;margin-top:12px;border-radius:8px;background:rgba(255,255,255,0.1);"></div>
               </div>`;
             ]]]
@@ -429,8 +429,8 @@ cards:
       content: |
         [[[
           return `<div style="padding:0 2px 0 24px;box-sizing:border-box;max-width:100%;">
-            <div style="font-size:clamp(1.15rem,2vw,1.4rem);font-weight:700;line-height:1.2;color:var(--primary-text-color);">The Engine</div>
-            <div style="opacity:0.58;font-size:14px;margin-top:6px;line-height:1.35;color:var(--primary-text-color);padding-bottom:12px;box-sizing:border-box;">System & Security</div>
+            <div style="font-size:clamp(1.275rem,2vw,1.525rem);font-weight:700;line-height:1.2;color:var(--primary-text-color);">The Engine</div>
+            <div style="opacity:0.58;font-size:16px;margin-top:6px;line-height:1.35;color:var(--primary-text-color);padding-bottom:12px;box-sizing:border-box;">System & Security</div>
           </div>`;
         ]]]
     styles:
@@ -490,13 +490,13 @@ cards:
               const lines = entries.map((obj) => {
                 const ts = new Date(obj.last_changed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const name = obj.attributes?.friendly_name || obj.entity_id;
-                return `<div style="font-size:12px;font-weight:400;opacity:0.9;color:var(--primary-text-color);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="font-weight:700;">${ts}</span> - ${name} -> ${stateLabel(obj.state)}</div>`;
+                return `<div style="font-size:14px;font-weight:400;opacity:0.9;color:var(--primary-text-color);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="font-weight:700;">${ts}</span> - ${name} -> ${stateLabel(obj.state)}</div>`;
               }).join('');
 
-              const empty = `<div style="font-size:12px;opacity:0.5;margin-top:8px;">No recent device updates</div>`;
+              const empty = `<div style="font-size:14px;opacity:0.5;margin-top:8px;">No recent device updates</div>`;
 
               return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Device Log</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Device Log</div>
                 ${lines || empty}
               </div>`;
             ]]]
@@ -548,9 +548,65 @@ cards:
                 ? `${ram} RAM`
                 : `${ram} RAM &middot; ${Math.round(tempVal)}&deg;C`;
               return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">HA Host</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;">${cpu} CPU</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:6px;">${subtitle}</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">HA Host</div>
+                <div style="font-size:19px;font-weight:600;margin-top:8px;">${cpu} CPU</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:6px;">${subtitle}</div>
+              </div>`;
+            ]]]
+        styles:
+          card:
+            - background: rgba(255,255,255,0.06)
+            - backdrop-filter: blur(20px)
+            - border-radius: 22px
+            - border: 1px solid rgba(255,255,255,0.12)
+      # Powered by the Speedtest.net integration. Add it via Settings ->
+      # Devices & Services -> Add Integration -> Speedtest.net (no auth
+      # required). It creates sensor.speedtest_download (Mbit/s),
+      # sensor.speedtest_upload (Mbit/s), and sensor.speedtest_ping (ms),
+      # which this card reads directly. Falls back to "-" until the
+      # first scan completes.
+      - type: custom:button-card
+        template: hemma_plain_button_card
+        tap_action:
+          action: none
+        triggers_update:
+          - sensor.speedtest_download
+          - sensor.speedtest_upload
+          - sensor.speedtest_ping
+          # sensor.time is from time_date in configuration.yaml; updates
+          # every minute so the "Updated N min ago" label stays fresh
+          # between speedtest scans without polling.
+          - sensor.time
+        custom_fields:
+          content: |
+            [[[
+              const fmt = (eid, unit) => {
+                const s = states[eid];
+                if (!s || ['unknown', 'unavailable'].includes(s.state)) return '—';
+                const n = parseFloat(s.state);
+                if (isNaN(n)) return '—';
+                return `${Math.round(n)} ${unit}`;
+              };
+              const relative = (eid) => {
+                const s = states[eid];
+                if (!s || !s.last_updated) return null;
+                const mins = Math.floor((Date.now() - new Date(s.last_updated).getTime()) / 60000);
+                if (mins < 1)    return 'just now';
+                if (mins < 60)   return `${mins} min ago`;
+                const hrs = Math.floor(mins / 60);
+                if (hrs < 24)    return `${hrs} hr ago`;
+                const days = Math.floor(hrs / 24);
+                return `${days} d ago`;
+              };
+              const dl   = fmt('sensor.speedtest_download', 'Mbps');
+              const ul   = fmt('sensor.speedtest_upload',   'Mbps');
+              const ping = fmt('sensor.speedtest_ping',     'ms');
+              const last = relative('sensor.speedtest_download');
+              return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Internet Speed</div>
+                <div style="font-size:19px;font-weight:600;margin-top:8px;">↓ ${dl}</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:6px;">↑ ${ul} &middot; ${ping} ping</div>
+                ${last ? `<div style="font-size:12px;opacity:0.35;margin-top:6px;">Updated ${last}</div>` : ''}
               </div>`;
             ]]]
         styles:
@@ -567,28 +623,9 @@ cards:
           content: |
             [[[
               return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Internet Speed</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;">↓ 420 Mbps</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:6px;">↑ 38 Mbps · sample</div>
-              </div>`;
-            ]]]
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 22px
-            - border: 1px solid rgba(255,255,255,0.12)
-      - type: custom:button-card
-        template: hemma_plain_button_card
-        tap_action:
-          action: none
-        custom_fields:
-          content: |
-            [[[
-              return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
-                <div style="font-size:11px;font-weight:700;opacity:0.45;text-transform:uppercase;letter-spacing:0.08em;">Battery Levels</div>
-                <div style="font-size:17px;font-weight:600;margin-top:8px;">All OK</div>
-                <div style="font-size:12px;opacity:0.5;margin-top:6px;">3 devices · sample</div>
+                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Battery Levels</div>
+                <div style="font-size:19px;font-weight:600;margin-top:8px;">All OK</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:6px;">3 devices · sample</div>
               </div>`;
             ]]]
         styles:
