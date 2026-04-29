@@ -311,7 +311,7 @@
       - front_door
       - xuan_guan
     data: {}
-  mode: single
+  mode: restart
 - id: '1771600000001'
   alias: Home Mode - Set Home After Arrival (10 min)
   description: When anyone enters the home zone, wait 10 minutes then set Home Mode to Home if at least one person is still home
@@ -354,7 +354,9 @@
   mode: restart
 - id: '1756832264041'
   alias: Routines - Leave Home Turn Off Devices
-  description: ''
+  description: 'Debounced via for: 10 minutes so a brief GPS-jitter not_home glitch
+    (we have seen these last under a minute on iCloud trackers) does not falsely
+    trigger the leave actions while the residents are still inside the house.'
   triggers:
   - device_id: 322cbb275deee7edce6388320b436c40
     domain: device_tracker
@@ -362,12 +364,16 @@
     type: leaves
     trigger: device
     zone: zone.home
+    for:
+      minutes: 10
   - device_id: fd7dfa4ede01b45f7c566181765332b8
     domain: device_tracker
     entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
     type: leaves
     trigger: device
     zone: zone.home
+    for:
+      minutes: 10
   conditions:
   - condition: and
     conditions:
@@ -395,7 +401,10 @@
   mode: single
 - id: '1771500000005'
   alias: Home Mode - Set Away When Everyone Leaves
-  description: Set Home Mode to Away when both tracked people are not home
+  description: Set Home Mode to Away when both tracked people are not home. Debounced
+    via for: 10 minutes so a brief GPS-jitter not_home glitch does not flip the
+    home mode to Away (which would cascade into Home Mode - Away turning off
+    every light in the house).
   triggers:
   - device_id: 322cbb275deee7edce6388320b436c40
     domain: device_tracker
@@ -403,12 +412,16 @@
     type: leaves
     trigger: device
     zone: zone.home
+    for:
+      minutes: 10
   - device_id: fd7dfa4ede01b45f7c566181765332b8
     domain: device_tracker
     entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
     type: leaves
     trigger: device
     zone: zone.home
+    for:
+      minutes: 10
   conditions:
   - condition: and
     conditions:
