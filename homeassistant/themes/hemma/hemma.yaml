@@ -9,6 +9,11 @@ Hemma:
       ha-color-fill-primary-normal-resting: var(--hemma-nav-bg)
       wa-color-text-quiet: var(--secondary-text-color)
       wa-color-neutral-fill-normal: var(--ha-card-background-active)
+      # ha-input / settings forms (not covered by legacy mdc-text-field-fill)
+      ha-color-form-background: rgba(72, 72, 76, 1)
+      ha-color-form-background-hover: rgba(82, 82, 88, 1)
+      ha-color-form-background-disabled: rgba(56, 56, 60, 0.75)
+      ha-color-form-border: rgba(255, 255, 255, 0.14)
       mdc-text-field-fill-color: rgba(50,50,50,0.4)
       mdc-theme-surface: var(--ha-card-background)
       ha-color-border-neutral-normal: transparent
@@ -65,6 +70,11 @@ Hemma:
       mdc-theme-surface: var(--ha-card-background)
       wa-color-text-quiet: var(--secondary-text-color)
       wa-color-neutral-fill-normal: var(--ha-card-background-active)
+      # ha-input / settings forms — mid grey so fields aren’t bright white on dark cards
+      ha-color-form-background: rgba(58, 58, 62, 1)
+      ha-color-form-background-hover: rgba(68, 68, 74, 1)
+      ha-color-form-background-disabled: rgba(46, 46, 50, 0.72)
+      ha-color-form-border: rgba(255, 255, 255, 0.12)
       hemma-control-off: rgba(150,150,150,0.12)
       hemma-control-on: rgba(255,255,255,0.12)
       thermostat-card-off: var(--hemma-control-off)
@@ -360,6 +370,21 @@ Hemma:
   hemma-nav-gap-tablet: 45px
   hemma-nav-top-desktop: 60px
   hemma-nav-top-tablet: 55px
+  # Space between the HA app header (bottom edge) and the fixed Hemma nav strip / menu.
+  # Used as: top: calc(var(--app-header-height) + var(--hemma-nav-strip-gap)); not padding on the header itself.
+  hemma-nav-strip-gap: 8px
+  # Extra drop under the app bar when header chrome is shown (0 in kiosk via card-mod). Pushes menu/nav slightly below the bar.
+  hemma-menu-below-header-nudge: 4px
+  # When the app header is hidden: fixed row (menu, clock, nav strip, navbar) uses this distance from the top of the viewport (+ safe-area on notch devices).
+  hemma-menu-top-when-header-hidden: 28px
+  # When the drawer is hidden (width 0), keep the hamburger at least this far from the screen edge (see max(..., calc(drawer + offset))).
+  hemma-menu-inset-inline-when-drawer-hidden: 16px
+  # Horizontal inset per side for floating nav pills (phone portrait/landscape + tablet). Used in width caps and min(fit-content, …); also tune ha-card padding in hemma_navbar_mobile for label inset inside the pill.
+  hemma-mobile-floating-pill-inline: 44px
+  # Vertical gap below the HA app header to the floating nav pill (header visible). Kiosk / hidden header: pill `top` is hardcoded 32px in card-mod; other shell still uses --hemma-nav-wall-top where applicable.
+  hemma-mobile-pill-gap-below-header: 28px
+  # Legacy tweak for --hemma-floating-nav-top (desktop strip alignment in theme).
+  hemma-tablet-floating-nav-top-offset: 0px
 
   # Hero Title Sizing
   hero-title-size-desktop: clamp(52px, 4.6vw + 8px, 96px)
@@ -414,16 +439,26 @@ Hemma:
   ha-card-border-color: transparent
   ha-card-border-radius: 28px
   ha-card-border-width: 0
+  # ha-input / ha-textarea: HA uses --ha-border-radius-sm on top corners and
+  # --ha-border-radius-square on bottom (material); one token keeps all corners
+  # even and in proportion to cards (half of ha-card-border-radius).
+  hemma-input-border-radius: 12px
   stack-card-gap: 0px
   horizontal-stack-card-gap: 10px
 
-  # Input
+  # Input (legacy MDC + older cards). New settings / ha-input uses
+  # ha-color-form-background* in each mode above.
   input-fill-color: rgba(130,130,130,0.3)
   input-ink-color: rgba(255,255,255,0.8)
   input-label-ink-color: rgba(255,255,255,0.6)
   input-disabled-ink-color: rgba(255,255,255,0.37)
   input-dropdown-icon-color: rgba(255,255,255,0.54)
   mdc-text-field-fill-color: rgba(130,130,130,0.3)
+  # Fallback if a surface doesn’t pick up mode-scoped form tokens
+  ha-color-form-background: rgba(58, 58, 62, 1)
+  ha-color-form-background-hover: rgba(68, 68, 74, 1)
+  ha-color-form-background-disabled: rgba(46, 46, 50, 0.72)
+  ha-color-form-border: rgba(255, 255, 255, 0.12)
   ha-color-red-40: '#d6314a'
 
   # Code Editor
@@ -514,15 +549,58 @@ Hemma:
       }
 
       :host, ha-app-layout {
-        --hemma-header-offset: var(--app-header-height, var(--header-height, 0px));
+        /* kiosk-mode (NemesisRE) sets --kiosk-header-height: 0 on #view when header is hidden; fallback = real bar. body.kiosk-mode still forces 0 on layout (below). */
+        --hemma-header-offset: calc(var(--kiosk-header-height, var(--header-height, 56px)) + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)));
+        /* Fixed Hemma chrome: kiosk forces offset + nudge to 0 (see body.kiosk-mode ha-app-layout). */
+        --hemma-nav-strip-top: calc(var(--hemma-header-offset) + var(--hemma-nav-strip-gap, 8px) + var(--hemma-menu-below-header-nudge, 4px));
+        --hemma-time-strip-top: calc(var(--hemma-header-offset) + 2 * var(--hemma-nav-strip-gap, 8px) + var(--hemma-menu-below-header-nudge, 4px));
+        /* Wall row when chrome is hidden (matches hemma_menu_icon / hemma_nav_shell JS). max(...) keeps nav aligned when strip-top collapses in kiosk. */
+        --hemma-nav-wall-top: calc(var(--hemma-menu-top-when-header-hidden, 28px) + env(safe-area-inset-top, 0px));
+        --hemma-desktop-navbar-top: max(var(--hemma-nav-strip-top), var(--hemma-nav-wall-top));
+        /* Tablet floating pill (header shown): 28px below header bar — hemma_navbar_mobile ha-card.navbar-card.desktop */
+        --hemma-tablet-floating-pill-top: calc(var(--hemma-header-offset) + var(--hemma-mobile-pill-gap-below-header, 28px));
+        --hemma-floating-nav-top: calc(var(--hemma-desktop-navbar-top) + var(--hemma-tablet-floating-nav-top-offset, 0px));
       }
 
+      body.kiosk-mode ha-app-layout,
       body.kiosk-mode,
       ha-panel-lovelace.kiosk-mode,
       ha-panel-lovelace[is-kiosk],
       ha-app-layout.kiosk-mode,
       ha-app-layout[is-kiosk]{
         --hemma-header-offset: 0px !important;
+        --hemma-menu-below-header-nudge: 0px !important;
+        /* Floating pill under kiosk: hardcoded offset (nav bar); wall row / hemma_nav_ shell still uses --hemma-nav-wall-top */
+        --hemma-tablet-floating-pill-top: 32px !important;
+      }
+
+      /* Floating nav pill when header is hidden */
+      body.kiosk-mode ha-panel-lovelace ha-card.navbar-card.desktop,
+      body.kiosk-mode ha-card.navbar-card.desktop,
+      ha-panel-lovelace.kiosk-mode ha-card.navbar-card.desktop,
+      ha-panel-lovelace[is-kiosk] ha-card.navbar-card.desktop{
+        top: 32px !important;
+      }
+
+      /* Phone landscape (coarse, ≤932px): fixed 24px from top — overrides kiosk 32px above. */
+      @media (orientation: landscape) and (max-width: 932px) and (pointer: coarse) {
+        body.kiosk-mode ha-panel-lovelace ha-card.navbar-card.desktop,
+        body.kiosk-mode ha-card.navbar-card.desktop,
+        ha-panel-lovelace.kiosk-mode ha-card.navbar-card.desktop,
+        ha-panel-lovelace[is-kiosk] ha-card.navbar-card.desktop{
+          top: 24px !important;
+        }
+      }
+
+      /* NemesisRE kiosk-mode sets --kiosk-header-height on hui-root #view, not body.kiosk-mode.
+         Blend 32px wall offset when header hidden. Use 32px * (…/1px) so clamp never yields length×length (invalid in calc). */
+      hui-view-container#view,
+      #view {
+        --hemma-tablet-floating-pill-top: calc(
+          32px * (clamp(0px, 1px - var(--kiosk-header-height, 56px), 1px) / 1px)
+          + (var(--hemma-header-offset) + var(--hemma-mobile-pill-gap-below-header, 28px))
+            * ((1px - clamp(0px, 1px - var(--kiosk-header-height, 56px), 1px)) / 1px)
+        );
       }
 
       :not(.edit-mode) > hui-view::after,
@@ -548,6 +626,13 @@ Hemma:
       ha-more-info-dialog {
         --vertical-align-dialog: flex-end;
         --dialog-surface-margin-top: 15vh;
+      }
+
+      ha-input,
+      ha-textarea {
+        --ha-border-radius-sm: var(--hemma-input-border-radius, 12px);
+        --ha-border-radius-square: var(--hemma-input-border-radius, 12px);
+        --ha-border-radius-md: var(--hemma-input-border-radius, 12px);
       }
 
       ha-more-info-dialog .mdc-dialog,
@@ -811,6 +896,16 @@ Hemma:
         -webkit-backdrop-filter: blur(10px);
       }
 
+      /* Menu button stays in app-toolbar flow (relative to layout) so when the docked sidebar
+         opens and the main column shifts, the icon moves with it — unlike position:fixed. */
+      app-header ha-menu-button,
+      app-toolbar ha-menu-button {
+        position: relative !important;
+        inset-inline-start: auto !important;
+        top: auto !important;
+        z-index: auto !important;
+      }
+
       ha-card {
         transition: filter .2s ease, opacity .2s ease;
       }
@@ -894,6 +989,20 @@ Hemma:
         max-height: 100svh !important;
         -webkit-overflow-scrolling: auto !important;
         overscroll-behavior: none !important;
+        /* Recalculate under hui-view so --kiosk-header-height from #view reaches the Lovelace tree (kiosk-mode hides header without body.kiosk-mode). */
+        --hemma-header-offset: calc(var(--kiosk-header-height, var(--header-height, 56px)) + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)));
+        --hemma-nav-strip-top: calc(var(--hemma-header-offset) + var(--hemma-nav-strip-gap, 8px) + var(--hemma-menu-below-header-nudge, 4px));
+        --hemma-time-strip-top: calc(var(--hemma-header-offset) + 2 * var(--hemma-nav-strip-gap, 8px) + var(--hemma-menu-below-header-nudge, 4px));
+        --hemma-desktop-navbar-top: max(var(--hemma-nav-strip-top), var(--hemma-nav-wall-top));
+        --hemma-tablet-floating-pill-top: calc(var(--hemma-header-offset) + var(--hemma-mobile-pill-gap-below-header, 28px));
+        --hemma-floating-nav-top: calc(var(--hemma-desktop-navbar-top) + var(--hemma-tablet-floating-nav-top-offset, 0px));
+      }
+
+      /* Kiosk / hidden header: match root token so navbar-card inherits 32px inside this view tree */
+      :host-context(body.kiosk-mode),
+      :host-context(ha-panel-lovelace.kiosk-mode),
+      :host-context(ha-panel-lovelace[is-kiosk]){
+        --hemma-tablet-floating-pill-top: 32px !important;
       }
 
       :host .hemma-entities{
@@ -942,7 +1051,6 @@ Hemma:
           height: 100% !important;
           width: 100% !important;
         }
-      }
 
       /* iPad / tablet width only: Safari often reports hover:hover + pointer:fine, so pointer/hover queries above never match. */
       @media (min-width: 768px) and (max-width: 1366px) {

@@ -1,12 +1,31 @@
 hemma_menu_icon:
   show_icon: false
 
+  triggers_update:
+    - input_boolean.hemma_show_ha_chrome
+
+  # Kiosk-mode ties header/sidebar visibility to input_boolean.hemma_show_ha_chrome
+  # (see hemma.yaml kiosk_mode). Use the native call-service path — javascript
+  # actions do not reliably expose hass.callService here.
+  # Optional second step: after a short delay, open the sidebar drawer only if chrome
+  # is now shown (so "hide bars" taps do not fire the menu).
   tap_action:
-    action: javascript
-    javascript: |
-      [[[
-        this.dispatchEvent(new Event('hass-toggle-menu', { bubbles: true, composed: true }));
-      ]]]
+    action: multi-actions
+    actions:
+      - action: call-service
+        service: input_boolean.toggle
+        service_data:
+          entity_id: input_boolean.hemma_show_ha_chrome
+      - delay: "320ms"
+      - action: javascript
+        javascript: |
+          [[[
+            if (hass.states['input_boolean.hemma_show_ha_chrome']?.state !== 'on') return;
+            const main = document.querySelector('home-assistant-main');
+            if (main) {
+              main.dispatchEvent(new Event('hass-toggle-menu', { bubbles: true, composed: true }));
+            }
+          ]]]
 
   hold_action: { action: none }
   double_tap_action: { action: none }
@@ -37,7 +56,11 @@ hemma_menu_icon:
       - pointer-events: all
       - transition: background 120ms ease
     card:hover:
-      - background: rgba(255,255,255,0.10)
+      - background: transparent
+
+    # Any multi-actions step with `delay` activates button-card's ha-spinner overlay; hide it (delay stays for state sync).
+    spinner:
+      - display: none !important
 
     custom_fields:
       glyph:
@@ -49,93 +72,158 @@ hemma_menu_icon:
         - line-height: 0
 
   extra_styles: |
-    :host{
-      position: fixed !important;
-      top: calc(var(--app-header-height, 46px) + 8px) !important;
-      left: 10px !important;
-      right: auto !important;
+    [[[
+      /* Vertical position uses input_boolean.hemma_show_ha_chrome only (see hemma_nav_shell). */
+      const chromeId = 'input_boolean.hemma_show_ha_chrome';
+      const chromeOn = hass.states[chromeId]?.state === 'on';
+      const topUnderBar = 'var(--hemma-nav-strip-top, calc(var(--hemma-header-offset, calc(var(--header-height, 56px) + var(--safe-area-inset-top, 0px))) + var(--hemma-nav-strip-gap, 8px) + var(--hemma-menu-below-header-nudge, 4px)))';
+      const topWall = 'calc(var(--hemma-menu-top-when-header-hidden, 28px) + env(safe-area-inset-top, 0px))';
+      const top = chromeOn ? topUnderBar : topWall;
+      /* Phone portrait: flush under HA app bar (0px gap) when header is shown. */
+      const topPortraitChromeOn =
+        'var(--hemma-header-offset, calc(var(--header-height, 56px) + env(safe-area-inset-top, 0px)))';
+      const topPortraitChromeOff = 'calc(env(safe-area-inset-top, 0px) + 10px)';
+      const topPortrait = chromeOn ? topPortraitChromeOn : topPortraitChromeOff;
+      const scrollHide = variables?.hemma_info_scroll_hide_menu === true;
+      const scrollHideCss = scrollHide
+        ? [
+            '',
+            '    @keyframes hemma-info-menu-scroll-end {',
+            '      0%, 68% {',
+            '        opacity: 1;',
+            '        pointer-events: auto;',
+            '      }',
+            '      82%, 100% {',
+            '        opacity: 0;',
+            '        pointer-events: none;',
+            '      }',
+            '    }',
+            '',
+            '    @supports (animation-timeline: scroll(nearest block)) {',
+            '      @media (prefers-reduced-motion: no-preference) {',
+            '        :host {',
+            '          animation: hemma-info-menu-scroll-end linear forwards;',
+            '          animation-timeline: scroll(nearest block);',
+            '        }',
+            '      }',
+            '    }',
+          ].join('\n')
+        : '';
 
-      width: 40px !important;
-      height: 40px !important;
-      margin: 0 !important;
-      display: block !important;
-      color: var(--primary-text-color) !important;
-      z-index: 9999 !important;
-      pointer-events: auto !important;
-    }
-
-    :host ha-card{
-      position: relative !important;
-      width: 40px !important;
-      height: 40px !important;
-      border-radius: 50% !important;
-      display: grid !important;
-      place-items: center !important;
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-
-    :host .custom-field,
-    :host .custom-field-glyph{
-      line-height: 0 !important;
-    }
-
-    :host .hamburger{
-      position: absolute !important;
-      top: 50% !important;
-      left: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      width: 26px !important;
-      height: 26px !important;
-      display: block !important;
-      fill: currentColor !important;
-      pointer-events: none !important;
-      opacity: .32 !important;
-      transition: opacity 360ms cubic-bezier(.22,.61,.36,1) !important;
-      will-change: opacity;
-    }
-
-    @media (hover: hover) and (pointer: fine) and (min-width: 769px){
-      :host .hamburger{ opacity: .12 !important; }
-      :host(:hover) .hamburger,
-      :host(:focus-within) .hamburger,
-      :host ha-card:hover .hamburger{ opacity: .9 !important; }
-    }
-
-    @media (max-width: 767px), (max-height: 500px){
-      :host{
-        width: 48px !important;
-        height: 48px !important;
-        top: calc(var(--app-header-height, 46px) + 8px) !important;
-        left: calc(var(--hero-gutter, 10px) - 11px) !important;
-      }
-
-      :host ha-card{
-        width: 48px !important;
-        height: 48px !important;
-        border-radius: 50% !important;
-      }
-
-      :host .hamburger{
-        width: 28px !important;
-        height: 28px !important;
-        opacity: .1 !important;
-      }
-    }
-
-    @media (min-width:768px) and (max-width:1249px) and (orientation: portrait){
-      :host{
-        top: calc(var(--app-header-height, 46px) + 8px) !important;
-        left: calc(var(--hero-gutter, 10px) - 16px) !important;
-      }
-    }
-
-    @media (max-width: 767px) and (orientation: portrait){
-      :host{
-        display: none !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        width: 0 !important;
-        height: 0 !important;
-      }
-    }
+      const cssTop = top;
+      const chunks = [
+        '    :host{',
+        '      position: fixed !important;',
+        '      top: ' + cssTop + ' !important;',
+        '      /* At least hemma-menu-inset-inline-when-drawer-hidden when drawer width is 0; else follow rail/expanded sidebar. */',
+        '      inset-inline-start: max(var(--hemma-menu-inset-inline-when-drawer-hidden, 16px), calc(var(--mdc-drawer-width, 0px) + 10px)) !important;',
+        '      right: auto !important;',
+        '      transition:',
+        '        inset-inline-start var(--ha-animation-duration-normal, 200ms) ease,',
+        '        top var(--ha-animation-duration-normal, 200ms) ease !important;',
+        '',
+        '      width: 40px !important;',
+        '      height: 40px !important;',
+        '      margin: 0 !important;',
+        '      display: block !important;',
+        '      color: var(--primary-text-color) !important;',
+        '      z-index: 9999 !important;',
+        '      pointer-events: auto !important;',
+      ];
+      if (!scrollHide) chunks.push('      opacity: 1 !important;');
+      chunks.push(
+        '    }',
+        '',
+        '    :host ha-card{',
+        '      position: relative !important;',
+        '      width: 40px !important;',
+        '      height: 40px !important;',
+        '      border-radius: 50% !important;',
+        '      display: grid !important;',
+        '      place-items: center !important;',
+        '      background: transparent !important;',
+        '      box-shadow: none !important;',
+        '      transition: background 120ms ease !important;',
+        '    }',
+        '',
+        '    :host ha-card:hover,',
+        '    :host(:hover) ha-card{',
+        '      background: transparent !important;',
+        '    }',
+        '',
+        '    :host .custom-field,',
+        '    :host .custom-field-glyph{',
+        '      line-height: 0 !important;',
+        '    }',
+        '',
+        '    :host .hamburger{',
+        '      position: absolute !important;',
+        '      top: 50% !important;',
+        '      left: 50% !important;',
+        '      transform: translate(-50%, -50%) !important;',
+        '      width: 26px !important;',
+        '      height: 26px !important;',
+        '      display: block !important;',
+        '      fill: currentColor !important;',
+        '      pointer-events: none !important;',
+        '      opacity: 0.15 !important;',
+        '      transition: opacity 360ms cubic-bezier(.22,.61,.36,1) !important;',
+        '      will-change: opacity;',
+        '    }',
+      );
+      if (scrollHide && scrollHideCss) chunks.push(scrollHideCss);
+      chunks.push(
+        '    @media (max-width: 767px), (max-height: 500px){',
+        '      :host{',
+        '        width: 48px !important;',
+        '        height: 48px !important;',
+        '        top: ' + cssTop + ' !important;',
+        '        inset-inline-start: max(var(--hemma-menu-inset-inline-when-drawer-hidden, 16px), calc(var(--mdc-drawer-width, 0px) + var(--hero-gutter, 10px) - 11px)) !important;',
+        '      }',
+        '',
+        '      :host ha-card{',
+        '        width: 48px !important;',
+        '        height: 48px !important;',
+        '        border-radius: 50% !important;',
+        '      }',
+        '',
+        '      :host .hamburger{',
+        '        width: 28px !important;',
+        '        height: 28px !important;',
+        '        opacity: 0.15 !important;',
+        '      }',
+        '    }',
+        '',
+        '    @media (min-width:768px) and (max-width:1249px) and (orientation: portrait){',
+        '      :host{',
+        '        top: ' + cssTop + ' !important;',
+        '        inset-inline-start: max(var(--hemma-menu-inset-inline-when-drawer-hidden, 16px), calc(var(--mdc-drawer-width, 0px) + var(--hero-gutter, 10px) - 16px)) !important;',
+        '      }',
+        '    }',
+        '',
+        '    @media (max-width: 767px) and (orientation: portrait){',
+        '      :host{',
+        '        display: block !important;',
+        '        opacity: 1 !important;',
+        '        pointer-events: auto !important;',
+        '        width: 48px !important;',
+        '        height: 48px !important;',
+        '        top: ' + topPortrait + ' !important;',
+        '        inset-inline-start: env(safe-area-inset-left, 0px) !important;',
+        '        right: auto !important;',
+        '      }',
+        '',
+        '      :host ha-card{',
+        '        width: 48px !important;',
+        '        height: 48px !important;',
+        '      }',
+        '',
+        '      :host .hamburger{',
+        '        width: 28px !important;',
+        '        height: 28px !important;',
+        '        opacity: 0.15 !important;',
+        '      }',
+        '    }',
+      );
+      return chunks.join('\n');
+    ]]]

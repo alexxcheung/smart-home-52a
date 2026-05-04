@@ -69,11 +69,6 @@ card:
 
     # Navbar (center)
     - type: custom:navbar-card
-      card_mod:
-        style: |
-          ha-card {
-            margin-top: 54px !important;
-          }
       desktop:
         min_width: 1
         hidden: false
@@ -95,7 +90,6 @@ card:
       card_mod:
         style: |
           :host{
-            --hemma-header-offset: var(--app-header-height, var(--header-height, 0px));
             --hemma-nav-popup-top: 80px;
             --hemma-nav-popup-nudge-x: -18px;
             --hemma-desktop-media-top: 104px;
@@ -148,8 +142,16 @@ card:
           gap: 40px !important;
         }
 
-        .navbar-card.desktop.top{
-          top: 4px !important;
+        /* navbar-card bundles .navbar { position: fixed; top: …; left: …; transform } for floating modes (see www/community/lovelace-navbar-card/navbar-card.js NAVBAR_CONTAINER_STYLES ~1739, .navbar.desktop.top ~1824). Hemma positions the strip via nav_shell navigation (fixed); cancel inner fixed so links sit in that strip. */
+        .navbar.desktop.top{
+          position: relative !important;
+          top: auto !important;
+          left: auto !important;
+          right: auto !important;
+          bottom: auto !important;
+          transform: none !important;
+          width: auto !important;
+          max-width: 100% !important;
         }
 
         .navbar.desktop{
@@ -167,6 +169,8 @@ card:
         .navbar.desktop .route{
           width: auto !important;
           min-width: 0 !important;
+          height: auto !important;
+          min-height: 0 !important;
           flex: 0 0 auto !important;
           display: flex !important;
           align-items: center !important;
@@ -182,6 +186,8 @@ card:
           box-shadow: none !important;
           padding: 0 !important;
           margin: 0 !important;
+          height: auto !important;
+          max-height: none !important;
         }
 
         .navbar.desktop .route :is(ha-icon, .icon, .image){
@@ -494,7 +500,7 @@ card:
 
         - url: /dashboard-hemma/hallway
           label: Hallway
-          icon: mdi:fridge
+          icon: mdi:door-open
 
         - url: /dashboard-hemma/study
           label: Study

@@ -11,6 +11,8 @@
 #
 # ENTITIES CREATED:
 #   - input_boolean.hemma_thermostat_overlay: Thermostat card temperature adjustment overlay
+#   - input_boolean.hemma_show_ha_chrome: When on, show HA top bar + sidebar
+#     (kiosk-mode reads this via templates). Default off for wall tablets.
 #   - input_boolean.hemma_mobile_navigation: Mobile nav menu state
 #   - input_number.hemma_thermostat_target_temperature: Thermostat target temp
 #   - input_select.hemma_thermostat_mode: Heat/Cool mode selector
@@ -27,6 +29,13 @@ input_boolean:
 
   hemma_mobile_navigation:
     name: Mobile Navigation
+    initial: off
+
+  # Wall / kiosk: turn ON to temporarily show the HA header + sidebar. When off,
+  # kiosk_mode templates below hide that chrome (on viewports that use them).
+  hemma_show_ha_chrome:
+    name: Show HA app bar and sidebar
+    icon: mdi:page-layout-sidebar-left
     initial: off
 
   hemma_dishwasher_delay_start:

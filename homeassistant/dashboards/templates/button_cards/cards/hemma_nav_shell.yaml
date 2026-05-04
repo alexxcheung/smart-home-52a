@@ -1,6 +1,9 @@
 # Nav shell: same navigation bar structure as hemma_room (desktop nav + menu + time)
 # Use this as the first card on non-room views (e.g. Info) so the nav matches room views.
 hemma_nav_shell:
+  triggers_update:
+    - input_boolean.hemma_show_ha_chrome
+
   template:
     - hemma_default
   show_name: false
@@ -16,6 +19,9 @@ hemma_nav_shell:
       card:
         type: custom:button-card
         template: hemma_menu_icon
+        variables:
+          hemma_info_scroll_hide_menu: >
+            [[[ return variables.hemma_info_scroll_hide_menu === true; ]]]
     time:
       card:
         type: custom:button-card
@@ -36,11 +42,17 @@ hemma_nav_shell:
       - min-height: 0 !important
       - overflow: visible !important
     custom_fields:
-      # Relative to header: below header when shown, top when hidden
+      # Top: hemma_show_ha_chrome on = under strip; off = wall (Mac kiosk may keep app-header in DOM — boolean still controls gap).
       navigation:
         - position: fixed
-        - top: calc(var(--app-header-height, 46px) + 8px)
-        - left: 0
+        - top: >
+            [[[
+              const chromeOn = hass.states['input_boolean.hemma_show_ha_chrome']?.state === 'on';
+              if (!chromeOn) return 'calc(var(--hemma-menu-top-when-header-hidden, 28px) + env(safe-area-inset-top, 0px))';
+              return 'var(--hemma-nav-strip-top, calc(var(--hemma-header-offset, calc(var(--header-height, 56px) + var(--safe-area-inset-top, 0px))) + var(--hemma-nav-strip-gap, 8px) + var(--hemma-menu-below-header-nudge, 4px)))';
+            ]]]
+        - transition: top var(--ha-animation-duration-normal, 200ms) ease
+        - left: var(--mdc-drawer-width, 0px)
         - right: 0
         - z-index: 50
         - overflow: visible
@@ -57,27 +69,65 @@ hemma_nav_shell:
               return isMobile ? 'none' : 'block';
             ]]]
         - position: fixed
-        - top: calc(var(--app-header-height, 46px) + 16px)
+        - top: >
+            [[[
+              const chromeOn = hass.states['input_boolean.hemma_show_ha_chrome']?.state === 'on';
+              if (!chromeOn) return 'calc(var(--hemma-menu-top-when-header-hidden, 28px) + env(safe-area-inset-top, 0px))';
+              return 'var(--hemma-time-strip-top, calc(var(--hemma-header-offset, calc(var(--header-height, 56px) + var(--safe-area-inset-top, 0px))) + 2 * var(--hemma-nav-strip-gap, 8px) + var(--hemma-menu-below-header-nudge, 4px)))';
+            ]]]
         - right: 16px
-        - z-index: 10
+        # Above navigation strip (50) so fixed row does not steal clicks on desktop (pointer: fine).
+        - z-index: 100
         - overflow: visible
         - pointer-events: none
         - "--mdc-ripple-press-opacity": 0
         - "-webkit-tap-highlight-color": transparent
       menu:
         - position: fixed
-        - top: calc(var(--app-header-height, 46px) + 8px)
+        - top: >
+            [[[
+              const chromeOn = hass.states['input_boolean.hemma_show_ha_chrome']?.state === 'on';
+              const w = window?.innerWidth || 1024;
+              const mm = window.matchMedia && window.matchMedia('(orientation: portrait)').matches;
+              if (w <= 767 && mm) {
+                if (chromeOn) {
+                  return 'var(--hemma-header-offset, calc(var(--header-height, 56px) + env(safe-area-inset-top, 0px)))';
+                }
+                return 'calc(env(safe-area-inset-top, 0px) + 10px)';
+              }
+              if (!chromeOn) return 'calc(var(--hemma-menu-top-when-header-hidden, 28px) + env(safe-area-inset-top, 0px))';
+              return 'var(--hemma-nav-strip-top, calc(var(--hemma-header-offset, calc(var(--header-height, 56px) + var(--safe-area-inset-top, 0px))) + var(--hemma-nav-strip-gap, 8px) + var(--hemma-menu-below-header-nudge, 4px)))';
+            ]]]
         - left: >
             [[[
               const w = window?.innerWidth || 1024;
               const h = window?.innerHeight || 800;
-              if (w <= 767 || h <= 500) {
-                return 'calc(var(--hero-gutter) - 11px)';
+              const portrait = window.matchMedia && window.matchMedia('(orientation: portrait)').matches;
+              if (w <= 767 && portrait) {
+                return 'env(safe-area-inset-left, 0px)';
               }
-              return 'calc(var(--hero-gutter) - 6px)';
+              const dw = 'var(--mdc-drawer-width, 0px)';
+              const minIn = 'var(--hemma-menu-inset-inline-when-drawer-hidden, 16px)';
+              if (w <= 767 || h <= 500) {
+                return `max(${minIn}, calc(${dw} + var(--hero-gutter) - 11px))`;
+              }
+              return `max(${minIn}, calc(${dw} + var(--hero-gutter) - 6px))`;
             ]]]
-        - width: 40px
-        - height: 40px
-        - z-index: 10
+        - width: >
+            [[[
+              const w = window?.innerWidth || 1024;
+              const portrait = window.matchMedia && window.matchMedia('(orientation: portrait)').matches;
+              if (w <= 767 && portrait) return '48px';
+              return '40px';
+            ]]]
+        - height: >
+            [[[
+              const w = window?.innerWidth || 1024;
+              const portrait = window.matchMedia && window.matchMedia('(orientation: portrait)').matches;
+              if (w <= 767 && portrait) return '48px';
+              return '40px';
+            ]]]
+        # Above navigation strip (50); :host z-index inside menu card cannot outrank sibling fields.
+        - z-index: 100
         - pointer-events: auto
         - cursor: pointer

@@ -11,23 +11,18 @@
 button_card_templates: !include_dir_merge_named /config/dashboards/templates/button_cards
 
 # Kiosk Mode (optional - requires kiosk-mode HACS integration)
-# Uncomment and customize if you want to hide certain elements
+# hide_header / hide_sidebar can be Jinja templates (subscribed by kiosk-mode).
+# input_boolean.hemma_show_ha_chrome: ON = show chrome, OFF = hide (wall mode).
+# Emergency: append ?disable_km to the URL to force kiosk off for that load.
 kiosk_mode:
-  # Default: hide header + sidebar
-  hide_header: false
-  hide_sidebar: false
+  hide_header: '{{ not is_state(''input_boolean.hemma_show_ha_chrome'', ''on'') }}'
+  hide_sidebar: '{{ not is_state(''input_boolean.hemma_show_ha_chrome'', ''on'') }}'
   hide_dialog_light_settings_actions: true
   hide_dialog_logbook: true
 
-  # You can drop these if everything is globally hidden anyway,
-  # but keeping them is fine.
-  mobile_settings:
-    hide_header: false
-    hide_sidebar: false
-
-  tablet_settings:
-    hide_header: false
-    hide_sidebar: false
+  # No mobile_settings block: kiosk-mode merges mobile_settings when width ≤812px and it
+  # would override hide_header/hide_sidebar. Omitting it lets phones use the same
+  # hemma_show_ha_chrome templates as desktop (Hem menu toggles HA chrome).
 
   custom_settings:
     # EXCEPTION: show header/sidebar on MacBook web browsers
@@ -144,6 +139,8 @@ views:
       # NAV BAR - spans all columns with zero height so it doesn't consume a grid row
       - type: custom:button-card
         template: hemma_nav_shell
+        variables:
+          hemma_info_scroll_hide_menu: true
         view_layout:
           grid-column: 1 / -1
           height: 0

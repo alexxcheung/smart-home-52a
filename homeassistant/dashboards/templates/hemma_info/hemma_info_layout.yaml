@@ -9,7 +9,7 @@ place-items: stretch
 width: 100%
 max-width: min(1200px, 100%)
 margin: 0 auto
-padding: 64px 0 calc(28px + env(safe-area-inset-bottom)) 0
+padding: 120px 0 calc(28px + env(safe-area-inset-bottom)) 0
 box-sizing: border-box
 overflow-x: hidden
 overflow-y: auto
@@ -23,4 +23,4 @@ touch-action: pan-y
 
 mediaquery:
   "(min-width: 933px)":
-    padding: 64px 0 calc(32px + env(safe-area-inset-bottom)) 0
+    padding: 120px 0 calc(32px + env(safe-area-inset-bottom)) 0

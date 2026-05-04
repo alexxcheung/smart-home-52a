@@ -1,0 +1,56 @@
+# Shared routes for phone portrait nav (Home + Rooms + Scenes). Included twice (chrome on/off).
+- url: /dashboard-hemma/home
+  label: Home
+  icon: mdi:home-variant
+  icon_selected: mdi:home-variant
+
+- url: /dashboard-hemma/info
+  label: Info
+  icon: mdi:information-outline
+  icon_selected: mdi:information-outline
+
+- label: Rooms
+  icon: >
+    [[[
+      const p = window.location.pathname || '';
+      if (p === '/dashboard-hemma/bedroom') return 'mdi:bed-king';
+      if (p === '/dashboard-hemma/kitchen') return 'mdi:fridge';
+      if (p === '/dashboard-hemma/living-room') return 'mdi:sofa';
+      if (p === '/dashboard-hemma/hallway') return 'mdi:door-open';
+      if (p === '/dashboard-hemma/study') return 'mdi:book';
+      return 'mdi:sofa';
+    ]]]
+  icon_selected: >
+    [[[
+      const p = window.location.pathname || '';
+      if (p === '/dashboard-hemma/bedroom') return 'mdi:bed-king';
+      if (p === '/dashboard-hemma/kitchen') return 'mdi:fridge';
+      if (p === '/dashboard-hemma/living-room') return 'mdi:sofa';
+      if (p === '/dashboard-hemma/hallway') return 'mdi:door-open';
+      if (p === '/dashboard-hemma/study') return 'mdi:book';
+      return 'mdi:sofa';
+    ]]]
+  tap_action:
+    action: open-popup
+  selected: >
+    [[[
+      const p = window.location.pathname;
+      return p.startsWith('/dashboard-hemma/')
+        && !['/dashboard-hemma/home','/dashboard-hemma/info'].includes(p);
+    ]]]
+  popup:
+    - label: Living Room
+      url: /dashboard-hemma/living-room
+      icon: mdi:sofa
+    - label: Kitchen
+      url: /dashboard-hemma/kitchen
+      icon: mdi:fridge
+    - label: Hallway
+      url: /dashboard-hemma/hallway
+      icon: mdi:door-open
+    - label: Study
+      url: /dashboard-hemma/study
+      icon: mdi:book
+    - label: Bedroom
+      url: /dashboard-hemma/bedroom
+      icon: mdi:bed-king
