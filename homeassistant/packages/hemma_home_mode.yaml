@@ -231,6 +231,9 @@ automation:
           - action: light.turn_off
             target:
               entity_id: "{{ away_lights }}"
+      - action: switch.turn_off
+        target:
+          entity_id: switch.zbminil2_study_downlight
       - if:
           - condition: template
             value_template: "{{ away_media_players | count > 0 }}"

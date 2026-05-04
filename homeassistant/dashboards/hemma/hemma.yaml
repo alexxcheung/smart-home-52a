@@ -530,6 +530,18 @@ views:
             variables:
               icon: light
 
+          - type: custom:button-card
+            template: hemma_light
+            entity: switch.zbminil2_study_downlight
+            name: Downlight
+            variables:
+              icon: light
+            state_display: >
+              [[[
+                const s = (entity?.state || '').toLowerCase();
+                return s === 'on' ? 'On' : 'Off';
+              ]]]
+
           # Printer
           - type: custom:button-card
             template: hemma_printer

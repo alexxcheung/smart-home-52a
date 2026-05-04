@@ -267,6 +267,8 @@
       state: off
     light.study_floor_light:
       state: off
+    switch.zbminil2_study_downlight:
+      state: off
 
 - name: Study Away Scene
   entities:
@@ -275,4 +277,6 @@
     light.sammy_desk_light:
       state: off
     light.study_floor_light:
+      state: off
+    switch.zbminil2_study_downlight:
       state: off
