@@ -1,0 +1,163 @@
+# Engine strip — batteries summary + Bubble detail (#hemma-engine-batteries).
+# Duplicate SPECS in hemma_engine_battery_popup_content MUST match hemma_engine_battery.
+#
+hemma_engine_battery:
+  template: hemma_plain_button_card
+  tap_action:
+    action: navigate
+    navigation_path: '#hemma-engine-batteries'
+  triggers_update: all
+  custom_fields:
+    content: |
+      [[[
+        const SPECS = [
+          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery' },
+          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery_2' },
+          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery_3' },
+          { level: 'sensor.front_door_battery' },
+          { level: 'sensor.imalex_17_battery_level', state: 'sensor.imalex_17_battery_state' },
+          { level: 'sensor.imalex_ipad_battery_level', state: 'sensor.imalex_ipad_battery_state' },
+          { level: 'sensor.imalex_mac_internal_battery_level', state: 'sensor.imalex_mac_internal_battery_state' },
+          { level: 'sensor.imsammy_iphone_battery_level', state: 'sensor.imsammy_iphone_battery_state' },
+          { level: 'sensor.zbminil2_study_downlight_battery' },
+        ];
+        const bad = (s) => !s || ['unknown', 'unavailable'].includes(String(s.state));
+        const needsCharge = (spec) => {
+          if (spec.binary) {
+            const b = states[spec.binary];
+            return b && !bad(b) && b.state === 'on';
+          }
+          const le = states[spec.level];
+          if (!le || bad(le)) return false;
+          const n = parseFloat(le.state);
+          if (isNaN(n)) return false;
+          return n < 20;
+        };
+        const lowCount = SPECS.filter(needsCharge).length;
+        const sub =
+          lowCount === 0
+            ? `All monitored devices ≥20% · ${SPECS.length} devices`
+            : `${lowCount} need charging (<20%) · tap for details`;
+
+        return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
+          <div style="font-size:12px;font-weight:700;opacity:0.55;letter-spacing:0.03em;">Battery level</div>
+          <div style="font-size:26px;font-weight:700;margin-top:8px;letter-spacing:-0.02em;">${lowCount}</div>
+          <div style="font-size:14px;opacity:0.5;margin-top:6px;line-height:1.35;">${sub}</div>
+        </div>`;
+      ]]]
+  styles:
+    card:
+      - background: rgba(255,255,255,0.06)
+      - backdrop-filter: blur(20px)
+      - border-radius: 22px
+      - border: 1px solid rgba(255,255,255,0.12)
+
+hemma_engine_battery_popup_content:
+  template: hemma_plain_button_card
+  tap_action:
+    action: none
+  triggers_update: all
+  custom_fields:
+    content: |
+      [[[
+        const SPECS = [
+          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery' },
+          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery_2' },
+          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery_3' },
+          { level: 'sensor.front_door_battery' },
+          { level: 'sensor.imalex_17_battery_level', state: 'sensor.imalex_17_battery_state' },
+          { level: 'sensor.imalex_ipad_battery_level', state: 'sensor.imalex_ipad_battery_state' },
+          { level: 'sensor.imalex_mac_internal_battery_level', state: 'sensor.imalex_mac_internal_battery_state' },
+          { level: 'sensor.imsammy_iphone_battery_level', state: 'sensor.imsammy_iphone_battery_state' },
+          { level: 'sensor.zbminil2_study_downlight_battery' },
+        ];
+        const na = 'N/A';
+        const bad = (s) => !s || ['unknown', 'unavailable'].includes(String(s.state));
+        const displayTitle = (spec) => {
+          if (spec.binary) {
+            const b = states[spec.binary];
+            const tail = String(spec.binary).split('.').pop();
+            let fn = b?.attributes?.friendly_name || spec.binary;
+            if (tail.endsWith('_2')) fn += ' · 2';
+            else if (tail.endsWith('_3')) fn += ' · 3';
+            return fn;
+          }
+          const le = states[spec.level];
+          let fn = le?.attributes?.friendly_name || spec.level;
+          fn = fn.replace(/\s*Battery\s*Level\s*$/i, '').trim();
+          return fn.replace(/\s*Battery\s*$/i, '').trim();
+        };
+        const levelStr = (spec) => {
+          if (spec.binary) return na;
+          const le = states[spec.level];
+          if (!le || bad(le)) return na;
+          const n = parseFloat(le.state);
+          return isNaN(n) ? na : `${Math.round(n)} %`;
+        };
+        const chargeStr = (spec) => {
+          if (spec.binary) {
+            const b = states[spec.binary];
+            if (!b || bad(b)) return na;
+            return b.state === 'on' ? 'Low battery' : 'OK';
+          }
+          if (!spec.state) return na;
+          const st = states[spec.state];
+          if (!st || bad(st)) return na;
+          return String(st.state);
+        };
+        const warn = (spec) => {
+          if (spec.binary) {
+            const b = states[spec.binary];
+            return b && !bad(b) && b.state === 'on';
+          }
+          const le = states[spec.level];
+          if (!le || bad(le)) return false;
+          const n = parseFloat(le.state);
+          return !isNaN(n) && n < 20;
+        };
+
+        const rows = SPECS.map((spec, i) => {
+          const title = displayTitle(spec);
+          const lvl = levelStr(spec);
+          const chg = chargeStr(spec);
+          const w = warn(spec);
+          const border =
+            i === SPECS.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.08)';
+          const lvlNum = lvl.endsWith('%') ? parseFloat(lvl) : NaN;
+          const lvlColor =
+            lvl === na
+              ? 'opacity:0.45'
+              : !isNaN(lvlNum) && lvlNum < 20
+                ? 'font-weight:700;color:#fca5a5'
+                : 'opacity:0.92';
+          return `
+            <div style="padding:12px 0;border-bottom:${border};display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;">
+              <div style="font-size:14px;font-weight:600;line-height:1.25;min-width:0;${w ? 'color:#fca5a5' : ''}">${title}</div>
+              <div style="font-size:13px;${lvlColor};text-align:right;font-variant-numeric:tabular-nums">${lvl}</div>
+              <div style="font-size:12px;opacity:0.75;text-align:right;max-width:120px;line-height:1.2">${chg}</div>
+            </div>`;
+        }).join('');
+
+        return `
+          <div style="padding:14px 16px 10px;box-sizing:border-box;">
+            <div style="font-size:12px;font-weight:700;opacity:0.5;text-transform:uppercase;letter-spacing:0.08em;">Battery level and state</div>
+            <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;margin-top:10px;font-size:11px;text-transform:uppercase;opacity:0.42;padding-bottom:4px;font-weight:600;">
+              <span>Device</span><span style="text-align:right">Level</span><span style="text-align:right">State</span>
+            </div>
+          </div>
+          <div style="padding:0 16px 12px;height:min(58vh,480px);overflow-y:auto;overflow-x:hidden;box-sizing:border-box;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;">
+            ${rows}
+          </div>
+        `;
+      ]]]
+  styles:
+    card:
+      - background: rgba(255,255,255,0.06)
+      - backdrop-filter: blur(20px)
+      - border-radius: 20px
+      - border: 1px solid rgba(255,255,255,0.12)
+      - box-shadow: none
+      - margin-top: 16px
+    custom_fields:
+      content:
+        - pointer-events: auto

@@ -173,6 +173,8 @@ views:
       - !include /config/dashboards/templates/button_cards/cards/hemma_octopus_agile_bubble_popup.yml
       # Lists Bubble (hash #hemma-lists) - opened from the shopping tile
       - !include /config/dashboards/templates/button_cards/cards/hemma_shopping_list_bubble_popup.yml
+      # Engine batteries Bubble (hash #hemma-engine-batteries)
+      - !include /config/dashboards/templates/button_cards/cards/hemma_engine_battery_bubble_popup.yml
 
   # ------------------------------------------------------
   # LIVING ROOM

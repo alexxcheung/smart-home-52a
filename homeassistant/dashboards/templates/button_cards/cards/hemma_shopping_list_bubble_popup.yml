@@ -10,6 +10,8 @@
 # edit both if you change the shell. Inner cards use HA's built-in
 # `type: todo-list` so each list is fully editable inline (add items,
 # tick items, remove items) without leaving the popup.
+# close_by_clicking_outside: false — avoids the pop-up closing when tapping the
+# built-in todo-list (shadow DOM clicks can be mis-detected as “outside” clicks).
 
 type: vertical-stack
 cards:
@@ -22,7 +24,8 @@ cards:
     show_state: false
     force_icon: false
     show_header: true
-    close_by_clicking_outside: true
+    close_on_click: false
+    close_by_clicking_outside: false
     width_desktop: 520px
     margin_top_mobile: '0px'
     margin_top_desktop: '0px'
