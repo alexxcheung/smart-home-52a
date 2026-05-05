@@ -104,7 +104,7 @@ cards:
               return `<div style="padding:18px 20px;box-sizing:border-box;">
                 <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Reminders</div>
                 <div style="font-size:19px;font-weight:600;margin-top:8px;line-height:1.2;">3 for today</div>
-                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Sample</div>
               </div>`;
             ]]]
         styles:
@@ -124,7 +124,7 @@ cards:
               return `<div style="padding:18px 20px;box-sizing:border-box;">
                 <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Meal plan</div>
                 <div style="font-size:19px;font-weight:600;margin-top:8px;line-height:1.2;">Dinner TBD</div>
-                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Sample</div>
               </div>`;
             ]]]
         styles:
@@ -144,27 +144,7 @@ cards:
               return `<div style="padding:18px 20px;box-sizing:border-box;">
                 <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Parcel ETA</div>
                 <div style="font-size:19px;font-weight:600;margin-top:8px;line-height:1.2;">14:20–15:20</div>
-                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Scroll test · sample</div>
-              </div>`;
-            ]]]
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 22px
-            - border: 1px solid rgba(255,255,255,0.12)
-            - min-height: 120px
-      - type: custom:button-card
-        template: hemma_plain_button_card
-        tap_action:
-          action: none
-        custom_fields:
-          content: |
-            [[[
-              return `<div style="padding:18px 20px;box-sizing:border-box;">
-                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Scroll test</div>
-                <div style="font-size:19px;font-weight:600;margin-top:8px;line-height:1.2;">End of strip</div>
-                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Remove when done testing</div>
+                <div style="font-size:14px;opacity:0.5;margin-top:10px;">Sample</div>
               </div>`;
             ]]]
         styles:
@@ -390,26 +370,6 @@ cards:
                 <div style="font-size:30px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">2.4 kW</div>
                 <div style="font-size:12px;opacity:0.45;margin-top:2px;">to grid · sample</div>
                 <div style="height:36px;margin-top:12px;border-radius:8px;background:linear-gradient(90deg,rgba(250,204,21,0.35) 0%,rgba(255,255,255,0.12) 100%);"></div>
-              </div>`;
-            ]]]
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 22px
-            - border: 1px solid rgba(255,255,255,0.12)
-      - type: custom:button-card
-        template: hemma_plain_button_card
-        tap_action:
-          action: none
-        custom_fields:
-          content: |
-            [[[
-              return `<div style="padding:16px 18px;box-sizing:border-box;min-height:132px;">
-                <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Scroll test</div>
-                <div style="font-size:30px;font-weight:700;margin-top:6px;letter-spacing:-0.02em;">End</div>
-                <div style="font-size:12px;opacity:0.45;margin-top:2px;">Energy row · sample</div>
-                <div style="height:36px;margin-top:12px;border-radius:8px;background:rgba(255,255,255,0.1);"></div>
               </div>`;
             ]]]
         styles:

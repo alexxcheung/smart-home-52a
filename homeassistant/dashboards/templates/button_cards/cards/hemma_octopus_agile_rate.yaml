@@ -76,7 +76,6 @@ hemma_octopus_agile_rate:
               ${row('Lowest rate', tomorrow.cheapest)}
               ${row('Highest rate', tomorrow.expensive)}
             </div>
-            <div class="hint">Tap to view all rates</div>
           </div>`;
       ]]]
 
@@ -107,4 +106,3 @@ hemma_octopus_agile_rate:
     .rtime-range { color: var(--primary-text-color); opacity: 0.85; }
     .rate { font-size: 12px; margin-left: 4px; }
     .muted { opacity: 0.4; }
-    .hint { font-size: 12px; opacity: 0.3; text-align: center; margin-top: 20px; }

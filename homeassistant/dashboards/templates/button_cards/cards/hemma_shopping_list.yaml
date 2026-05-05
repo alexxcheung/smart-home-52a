@@ -48,10 +48,9 @@ hemma_shopping_list:
 
         return `
           <div class="shopping-wrap">
-            <div class="shopping-title">List</div>
+            <div class="shopping-title">TODO List</div>
             <div class="shopping-status">${status}</div>
             <div class="shopping-items">${rows}</div>
-            <div class="shopping-hint">Tap to edit lists</div>
           </div>
         `;
       ]]]
@@ -77,4 +76,3 @@ hemma_shopping_list:
     .shopping-item .text { font-size: 14px; line-height: 1.25; opacity: 0.82; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .shopping-item .count { font-size: 14px; line-height: 1.2; opacity: 0.7; font-variant-numeric: tabular-nums; }
     .shopping-empty { font-size: 14px; opacity: 0.5; }
-    .shopping-hint { margin-top: 22px; font-size: 12px; opacity: 0.35; text-align: center; }
