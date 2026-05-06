@@ -1,0 +1,78 @@
+# Appliance connectivity watchdog — Logbook (device timeline) + persistent notifications.
+#
+# When you add an appliance, put its primary “always should be online” entity in
+# BOTH automations below (same entity_id lists).
+#
+# Avoid sensors that go unavailable during normal idle unless that is what you want.
+#
+# Current watch list:
+#   - sensor.bosch_dishwasher_operation_state
+#   - sensor.washer_current_status
+#   - humidifier.probreeze_dehumidifier
+
+automation:
+  # Uses trigger.entity_id from whichever listed entity went unavailable.
+  - id: hemma_appliance_connect_disconnect_alert
+    alias: "Appliances · primary entity unavailable (disconnect)"
+    description: >-
+      Logbook + persistent notification when any watched appliance entity stays
+      unavailable for 10 minutes (integration, cloud, or auth issues).
+    mode: parallel
+    triggers:
+      - trigger: state
+        entity_id:
+          - sensor.bosch_dishwasher_operation_state
+          - sensor.washer_current_status
+          - humidifier.probreeze_dehumidifier
+        to: unavailable
+        for:
+          minutes: 10
+    actions:
+      - action: logbook.log
+        data:
+          name: >-
+            {% set eid = trigger.entity_id %}
+            {{ state_attr(eid, 'friendly_name') | default(eid) }} · connectivity
+          entity_id: "{{ trigger.entity_id }}"
+          message: >-
+            Unavailable for 10+ minutes — check integration reload, network,
+            and vendor app login (e.g. Home Connect). Entity {{ trigger.entity_id }}.
+      - action: persistent_notification.create
+        data:
+          title: >-
+            {% set eid = trigger.entity_id %}
+            {{ state_attr(eid, 'friendly_name') | default(eid) }} unavailable
+          notification_id: >-
+            {% set slug = trigger.entity_id | replace('.', '_') %}
+            hemma_appliance_disconnect_{{ slug }}
+          message: >-
+            {{ trigger.entity_id }} has been unavailable for 10+ minutes.
+            Settings → Devices & services → open the matching integration → Reload
+            or Reconfigure. For Bosch, also sign in again in the Home Connect app if needed.
+
+  - id: hemma_appliance_connect_recovered
+    alias: "Appliances · primary entity recovered from unavailable"
+    description: >-
+      Logbook entry when a watched entity leaves unavailable; clears that device’s banner.
+    mode: parallel
+    triggers:
+      - trigger: state
+        entity_id:
+          - sensor.bosch_dishwasher_operation_state
+          - sensor.washer_current_status
+          - humidifier.probreeze_dehumidifier
+        from: unavailable
+    actions:
+      - action: persistent_notification.dismiss
+        data:
+          notification_id: >-
+            {% set slug = trigger.entity_id | replace('.', '_') %}
+            hemma_appliance_disconnect_{{ slug }}
+      - action: logbook.log
+        data:
+          name: >-
+            {% set eid = trigger.entity_id %}
+            {{ state_attr(eid, 'friendly_name') | default(eid) }} · connectivity
+          entity_id: "{{ trigger.entity_id }}"
+          message: >-
+            Available again (was unavailable).

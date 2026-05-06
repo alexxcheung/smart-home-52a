@@ -2,319 +2,54 @@
 - type: vertical-stack
   cards:
 
-    # ── Status + progress: one conditional per state so popup shows updated status when state changes ──
-    - type: conditional
-      conditions:
-        - entity: sensor.bosch_dishwasher_operation_state
-          state: inactive
-      card:
-        type: custom:button-card
-        template: hemma_plain_button_card
-        entity: sensor.bosch_dishwasher_operation_state
-        tap_action: { action: none }
-        styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
-        custom_fields:
-          content: >
-            [[[
-              const op = entity.state ?? 'unknown';
-              const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
-              const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
-              const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
-              const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
-              const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
-              const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
-              const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
-              const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
-              const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
-              let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
-              return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
-            ]]]
-        extra_styles: |
-          .dw-header { padding: 16px 0; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
-          .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-          .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
-          .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
-          .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-          .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
-          .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
-    - type: conditional
-      conditions:
-        - entity: sensor.bosch_dishwasher_operation_state
-          state: ready
-      card:
-        type: custom:button-card
-        template: hemma_plain_button_card
-        entity: sensor.bosch_dishwasher_operation_state
-        tap_action: { action: none }
-        styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
-        custom_fields:
-          content: >
-            [[[
-              const op = entity.state ?? 'unknown';
-              const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
-              const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
-              const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
-              const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
-              const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
-              const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
-              const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
-              const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
-              const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
-              let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
-              return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
-            ]]]
-        extra_styles: |
-          .dw-header { padding: 16px 0; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
-          .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-          .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
-          .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
-          .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-          .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
-          .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
-    - type: conditional
-      conditions:
-        - entity: sensor.bosch_dishwasher_operation_state
-          state: delayedstart
-      card:
-        type: custom:button-card
-        template: hemma_plain_button_card
-        entity: sensor.bosch_dishwasher_operation_state
-        tap_action: { action: none }
-        styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
-        custom_fields:
-          content: >
-            [[[
-              const op = entity.state ?? 'unknown';
-              const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
-              const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
-              const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
-              const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
-              const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
-              const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
-              const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
-              const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
-              const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
-              let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
-              return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
-            ]]]
-        extra_styles: |
-          .dw-header { padding: 16px 0; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
-          .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-          .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
-          .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
-          .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-          .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
-          .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
-    - type: conditional
-      conditions:
-        - entity: sensor.bosch_dishwasher_operation_state
-          state: run
-      card:
-        type: custom:button-card
-        template: hemma_plain_button_card
-        entity: sensor.bosch_dishwasher_operation_state
-        tap_action: { action: none }
-        styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
-        custom_fields:
-          content: >
-            [[[
-              const op = entity.state ?? 'unknown';
-              const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
-              const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
-              const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
-              const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
-              const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
-              const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
-              const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
-              const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
-              const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
-              let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
-              return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
-            ]]]
-        extra_styles: |
-          .dw-header { padding: 16px 0; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
-          .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-          .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
-          .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
-          .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-          .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
-          .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
-    - type: conditional
-      conditions:
-        - entity: sensor.bosch_dishwasher_operation_state
-          state: pause
-      card:
-        type: custom:button-card
-        template: hemma_plain_button_card
-        entity: sensor.bosch_dishwasher_operation_state
-        tap_action: { action: none }
-        styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
-        custom_fields:
-          content: >
-            [[[
-              const op = entity.state ?? 'unknown';
-              const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
-              const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
-              const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
-              const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
-              const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
-              const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
-              const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
-              const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
-              const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
-              let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
-              return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
-            ]]]
-        extra_styles: |
-          .dw-header { padding: 16px 0; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
-          .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-          .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
-          .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
-          .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-          .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
-          .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
-    - type: conditional
-      conditions:
-        - entity: sensor.bosch_dishwasher_operation_state
-          state: actionrequired
-      card:
-        type: custom:button-card
-        template: hemma_plain_button_card
-        entity: sensor.bosch_dishwasher_operation_state
-        tap_action: { action: none }
-        styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
-        custom_fields:
-          content: >
-            [[[
-              const op = entity.state ?? 'unknown';
-              const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
-              const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
-              const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
-              const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
-              const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
-              const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
-              const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
-              const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
-              const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
-              let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
-              return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
-            ]]]
-        extra_styles: |
-          .dw-header { padding: 16px 0; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
-          .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-          .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
-          .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
-          .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-          .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
-          .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
-    - type: conditional
-      conditions:
-        - entity: sensor.bosch_dishwasher_operation_state
-          state: finished
-      card:
-        type: custom:button-card
-        template: hemma_plain_button_card
-        entity: sensor.bosch_dishwasher_operation_state
-        tap_action: { action: none }
-        styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
-        custom_fields:
-          content: >
-            [[[
-              const op = entity.state ?? 'unknown';
-              const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
-              const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
-              const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
-              const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
-              const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
-              const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
-              const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
-              const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
-              const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
-              let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
-              return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
-            ]]]
-        extra_styles: |
-          .dw-header { padding: 16px 0; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
-          .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-          .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
-          .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
-          .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-          .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
-          .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
-    - type: conditional
-      conditions:
-        - entity: sensor.bosch_dishwasher_operation_state
-          state: error
-      card:
-        type: custom:button-card
-        template: hemma_plain_button_card
-        entity: sensor.bosch_dishwasher_operation_state
-        tap_action: { action: none }
-        styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
-        custom_fields:
-          content: >
-            [[[
-              const op = entity.state ?? 'unknown';
-              const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
-              const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
-              const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
-              const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
-              const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
-              const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
-              const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
-              const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
-              const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
-              let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
-              return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
-            ]]]
-        extra_styles: |
-          .dw-header { padding: 16px 0; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
-          .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-          .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
-          .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
-          .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-          .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
-          .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
-    - type: conditional
-      conditions:
-        - entity: sensor.bosch_dishwasher_operation_state
-          state: aborting
-      card:
-        type: custom:button-card
-        template: hemma_plain_button_card
-        entity: sensor.bosch_dishwasher_operation_state
-        tap_action: { action: none }
-        styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
-        custom_fields:
-          content: >
-            [[[
-              const op = entity.state ?? 'unknown';
-              const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
-              const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
-              const door = states['sensor.bosch_dishwasher_door']?.state ?? '';
-              const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
-              const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
-              const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
-              const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
-              const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
-              const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
-              let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
-              return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
-            ]]]
-        extra_styles: |
-          .dw-header { padding: 16px 0; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
-          .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-          .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
-          .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
-          .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
-          .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
-          .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
+    # ── Status + progress (one card; subscribes to related entities) ──
+    - type: custom:button-card
+      template: hemma_plain_button_card
+      entity: sensor.bosch_dishwasher_operation_state
+      triggers_update:
+        - sensor.bosch_dishwasher_operation_state
+        - sensor.bosch_dishwasher_programme_finish_time
+        - sensor.bosch_dishwasher_programme_progress
+        - sensor.bosch_dishwasher_door
+        - sensor.dishwasher_salt_nearly_empty
+        - sensor.dishwasher_rinse_aid_nearly_empty
+        - switch.bosch_dishwasher_power
+      tap_action: { action: none }
+      styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
+      custom_fields:
+        content: >
+          [[[
+            const op = (entity.state ?? 'unknown').toString().toLowerCase();
+            const fin = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
+            const progress = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+            const doorRaw = states['sensor.bosch_dishwasher_door']?.state ?? '';
+            const door = doorRaw.toString().toLowerCase();
+            const label = { inactive:'Off', ready:'Ready', delayedstart:'Delayed Start', run:'Running', pause:'Paused', actionrequired:'Action Required', finished:'Finished', error:'Error', aborting:'Stopping…' };
+            const colors = { run: '#6bcb77', finished: '#6bcb77', error: '#ff6b6b', aborting: '#ff6b6b', actionrequired: '#f4a261', delayedstart: '#ffd166', pause: '#ffd166' };
+            const bgColors = { run: 'rgba(107,203,119,0.08)', finished: 'rgba(107,203,119,0.06)', error: 'rgba(255,107,107,0.08)', aborting: 'rgba(255,107,107,0.06)', actionrequired: 'rgba(244,162,97,0.08)', delayedstart: 'rgba(255,209,102,0.07)', pause: 'rgba(255,209,102,0.07)', ready: 'rgba(255,255,255,0.05)' };
+            const barColors = { run: '#6bcb77', pause: '#ffd166', error: '#ff6b6b', actionrequired: '#f4a261' };
+            const color = colors[op] ?? 'var(--primary-text-color)'; const bg = bgColors[op] ?? 'transparent'; const barColor = barColors[op] ?? '#6bcb77';
+            const saltLow = states['sensor.dishwasher_salt_nearly_empty']?.state === 'present'; const rinseAidLow = states['sensor.dishwasher_rinse_aid_nearly_empty']?.state === 'present';
+            let remStr = ''; if (op === 'run' && fin && fin !== 'unavailable') { const rem = Math.ceil((new Date(fin) - new Date()) / 60000); if (rem > 0) remStr = `${rem} min remaining`; }
+            return `<div class="dw-header"><div class="status-row"><span class="status-label" style="color:${color};background:${bg}">${label[op] ?? op}</span>${door ? (door === 'open' ? '<span class="warn-badge">Door Opened</span>' : `<span class="door-info" style="background:${bg}">Door Closed</span>`) : ''}${saltLow ? '<span class="warn-badge">⚠ Salt Low</span>' : ''}${rinseAidLow ? '<span class="warn-badge">⚠ Rinse Aid Low</span>' : ''}</div>${progress > 0 ? `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${progress}%;background:${barColor}"></div></div><span class="prog-info" style="color:${color}">${progress}%${remStr ? ' · ' + remStr : ''}</span></div>` : ''}</div>`;
+          ]]]
+      extra_styles: |
+        .dw-header { padding: 16px 0; border-radius: 12px; box-sizing: border-box; max-width: 100%; transition: background 0.3s ease; }
+        .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+        .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
+        .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
+        .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+        .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
+        .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
 
-    # ── Sections below power (only when power is on) ───────────────
+    # ── Programme + options: power on in HA, or operation_state shows activity (covers stale power switch while running)
     - type: conditional
       conditions:
-        - entity: switch.bosch_dishwasher_power
-          state: "on"
+        - condition: template
+          value_template: >-
+            {% set pwr = states('switch.bosch_dishwasher_power') %}
+            {% set op = (states('sensor.bosch_dishwasher_operation_state') | lower) %}
+            {{ pwr == 'on' or op in ['run', 'pause', 'delayedstart', 'ready', 'actionrequired', 'finished', 'error', 'aborting'] }}
       card:
         type: vertical-stack
         cards:

@@ -312,9 +312,9 @@ views:
             entity: sensor.bosch_dishwasher_operation_state
             name: Dishwasher
 
-      # Bubble Card pop-ups (must be last on this view)
-      - !include /config/dashboards/templates/button_cards/cards/hemma_dishwasher/hemma_dishwasher_bubble_popup.yml
+      # Bubble Card pop-ups (must be last on this view; dishwasher hash listener must be the final popup card per Bubble README)
       - !include /config/dashboards/templates/button_cards/cards/hemma_scenes/hemma_scenes_kitchen_bubble_popup.yml
+      - !include /config/dashboards/templates/button_cards/cards/hemma_dishwasher/hemma_dishwasher_bubble_popup.yml
 
   # ------------------------------------------------------
   # HALLWAY

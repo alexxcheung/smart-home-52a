@@ -16,11 +16,12 @@ hemma_dishwasher:
     - sensor.bosch_dishwasher_programme_finish_time
     - sensor.bosch_dishwasher_programme_progress
     - switch.bosch_dishwasher_power
+    - number.bosch_dishwasher_start_in_relative
     - sensor.5_minute_clock
 
   state_display: >
     [[[
-      const op   = states['sensor.bosch_dishwasher_operation_state']?.state ?? '';
+      const op   = (states['sensor.bosch_dishwasher_operation_state']?.state ?? '').toString().toLowerCase();
       const fin  = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
       const prog = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
       const dSec = parseFloat(states['number.bosch_dishwasher_start_in_relative']?.state ?? 0);
@@ -48,7 +49,7 @@ hemma_dishwasher:
       value: |
         [[[
           return ['run','delayedstart','pause'].includes(
-            states['sensor.bosch_dishwasher_operation_state']?.state
+            (states['sensor.bosch_dishwasher_operation_state']?.state ?? '').toString().toLowerCase()
           );
         ]]]
       styles:
