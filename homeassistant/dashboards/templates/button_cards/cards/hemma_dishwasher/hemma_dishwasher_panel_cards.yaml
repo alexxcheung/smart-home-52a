@@ -42,14 +42,39 @@
         .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
         .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
 
-    # ── Programme + options: power on in HA, or operation_state shows activity (covers stale power switch while running)
+    # ── Programme + options: power on in HA, or operation_state shows activity.
+    # (Lovelace conditional cards only support state/or/not/etc — NOT template conditions.)
     - type: conditional
       conditions:
-        - condition: template
-          value_template: >-
-            {% set pwr = states('switch.bosch_dishwasher_power') %}
-            {% set op = (states('sensor.bosch_dishwasher_operation_state') | lower) %}
-            {{ pwr == 'on' or op in ['run', 'pause', 'delayedstart', 'ready', 'actionrequired', 'finished', 'error', 'aborting'] }}
+        - condition: or
+          conditions:
+            - condition: state
+              entity: switch.bosch_dishwasher_power
+              state: "on"
+            - condition: state
+              entity: sensor.bosch_dishwasher_operation_state
+              state: run
+            - condition: state
+              entity: sensor.bosch_dishwasher_operation_state
+              state: pause
+            - condition: state
+              entity: sensor.bosch_dishwasher_operation_state
+              state: delayedstart
+            - condition: state
+              entity: sensor.bosch_dishwasher_operation_state
+              state: ready
+            - condition: state
+              entity: sensor.bosch_dishwasher_operation_state
+              state: actionrequired
+            - condition: state
+              entity: sensor.bosch_dishwasher_operation_state
+              state: finished
+            - condition: state
+              entity: sensor.bosch_dishwasher_operation_state
+              state: error
+            - condition: state
+              entity: sensor.bosch_dishwasher_operation_state
+              state: aborting
       card:
         type: vertical-stack
         cards:
