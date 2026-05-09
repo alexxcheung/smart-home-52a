@@ -40,7 +40,7 @@ hemma_engine_battery:
             : `${lowCount} need charging (<20%) · tap for details`;
 
         return `<div style="padding:18px 20px;box-sizing:border-box;min-height:120px;">
-          <div style="font-size:12px;font-weight:700;opacity:0.55;letter-spacing:0.03em;">Battery level</div>
+          <div style="font-size:12px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;">Battery Level</div>
           <div style="font-size:26px;font-weight:700;margin-top:8px;letter-spacing:-0.02em;">${lowCount}</div>
           <div style="font-size:14px;opacity:0.5;margin-top:6px;line-height:1.35;">${sub}</div>
         </div>`;

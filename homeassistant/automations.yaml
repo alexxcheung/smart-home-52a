@@ -202,10 +202,6 @@
       area_id:
       - study_room
       device_id: ccd22f130a1a7f593d0b6ced1daac9e9
-  - action: switch.turn_on
-    metadata: {}
-    target:
-      entity_id: switch.zbminil2_study_downlight
   - action: light.turn_on
     metadata: {}
     data:
