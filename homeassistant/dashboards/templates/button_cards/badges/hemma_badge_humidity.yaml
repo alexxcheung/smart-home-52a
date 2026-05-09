@@ -18,11 +18,22 @@ hemma_badge_humidity:
         (typeof ev === 'number') ? ev !== 0 :
         !['false','0','no','off','disabled'].includes(String(ev).trim().toLowerCase());
 
-      const hasEnt  = !!entity?.entity_id;
-      const stRaw   = String(entity?.state ?? '').trim();
-      const st      = stRaw.toLowerCase();
-      const v       = parseFloat(stRaw);
-      const hide    = !enabled || !hasEnt || !stRaw || ['unknown','unavailable','none'].includes(st) || Number.isNaN(v);
+      const hasEnt = !!entity?.entity_id;
+      const norm = (raw) => {
+        if (raw === undefined || raw === null || raw === '') return NaN;
+        const s = String(raw).trim().replace(',', '.');
+        const sl = s.toLowerCase();
+        if (['unknown','unavailable','none'].includes(sl)) return NaN;
+        const n = parseFloat(s);
+        return Number.isFinite(n) ? n : NaN;
+      };
+      let v = norm(entity?.state);
+      if (Number.isNaN(v)) {
+        const a = entity?.attributes ?? {};
+        v = norm(a.humidity);
+        if (Number.isNaN(v)) v = norm(a.current_humidity);
+      }
+      const hide = !enabled || !hasEnt || Number.isNaN(v);
 
       return `:host{display:${hide ? 'none' : 'inline-block'} !important;}`;
     ]]]
@@ -38,18 +49,42 @@ hemma_badge_humidity:
               (typeof ev === 'number') ? ev !== 0 :
               !['false','0','no','off','disabled'].includes(String(ev).trim().toLowerCase());
 
-            const hasEnt  = !!entity?.entity_id;
-            const stRaw   = String(entity?.state ?? '').trim();
-            const st      = stRaw.toLowerCase();
-            const v       = parseFloat(stRaw);
-            const hide    = !enabled || !hasEnt || !stRaw || ['unknown','unavailable','none'].includes(st) || Number.isNaN(v);
+            const hasEnt = !!entity?.entity_id;
+            const norm = (raw) => {
+              if (raw === undefined || raw === null || raw === '') return NaN;
+              const s = String(raw).trim().replace(',', '.');
+              const sl = s.toLowerCase();
+              if (['unknown','unavailable','none'].includes(sl)) return NaN;
+              const n = parseFloat(s);
+              return Number.isFinite(n) ? n : NaN;
+            };
+            let v = norm(entity?.state);
+            if (Number.isNaN(v)) {
+              const a = entity?.attributes ?? {};
+              v = norm(a.humidity);
+              if (Number.isNaN(v)) v = norm(a.current_humidity);
+            }
+            const hide = !enabled || !hasEnt || Number.isNaN(v);
 
             return hide ? 'none' : 'inline-grid';
           ]]]
     icon:
       - color: >
           [[[
-            const v = parseFloat(entity?.state);
+            const norm = (raw) => {
+              if (raw === undefined || raw === null || raw === '') return NaN;
+              const s = String(raw).trim().replace(',', '.');
+              const sl = s.toLowerCase();
+              if (['unknown','unavailable','none'].includes(sl)) return NaN;
+              const n = parseFloat(s);
+              return Number.isFinite(n) ? n : NaN;
+            };
+            let v = norm(entity?.state);
+            if (Number.isNaN(v)) {
+              const a = entity?.attributes ?? {};
+              v = norm(a.humidity);
+              if (Number.isNaN(v)) v = norm(a.current_humidity);
+            }
             if (isNaN(v)) return 'var(--disabled-text-color)';
             if (v <= 29.99) return '#ffb254';
             if (v >= 61)    return '#4bd1fa';
@@ -58,7 +93,20 @@ hemma_badge_humidity:
 
   name: >
     [[[
-      const v = parseFloat(entity?.state);
+      const norm = (raw) => {
+        if (raw === undefined || raw === null || raw === '') return NaN;
+        const s = String(raw).trim().replace(',', '.');
+        const sl = s.toLowerCase();
+        if (['unknown','unavailable','none'].includes(sl)) return NaN;
+        const n = parseFloat(s);
+        return Number.isFinite(n) ? n : NaN;
+      };
+      let v = norm(entity?.state);
+      if (Number.isNaN(v)) {
+        const a = entity?.attributes ?? {};
+        v = norm(a.humidity);
+        if (Number.isNaN(v)) v = norm(a.current_humidity);
+      }
       let label = 'Unknown';
       if (!isNaN(v)) {
         if (v <= 29.99)      label = 'Very Dry';

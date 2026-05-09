@@ -201,7 +201,7 @@ views:
           temp_sensor: sensor.radiator_thermostat_x_living_room_temperature
 
           show_humidity: true
-          humidity_sensor: sensor.radiator_thermostat_x_living_room_humidity
+          humidity_sensor: sensor.smart_radiator_thermostat_x_humidity_3
 
           show_quality: false # Set to true if you add an Air Quality sensor later
           quality_sensor: sensor.none
@@ -341,7 +341,7 @@ views:
           temp_sensor: sensor.radiator_thermostat_x_hallway_temperature
 
           show_humidity: true
-          humidity_sensor: sensor.radiator_thermostat_x_hallway_humidity
+          humidity_sensor: sensor.smart_radiator_thermostat_x_humidity_2
 
           show_quality: false
           quality_sensor: sensor.YOUR_AIR_QUALITY
@@ -475,7 +475,7 @@ views:
           temp_sensor: sensor.radiator_thermostat_x_study_temperature
 
           show_humidity: true
-          humidity_sensor: sensor.radiator_thermostat_x_study_humidity
+          humidity_sensor: sensor.smart_radiator_thermostat_x_humidity
 
           show_quality: false
           quality_sensor: sensor.YOUR_BEDROOM_AIR_QUALITY
