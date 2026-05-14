@@ -199,9 +199,9 @@
     data:
       brightness_pct: 60
     target:
-      area_id:
-      - study_room
-      device_id: ccd22f130a1a7f593d0b6ced1daac9e9
+      entity_id:
+      - light.alex_desk_light
+      - light.sammy_desk_light
   - action: light.turn_on
     metadata: {}
     data:
@@ -358,24 +358,19 @@
   mode: restart
 - id: '1756832264041'
   alias: Routines - Leave Home Turn Off Devices
-  description: 'Debounced via for: 10 minutes so a brief GPS-jitter not_home glitch
-    (we have seen these last under a minute on iCloud trackers) does not falsely
-    trigger the leave actions while the residents are still inside the house.'
+  description: 'Debounced via state trigger for: 10 minutes (device triggers do not
+    support for). Brief GPS-jitter not_home glitches (under a minute on iCloud
+    trackers) should not falsely trigger leave actions while residents are still
+    inside the house.'
   triggers:
-  - device_id: 322cbb275deee7edce6388320b436c40
-    domain: device_tracker
-    entity_id: 5287d46e72d6f9d1a46379d3919092b7
-    type: leaves
-    trigger: device
-    zone: zone.home
+  - trigger: state
+    entity_id: device_tracker.imalex_17
+    from: home
     for:
       minutes: 10
-  - device_id: fd7dfa4ede01b45f7c566181765332b8
-    domain: device_tracker
-    entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
-    type: leaves
-    trigger: device
-    zone: zone.home
+  - trigger: state
+    entity_id: device_tracker.imsammy_iphone
+    from: home
     for:
       minutes: 10
   conditions:
@@ -410,24 +405,18 @@
 - id: '1771500000005'
   alias: Home Mode - Set Away When Everyone Leaves
   description: 'Set Home Mode to Away when both tracked people are not home. Debounced
-    via for: 10 minutes so a brief GPS-jitter not_home glitch does not flip the
-    home mode to Away (which would cascade into Home Mode - Away turning off
-    every light in the house).'
+    via state trigger for: 10 minutes (device triggers do not support for) so a
+    brief GPS-jitter glitch does not flip home mode to Away (which would cascade
+    into Home Mode - Away turning off every light in the house).'
   triggers:
-  - device_id: 322cbb275deee7edce6388320b436c40
-    domain: device_tracker
-    entity_id: 5287d46e72d6f9d1a46379d3919092b7
-    type: leaves
-    trigger: device
-    zone: zone.home
+  - trigger: state
+    entity_id: device_tracker.imalex_17
+    from: home
     for:
       minutes: 10
-  - device_id: fd7dfa4ede01b45f7c566181765332b8
-    domain: device_tracker
-    entity_id: b02d43b59ac0b9cf1bd5d1b8bc2270b8
-    type: leaves
-    trigger: device
-    zone: zone.home
+  - trigger: state
+    entity_id: device_tracker.imsammy_iphone
+    from: home
     for:
       minutes: 10
   conditions:

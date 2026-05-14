@@ -35,7 +35,7 @@ script:
           notification_key: "{{ entity_id | replace('.', '_') }}"
           status_message: >-
             {% if label == 'Home Mode' %}
-              {{ value }} Mode has been switched on.
+              {{ value }} Mode activated
             {% elif 'Scene' in label %}
               {% set room = (label | replace(' Scene', '') | lower) %}
               {{ value }} scene has turned on in the {{ room }}.

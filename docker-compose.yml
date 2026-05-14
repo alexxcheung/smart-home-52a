@@ -58,8 +58,8 @@ services:
       - NAT64=1
       - DNS64=1
     devices:
-      # Map the physical port into the container
-      - /dev/ttyUSB0:/dev/ttyUSB0
+      # Map the persistent path into the container
+      - /dev/serial/by-id/usb-SONOFF_SONOFF_Dongle_Lite_MG21_06c44e3381a0ef11a49da1a361ce3355-if00-port0:/dev/serial/by-id/usb-SONOFF_SONOFF_Dongle_Lite_MG21_06c44e3381a0ef11a49da1a361ce3355-if00-port0
 
   matter-server:
     image: ghcr.io/home-assistant-libs/python-matter-server:stable
