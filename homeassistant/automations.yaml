@@ -61,13 +61,8 @@
     - sat
   conditions: []
   actions:
-  - action: climate.set_temperature
+  - action: script.hemma_set_radiators_if_cold
     metadata: {}
-    target:
-      entity_id:
-      - climate.radiator_thermostat_x_hallway
-      - climate.radiator_thermostat_x_living_room
-      - climate.radiator_thermostat_x_study_room
     data:
       temperature: 15
   mode: single
@@ -100,15 +95,10 @@
       type: is_home
     enabled: false
   actions:
-  - action: climate.set_temperature
+  - action: script.hemma_set_radiators_if_cold
     metadata: {}
     data:
       temperature: 18
-    target:
-      entity_id:
-      - climate.radiator_thermostat_x_hallway
-      - climate.radiator_thermostat_x_living_room
-      - climate.radiator_thermostat_x_study_room
   mode: single
 - id: '1757681212746'
   alias: Routines - Wake Up Early And Go Work

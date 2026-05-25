@@ -426,16 +426,26 @@ cards:
                 'humidifier',
                 'input_boolean',
                 'input_select',
+                'input_text',
                 'light',
                 'lock',
                 'media_player',
                 'switch'
               ]);
 
+              const hemmaRoomSceneEntities = new Set([
+                'input_text.hemma_living_room_scene',
+                'input_text.hemma_kitchen_scene',
+                'input_text.hemma_hallway_scene',
+                'input_text.hemma_bedroom_scene',
+                'input_text.hemma_study_scene',
+              ]);
+
               const entries = Object.values(states)
                 .filter((obj) => {
                   const [domain] = String(obj.entity_id || '').split('.');
                   if (!includeDomains.has(domain)) return false;
+                  if (domain === 'input_text' && !hemmaRoomSceneEntities.has(obj.entity_id)) return false;
                   return !['unknown', 'unavailable'].includes(String(obj.state));
                 })
                 .sort((a, b) => new Date(b.last_changed) - new Date(a.last_changed))

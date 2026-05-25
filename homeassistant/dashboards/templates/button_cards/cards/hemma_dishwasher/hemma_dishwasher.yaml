@@ -17,14 +17,30 @@ hemma_dishwasher:
     - sensor.bosch_dishwasher_programme_progress
     - switch.bosch_dishwasher_power
     - number.bosch_dishwasher_start_in_relative
-    - sensor.5_minute_clock
+    - input_boolean.hemma_dishwasher_delay_start
+    - input_datetime.hemma_dishwasher_start_at
+    - sensor.time
 
   state_display: >
     [[[
       const op   = (states['sensor.bosch_dishwasher_operation_state']?.state ?? '').toString().toLowerCase();
       const fin  = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
       const prog = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
-      const dSec = parseFloat(states['number.bosch_dishwasher_start_in_relative']?.state ?? 0);
+      const secsUntilStartAt = (startAtRaw) => {
+        if (!startAtRaw || startAtRaw === 'unknown' || startAtRaw === 'unavailable') return null;
+        const p = startAtRaw.split(':').map((x) => parseInt(x, 10));
+        if (p.length < 2 || Number.isNaN(p[0]) || Number.isNaN(p[1])) return null;
+        const now = new Date();
+        const target = new Date(now);
+        target.setHours(p[0], p[1], p[2] || 0, 0);
+        if (target <= now) target.setDate(target.getDate() + 1);
+        return Math.max(0, Math.floor((target - now) / 1000));
+      };
+      const formatStartsIn = (dSec) => {
+        const h = Math.floor(dSec / 3600);
+        const m = Math.floor((dSec % 3600) / 60);
+        return h > 0 ? `Starts in ${h}h ${m}m` : `Starts in ${m}m`;
+      };
       if (op === 'run') {
         if (fin && fin !== 'unavailable' && fin !== 'unknown') {
           const rem = Math.ceil((new Date(fin) - new Date()) / 60000);
@@ -32,10 +48,12 @@ hemma_dishwasher:
         }
         return prog > 0 ? `Running · ${prog}%` : 'Running';
       }
-      if (op === 'delayedstart' && dSec > 0) {
-        const h = Math.floor(dSec / 3600);
-        const m = Math.floor((dSec % 3600) / 60);
-        return h > 0 ? `Starts in ${h}h ${m}m` : `Starts in ${m}m`;
+      if (op === 'delayedstart') {
+        const delayOn = states['input_boolean.hemma_dishwasher_delay_start']?.state === 'on';
+        const startAt = states['input_datetime.hemma_dishwasher_start_at']?.state;
+        const fromStartAt = delayOn ? secsUntilStartAt(startAt) : null;
+        const dSec = fromStartAt ?? parseFloat(states['number.bosch_dishwasher_start_in_relative']?.state ?? 0);
+        if (dSec > 0) return formatStartsIn(dSec);
       }
       return {
         inactive: 'Off', ready: 'Ready', delayedstart: 'Delayed start',

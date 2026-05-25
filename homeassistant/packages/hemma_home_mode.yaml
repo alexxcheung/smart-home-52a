@@ -4,12 +4,16 @@
 #
 # ENTITIES CREATED:
 #   - input_select.hemma_home_state: current home mode (Home/Sleep/Vacation/…)
+#   - sensor.hemma_outdoor_temperature: outdoor temp mirror for reliable change triggers
 #
 # SCRIPTS CREATED:
+#   - script.hemma_set_radiators_if_cold: Off radiators when outdoor temp > 20°C, else set target
+#   - script.hemma_sync_radiators_from_home_mode: Re-apply Home Mode target using weather gate
 #   - script.hemma_security_presence_simulation: Vacation light randomiser
 #
 # AUTOMATIONS: one per mode, triggered by input_select state changes.
 #   Fill in the # TODO: sections with your actual entity IDs.
+#   - Climate - Sync radiators when outdoor temperature changes
 # ============================================================================
 
 input_select:
@@ -27,12 +31,105 @@ input_select:
     initial: Home
     icon: mdi:home
 
+template:
+  - trigger:
+      - trigger: state
+        entity_id: weather.forecast_home
+        attribute: temperature
+      - trigger: homeassistant
+        event: start
+    sensor:
+      - name: "Hemma outdoor temperature"
+        unique_id: hemma_outdoor_temperature
+        state: >
+          {% set t = state_attr('weather.forecast_home', 'temperature') %}
+          {{ t if t not in [none, 'unknown', 'unavailable'] else none }}
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+
 # ---------------------------------------------------------------------------
 # Presence simulation script (used by Vacation mode)
 # Randomly toggles Living Room + Bedroom lights between 18:00–23:00 to make
 # the house look occupied. Runs in a loop; stopped when leaving Vacation mode.
 # ---------------------------------------------------------------------------
 script:
+  hemma_set_radiators_if_cold:
+    alias: "Set radiators based on outdoor temperature"
+    description: >-
+      Turns off all radiator thermostats when weather.forecast_home is above 20°C;
+      otherwise sets target temperature and enables heat mode.
+    mode: queued
+    fields:
+      temperature:
+        required: true
+        selector:
+          number:
+            min: 5
+            max: 30
+            step: 0.5
+            unit_of_measurement: "°C"
+      hvac_mode:
+        required: false
+        example: heat
+    sequence:
+      - variables:
+          outdoor_temp: "{{ states('sensor.hemma_outdoor_temperature') }}"
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: >
+                  {% set t = outdoor_temp %}
+                  {{ t is not none and t not in ['unknown', 'unavailable'] and t | float(-99) > 20 }}
+            sequence:
+              - action: climate.turn_off
+                target:
+                  entity_id:
+                    - climate.radiator_thermostat_x_living_room
+                    - climate.radiator_thermostat_x_hallway
+                    - climate.radiator_thermostat_x_study_room
+          - conditions:
+              - condition: template
+                value_template: >
+                  {% set t = outdoor_temp %}
+                  {{ t is not none and t not in ['unknown', 'unavailable'] and t | float(99) <= 20 }}
+            sequence:
+              - action: climate.set_temperature
+                target:
+                  entity_id:
+                    - climate.radiator_thermostat_x_living_room
+                    - climate.radiator_thermostat_x_hallway
+                    - climate.radiator_thermostat_x_study_room
+                data:
+                  temperature: "{{ temperature | float }}"
+                  hvac_mode: "{{ hvac_mode | default('heat') }}"
+
+  hemma_sync_radiators_from_home_mode:
+    alias: "Sync radiators to Home Mode with outdoor temperature gate"
+    description: >-
+      Re-applies the radiator target for the current Home Mode, respecting the
+      outdoor temperature rule (> 20°C off, otherwise heat to mode target).
+    mode: queued
+    sequence:
+      - variables:
+          target_temp: >-
+            {% set mode = states('input_select.hemma_home_state') %}
+            {% set map = {
+              'Home': 18,
+              'Sleep': 15,
+              'Vacation': 12,
+              'Away': 12,
+              'Pet Home': 20,
+              'Guest': 18,
+              'Focus': 18,
+              'Bypass': 18
+            } %}
+            {{ map.get(mode, 18) }}
+      - action: script.hemma_set_radiators_if_cold
+        data:
+          temperature: "{{ target_temp | float }}"
+          hvac_mode: heat
+
   hemma_security_presence_simulation:
     alias: "Home Mode - Vacation Presence Simulation"
     mode: single
@@ -85,12 +182,7 @@ automation:
       # TODO: Re-enable motion sensor automations
 
       # Restore thermostats to default temperature
-      - action: climate.set_temperature
-        target:
-          entity_id:
-            - climate.radiator_thermostat_x_living_room
-            - climate.radiator_thermostat_x_hallway
-            - climate.radiator_thermostat_x_study_room
+      - action: script.hemma_set_radiators_if_cold
         data:
           temperature: 18
           hvac_mode: heat
@@ -119,12 +211,7 @@ automation:
       #   data: { code: "YOUR_CODE" }
 
       # Cool thermostats to 15 °C for sleeping
-      - action: climate.set_temperature
-        target:
-          entity_id:
-            - climate.radiator_thermostat_x_living_room
-            - climate.radiator_thermostat_x_hallway
-            - climate.radiator_thermostat_x_study_room
+      - action: script.hemma_set_radiators_if_cold
         data:
           temperature: 15
           hvac_mode: heat
@@ -170,12 +257,7 @@ automation:
       #   data: { code: "YOUR_CODE" }
 
       # Frost protection — set all thermostats to 12 °C
-      - action: climate.set_temperature
-        target:
-          entity_id:
-            - climate.radiator_thermostat_x_living_room
-            - climate.radiator_thermostat_x_hallway
-            - climate.radiator_thermostat_x_study_room
+      - action: script.hemma_set_radiators_if_cold
         data:
           temperature: 12
           hvac_mode: heat
@@ -213,12 +295,7 @@ automation:
       #   data: { code: "YOUR_CODE" }
 
       # Frost protection — set all thermostats to 12 °C
-      - action: climate.set_temperature
-        target:
-          entity_id:
-            - climate.radiator_thermostat_x_living_room
-            - climate.radiator_thermostat_x_hallway
-            - climate.radiator_thermostat_x_study_room
+      - action: script.hemma_set_radiators_if_cold
         data:
           temperature: 12
           hvac_mode: heat
@@ -315,12 +392,7 @@ automation:
       #   data: { code: "YOUR_CODE" }
 
       # Keep climate comfortable for pets (20 °C)
-      - action: climate.set_temperature
-        target:
-          entity_id:
-            - climate.radiator_thermostat_x_living_room
-            - climate.radiator_thermostat_x_hallway
-            - climate.radiator_thermostat_x_study_room
+      - action: script.hemma_set_radiators_if_cold
         data:
           temperature: 20
           hvac_mode: heat
@@ -392,3 +464,17 @@ automation:
           name: "Home Mode"
           message: "Bypass window ended — reverted to Home mode"
           entity_id: input_select.hemma_home_state
+
+  - id: hemma_radiators_sync_on_weather_change
+    alias: "Climate - Sync radiators when outdoor temperature changes"
+    description: >-
+      Re-syncs radiators whenever outdoor temperature changes: off above 20°C,
+      otherwise apply the current Home Mode target. Also runs at HA startup.
+    trigger:
+      - trigger: state
+        entity_id: sensor.hemma_outdoor_temperature
+      - trigger: homeassistant
+        event: start
+    action:
+      - action: script.hemma_sync_radiators_from_home_mode
+    mode: single

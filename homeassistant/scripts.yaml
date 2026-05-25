@@ -171,8 +171,13 @@ start_dishwasher:
             {% set tt = as_timestamp(strptime(t ~ ' ' ~ now().strftime('%Y-%m-%d'), '%H:%M:%S %Y-%m-%d')) %}
             {% set nt = as_timestamp(now()) %}
             {% set diff = (tt - nt) | int %}
-            {% set secs = (diff if diff > 0 else diff + 86400) %}
-            {{ secs if secs > 60 else 0 }}
+            {% if diff > 60 %}
+              {{ diff }}
+            {% elif diff >= -120 %}
+              0
+            {% else %}
+              {{ diff + 86400 }}
+            {% endif %}
           {% endif %}
 
 # Washer start (ThinQ): use washer option select API.
