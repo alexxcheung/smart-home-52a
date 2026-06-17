@@ -148,19 +148,19 @@ automation:
           reason: "Manual refresh"
       - action: script.hemma_send_device_status_notification
         data:
-          entity_id: sensor.bosch_dishwasher_operation_state
+          entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'dishwasher_operation_state') }}"
           label: "Dishwasher"
           value: "{{ states('sensor.bosch_dishwasher_operation_state') | replace('_', ' ') | title }}"
           reason: "Manual refresh"
       - action: script.hemma_send_device_status_notification
         data:
-          entity_id: sensor.washer_current_status
+          entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'washer_current_status') }}"
           label: "Washer"
           value: "{{ states('sensor.washer_current_status') | replace('_', ' ') | title }}"
           reason: "Manual refresh"
       - action: script.hemma_send_device_status_notification
         data:
-          entity_id: humidifier.probreeze_dehumidifier
+          entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier') }}"
           label: "Dehumidifier"
           value: >-
             {{ states('humidifier.probreeze_dehumidifier') | title }}{% if state_attr('humidifier.probreeze_dehumidifier', 'current_humidity') is not none %} · {{ state_attr('humidifier.probreeze_dehumidifier', 'current_humidity') }}%{% endif %}{% if state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none %} -> {{ state_attr('humidifier.probreeze_dehumidifier', 'humidity') }}%{% endif %}
@@ -226,7 +226,7 @@ automation:
             sequence:
               - action: script.hemma_send_device_status_notification
                 data:
-                  entity_id: sensor.bosch_dishwasher_operation_state
+                  entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'dishwasher_operation_state') }}"
                   label: "Dishwasher"
                   value: "Program started"
                   reason: "Program started"
@@ -241,7 +241,7 @@ automation:
             sequence:
               - action: script.hemma_send_device_status_notification
                 data:
-                  entity_id: sensor.bosch_dishwasher_operation_state
+                  entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'dishwasher_operation_state') }}"
                   label: "Dishwasher"
                   value: "Program finished"
                   reason: "Program ended"
@@ -256,7 +256,7 @@ automation:
             sequence:
               - action: script.hemma_send_device_status_notification
                 data:
-                  entity_id: sensor.washer_current_status
+                  entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'washer_current_status') }}"
                   label: "Washer"
                   value: "Program started"
                   reason: "Program started"
@@ -271,7 +271,7 @@ automation:
             sequence:
               - action: script.hemma_send_device_status_notification
                 data:
-                  entity_id: sensor.washer_current_status
+                  entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'washer_current_status') }}"
                   label: "Washer"
                   value: "Program finished"
                   reason: "Program ended"
@@ -281,11 +281,11 @@ automation:
     alias: "Area - Front Door Camera Detection Notifications"
     description: Notify when front door camera detects someone
     trigger:
-      - trigger: device
-        device_id: 19aa0b4688f45d61d8f0e337f0e4d023
-        entity_id: 0f636de54f26d61063b0dfc3481a400c
-        domain: switch
-        type: turned_on
+      - trigger: state
+        entity_id: event.ring_motion
+        not_from:
+          - unknown
+          - unavailable
     condition:
       - condition: state
         entity_id: input_boolean.hemma_architectural_notifications_enabled
@@ -293,7 +293,7 @@ automation:
     action:
       - action: script.hemma_send_device_status_notification
         data:
-          entity_id: camera.front_door_live_view
+          entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'ring_live_view') }}"
           label: "Front Door Camera"
           value: "detected someone at the front door"
           reason: "Person/motion detected"

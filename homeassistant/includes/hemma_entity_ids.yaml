@@ -1,0 +1,146 @@
+# Hemma semantic entity ID registry
+# ============================================================================
+# Single source of truth for entity IDs used across dashboards, automations,
+# scripts, and packages. Update here when an integration is re-added or
+# entities are renamed in Home Assistant.
+#
+# Usage:
+#   Lovelace (button-card):
+#     variables:
+#       eids: !include /config/includes/hemma_entity_ids.yaml
+#     entity: '[[[ return variables.eids.ring_live_view ]]]'
+#
+#   Automations / scripts (Jinja) — actions and conditions:
+#     entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'ring_live_view') }}"
+#
+#   Button-card JavaScript:
+#     const EID = states['sensor.hemma_entity_ids']?.attributes ?? {};
+#     states[EID.ring_battery]
+#
+#   State/event triggers cannot template entity_id — keep these in sync manually:
+#     ring_motion_event              → packages/hemma_architectural_notifications.yaml
+#                                      automations.yaml (Area - Entrance - Motion Detected Front Door)
+#     dishwasher_operation_state     → packages/hemma_appliance_connect_monitor.yaml
+#     washer_current_status          → packages/hemma_appliance_connect_monitor.yaml
+#     dehumidifier                   → packages/hemma_appliance_connect_monitor.yaml
+#                                      automations.yaml (dehumidifier automations)
+# ============================================================================
+
+# --- Ring doorbell (Front Door area) ---
+ring_live_view: camera.ring_live_view
+ring_battery: sensor.ring_battery
+ring_motion_event: event.ring_motion
+ring_ding_event: event.ring_ding
+ring_volume: number.ring_volume
+ring_last_activity: sensor.ring_last_activity
+ring_signal_strength: sensor.ring_signal_strength
+ring_wifi_signal_category: sensor.ring_wi_fi_signal_category
+
+# --- Ring door chime (Living Room area) ---
+door_chime_volume: number.door_chime_volume_2
+door_chime_siren: siren.door_chime_siren_2
+door_chime_signal_strength: sensor.door_chime_signal_strength
+door_chime_wifi_signal_category: sensor.door_chime_wi_fi_signal_category
+
+# --- Front door lights (Hue; not Ring) ---
+light_front_door: light.front_door
+light_genkan: light.xuan_guan
+
+# --- Bosch dishwasher (Home Connect) ---
+dishwasher_device_id: 919d3f00e9c673b530063b28e7189865
+dishwasher_operation_state: sensor.bosch_dishwasher_operation_state
+dishwasher_programme_finish_time: sensor.bosch_dishwasher_programme_finish_time
+dishwasher_programme_progress: sensor.bosch_dishwasher_programme_progress
+dishwasher_door: sensor.bosch_dishwasher_door
+dishwasher_selected_programme: select.bosch_dishwasher_selected_programme
+dishwasher_start_in_relative: number.bosch_dishwasher_start_in_relative
+dishwasher_power: switch.bosch_dishwasher_power
+dishwasher_stop_programme: button.bosch_dishwasher_stop_programme
+dishwasher_salt_nearly_empty: sensor.dishwasher_salt_nearly_empty
+dishwasher_rinse_aid_nearly_empty: sensor.dishwasher_rinse_aid_nearly_empty
+dishwasher_delay_start: input_boolean.hemma_dishwasher_delay_start
+dishwasher_start_at: input_datetime.hemma_dishwasher_start_at
+
+# --- LG washer (ThinQ) ---
+washer_current_status: sensor.washer_current_status
+washer_remaining_time: sensor.washer_remaining_time
+washer_total_time: sensor.washer_total_time
+washer_remote_start: binary_sensor.washer_remote_start
+washer_power: switch.washer_power
+washer_operation: select.washer_operation
+washer_delay_start: input_boolean.hemma_washer_delay_start
+washer_delay_start_ui: input_boolean.hemma_washer_delay_start_ui
+washer_start_at: input_datetime.hemma_washer_start_at
+
+# --- ProBreeze dehumidifier ---
+dehumidifier: humidifier.probreeze_dehumidifier
+dehumidifier_temperature: sensor.probreeze_dehumidifier_temperature
+dehumidifier_tank: binary_sensor.probreeze_dehumidifier_tank
+dehumidifier_defrost: binary_sensor.probreeze_dehumidifier_defrost
+dehumidifier_problem: binary_sensor.probreeze_dehumidifier_problem
+dehumidifier_target_humidity: input_number.hemma_dehumidifier_target_humidity
+
+# --- Climate / radiators ---
+climate_living_room: climate.radiator_thermostat_x_living_room
+climate_hallway: climate.radiator_thermostat_x_hallway
+climate_study: climate.radiator_thermostat_x_study_room
+temp_living_room: sensor.radiator_thermostat_x_living_room_temperature
+temp_hallway: sensor.radiator_thermostat_x_hallway_temperature
+temp_study: sensor.radiator_thermostat_x_study_temperature
+humidity_hallway: sensor.smart_radiator_thermostat_x_humidity_2
+humidity_study: sensor.smart_radiator_thermostat_x_humidity
+outdoor_temperature: sensor.hemma_outdoor_temperature
+
+# --- Lights ---
+light_sofa: light.sofa_light
+light_floor_living: light.floor_light
+light_bedroom_strip: light.hue_lightstrip_plus_1
+light_alex_desk: light.alex_desk_light
+light_sammy_desk: light.sammy_desk_light
+light_study_floor: light.study_floor_light
+switch_study_downlight: switch.zbminil2_study_downlight
+
+# --- Media players ---
+media_tv: media_player.samsung_qb90_qe65qn90batxxu
+media_sonos_arc: media_player.sonos_arc
+media_homepod_living: media_player.homepod_living_room
+
+# --- Weather ---
+weather_home: weather.forecast_home
+weather_today_range: sensor.hemma_weather_today_range
+
+# --- Presence ---
+presence_alex: sensor.presence_alex
+presence_sammy: sensor.presence_sammy
+presence_alex_select: input_select.presence_alex
+presence_sammy_select: input_select.presence_sammy
+device_tracker_alex: device_tracker.imalex_17
+device_tracker_sammy: device_tracker.imsammy_iphone
+
+# --- Octopus Agile ---
+octopus_current_rate: sensor.octopus_energy_electricity_20l3765434_2000057767569_current_rate
+octopus_next_day_rates: event.octopus_energy_electricity_20l3765434_2000057767569_next_day_rates
+
+# --- Printer ---
+printer: sensor.hp_officejet_pro_9720e_series
+
+# --- Hemma helpers ---
+home_state: input_select.hemma_home_state
+thermostat_overlay: input_boolean.hemma_thermostat_overlay
+thermostat_target_temperature: input_number.hemma_thermostat_target_temperature
+thermostat_mode: input_select.hemma_thermostat_mode
+architectural_notifications_enabled: input_boolean.hemma_architectural_notifications_enabled
+
+# --- Battery monitor (Engine strip) ---
+battery_radiator_1: binary_sensor.smart_radiator_thermostat_x_battery
+battery_radiator_2: binary_sensor.smart_radiator_thermostat_x_battery_2
+battery_radiator_3: binary_sensor.smart_radiator_thermostat_x_battery_3
+battery_alex_iphone: sensor.imalex_17_battery_level
+battery_alex_iphone_state: sensor.imalex_17_battery_state
+battery_alex_ipad: sensor.imalex_ipad_battery_level
+battery_alex_ipad_state: sensor.imalex_ipad_battery_state
+battery_alex_mac: sensor.imalex_mac_internal_battery_level
+battery_alex_mac_state: sensor.imalex_mac_internal_battery_state
+battery_sammy_iphone: sensor.imsammy_iphone_battery_level
+battery_sammy_iphone_state: sensor.imsammy_iphone_battery_state
+battery_study_downlight: sensor.zbminil2_study_downlight_battery

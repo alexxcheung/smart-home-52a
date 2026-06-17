@@ -1,5 +1,6 @@
 # hemma_dehumidifier/hemma_dehumidifier.yaml
 # Dehumidifier card for Probreeze Dehumidifier
+# Entity IDs: includes/hemma_entity_ids.yaml (dehumidifier_* keys)
 # Tap → Bubble Card pop-up on Hallway (navigate to #hemma-dehumidifier). Requires Bubble Card on dashboard.
 
 hemma_dehumidifier:
@@ -7,6 +8,7 @@ hemma_dehumidifier:
   variables:
     icon: dehumidifier
   triggers_update:
+    - sensor.hemma_entity_ids
     - humidifier.probreeze_dehumidifier
     - binary_sensor.probreeze_dehumidifier_tank
     - binary_sensor.probreeze_dehumidifier_defrost
@@ -15,32 +17,33 @@ hemma_dehumidifier:
 
   state_display: |
     [[[
-      const h = states['humidifier.probreeze_dehumidifier'];
+      const EID = states['sensor.hemma_entity_ids']?.attributes ?? {};
+      const h = states[EID.dehumidifier];
       const state = h?.state;
       if (!h || state === 'unavailable' || state === 'unknown' || state === '') return 'Disconnected';
       if (state === 'off') return 'Off';
-      
+
       const current = h?.attributes?.current_humidity;
       const target = h?.attributes?.humidity;
       const mode = h?.attributes?.mode;
-      
+
       const modeLabels = {
         auto: 'Auto',
         continuous: 'Continuous',
         boost: 'Boost',
         laundry: 'Laundry'
       };
-      
-      const tankFull = states['binary_sensor.probreeze_dehumidifier_tank']?.state === 'on';
-      const defrost = states['binary_sensor.probreeze_dehumidifier_defrost']?.state === 'on';
-      const problem = states['binary_sensor.probreeze_dehumidifier_problem']?.state === 'on';
-      
+
+      const tankFull = states[EID.dehumidifier_tank]?.state === 'on';
+      const defrost = states[EID.dehumidifier_defrost]?.state === 'on';
+      const problem = states[EID.dehumidifier_problem]?.state === 'on';
+
       if (tankFull) return '⚠ Tank Full';
       if (problem) return '⚠ Problem';
       if (defrost) return 'Defrosting';
-      
+
       let display = `${current}%`;
-      const helperRaw = states['input_number.hemma_dehumidifier_target_humidity']?.state;
+      const helperRaw = states[EID.dehumidifier_target_humidity]?.state;
       const helperTgt = helperRaw != null && helperRaw !== 'unavailable' && helperRaw !== 'unknown' && helperRaw !== ''
         ? parseFloat(helperRaw)
         : NaN;
@@ -48,7 +51,7 @@ hemma_dehumidifier:
       const targetPct = !Number.isNaN(helperTgt) ? Math.round(helperTgt) : deviceTgt;
       if (targetPct != null && !Number.isNaN(Number(targetPct))) display += ` → ${targetPct}%`;
       if (mode && modeLabels[mode]) display += ` · ${modeLabels[mode]}`;
-      
+
       return display;
     ]]]
 
@@ -56,11 +59,12 @@ hemma_dehumidifier:
     state:
       - color: |
           [[[
-            const state = states['humidifier.probreeze_dehumidifier']?.state;
+            const EID = states['sensor.hemma_entity_ids']?.attributes ?? {};
+            const state = states[EID.dehumidifier]?.state;
             if (state === 'unavailable' || state === 'unknown' || state === '') return 'var(--secondary-text-color)';
-            const tankFull = states['binary_sensor.probreeze_dehumidifier_tank']?.state === 'on';
-            const problem = states['binary_sensor.probreeze_dehumidifier_problem']?.state === 'on';
-            
+            const tankFull = states[EID.dehumidifier_tank]?.state === 'on';
+            const problem = states[EID.dehumidifier_problem]?.state === 'on';
+
             if (tankFull || problem) return '#f4a261';
             if (state === 'on') return '#6bcb77';
             return 'var(--secondary-text-color)';

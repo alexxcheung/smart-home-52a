@@ -53,64 +53,72 @@ hemma_dehumidifier_humidity_minus_1:
   alias: "Dehumidifier target −1 (device)"
   sequence:
     - variables:
-        cur: "{{ (state_attr('humidifier.probreeze_dehumidifier', 'humidity') if state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none else states('input_number.hemma_dehumidifier_target_humidity')) | int(50) }}"
+        dehumidifier: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier') }}"
+        target_helper: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier_target_humidity') }}"
+        cur: "{{ (state_attr(dehumidifier, 'humidity') if state_attr(dehumidifier, 'humidity') is not none else states(target_helper)) | int(50) }}"
         new_h: "{{ [[cur - 1, 30] | max, 80] | min }}"
     - action: humidifier.set_humidity
       target:
-        entity_id: humidifier.probreeze_dehumidifier
+        entity_id: "{{ dehumidifier }}"
       data:
         humidity: "{{ new_h }}"
     - action: input_number.set_value
       target:
-        entity_id: input_number.hemma_dehumidifier_target_humidity
+        entity_id: "{{ target_helper }}"
       data:
         value: "{{ new_h }}"
 hemma_dehumidifier_humidity_minus_5:
   alias: "Dehumidifier target −5 (device)"
   sequence:
     - variables:
-        cur: "{{ (state_attr('humidifier.probreeze_dehumidifier', 'humidity') if state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none else states('input_number.hemma_dehumidifier_target_humidity')) | int(50) }}"
+        dehumidifier: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier') }}"
+        target_helper: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier_target_humidity') }}"
+        cur: "{{ (state_attr(dehumidifier, 'humidity') if state_attr(dehumidifier, 'humidity') is not none else states(target_helper)) | int(50) }}"
         new_h: "{{ [[cur - 5, 30] | max, 80] | min }}"
     - action: humidifier.set_humidity
       target:
-        entity_id: humidifier.probreeze_dehumidifier
+        entity_id: "{{ dehumidifier }}"
       data:
         humidity: "{{ new_h }}"
     - action: input_number.set_value
       target:
-        entity_id: input_number.hemma_dehumidifier_target_humidity
+        entity_id: "{{ target_helper }}"
       data:
         value: "{{ new_h }}"
 hemma_dehumidifier_humidity_plus_1:
   alias: "Dehumidifier target +1 (device)"
   sequence:
     - variables:
-        cur: "{{ (state_attr('humidifier.probreeze_dehumidifier', 'humidity') if state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none else states('input_number.hemma_dehumidifier_target_humidity')) | int(50) }}"
+        dehumidifier: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier') }}"
+        target_helper: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier_target_humidity') }}"
+        cur: "{{ (state_attr(dehumidifier, 'humidity') if state_attr(dehumidifier, 'humidity') is not none else states(target_helper)) | int(50) }}"
         new_h: "{{ [[cur + 1, 30] | max, 80] | min }}"
     - action: humidifier.set_humidity
       target:
-        entity_id: humidifier.probreeze_dehumidifier
+        entity_id: "{{ dehumidifier }}"
       data:
         humidity: "{{ new_h }}"
     - action: input_number.set_value
       target:
-        entity_id: input_number.hemma_dehumidifier_target_humidity
+        entity_id: "{{ target_helper }}"
       data:
         value: "{{ new_h }}"
 hemma_dehumidifier_humidity_plus_5:
   alias: "Dehumidifier target +5 (device)"
   sequence:
     - variables:
-        cur: "{{ (state_attr('humidifier.probreeze_dehumidifier', 'humidity') if state_attr('humidifier.probreeze_dehumidifier', 'humidity') is not none else states('input_number.hemma_dehumidifier_target_humidity')) | int(50) }}"
+        dehumidifier: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier') }}"
+        target_helper: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier_target_humidity') }}"
+        cur: "{{ (state_attr(dehumidifier, 'humidity') if state_attr(dehumidifier, 'humidity') is not none else states(target_helper)) | int(50) }}"
         new_h: "{{ [[cur + 5, 30] | max, 80] | min }}"
     - action: humidifier.set_humidity
       target:
-        entity_id: humidifier.probreeze_dehumidifier
+        entity_id: "{{ dehumidifier }}"
       data:
         humidity: "{{ new_h }}"
     - action: input_number.set_value
       target:
-        entity_id: input_number.hemma_dehumidifier_target_humidity
+        entity_id: "{{ target_helper }}"
       data:
         value: "{{ new_h }}"
 
@@ -118,11 +126,14 @@ hemma_dehumidifier_humidity_plus_5:
 hemma_dehumidifier_target_apply:
   alias: "Dehumidifier - Apply helper target to device"
   sequence:
+    - variables:
+        dehumidifier: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier') }}"
+        target_helper: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier_target_humidity') }}"
     - action: humidifier.set_humidity
       target:
-        entity_id: humidifier.probreeze_dehumidifier
+        entity_id: "{{ dehumidifier }}"
       data:
-        humidity: "{{ states('input_number.hemma_dehumidifier_target_humidity') | int }}"
+        humidity: "{{ states(target_helper) | int }}"
 
 # Thermostat: set temperature and close overlay
 hemma_thermostat_set_and_close:
@@ -148,25 +159,29 @@ start_dishwasher_now:
   sequence:
     - action: home_connect.set_program_and_options
       data:
-        device_id: 919d3f00e9c673b530063b28e7189865
+        device_id: "{{ state_attr('sensor.hemma_entity_ids', 'dishwasher_device_id') }}"
         affects_to: active_program
-        program: "{{ states('select.bosch_dishwasher_selected_programme') }}"
+        program: "{{ states(state_attr('sensor.hemma_entity_ids', 'dishwasher_selected_programme')) }}"
         b_s_h_common_option_start_in_relative: "0"
 
 # Start now or at [time]: if delay-start toggle is on, use "Start at" time; otherwise delay 0.
 start_dishwasher:
   alias: "Start Dishwasher"
   sequence:
+    - variables:
+        dishwasher_delay_start: "{{ state_attr('sensor.hemma_entity_ids', 'dishwasher_delay_start') }}"
+        dishwasher_start_at: "{{ state_attr('sensor.hemma_entity_ids', 'dishwasher_start_at') }}"
+        dishwasher_selected_programme: "{{ state_attr('sensor.hemma_entity_ids', 'dishwasher_selected_programme') }}"
     - action: home_connect.set_program_and_options
       data:
-        device_id: 919d3f00e9c673b530063b28e7189865
+        device_id: "{{ state_attr('sensor.hemma_entity_ids', 'dishwasher_device_id') }}"
         affects_to: active_program
-        program: "{{ states('select.bosch_dishwasher_selected_programme') }}"
+        program: "{{ states(dishwasher_selected_programme) }}"
         b_s_h_common_option_start_in_relative: >
-          {% if states('input_boolean.hemma_dishwasher_delay_start') != 'on' %}
+          {% if states(dishwasher_delay_start) != 'on' %}
             0
           {% else %}
-            {% set t_raw = states('input_datetime.hemma_dishwasher_start_at') %}
+            {% set t_raw = states(dishwasher_start_at) %}
             {% set t = t_raw ~ ':00' if (t_raw.split(':') | length) == 2 else t_raw %}
             {% set tt = as_timestamp(strptime(t ~ ' ' ~ now().strftime('%Y-%m-%d'), '%H:%M:%S %Y-%m-%d')) %}
             {% set nt = as_timestamp(now()) %}
@@ -186,7 +201,7 @@ start_washing_machine:
   sequence:
     - action: select.select_option
       data:
-        entity_id: select.washer_operation
+        entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'washer_operation') }}"
         option: start
 
 # Washer delay-start (local HA scheduler):
@@ -196,7 +211,7 @@ start_washing_machine_with_delay:
   sequence:
     - action: input_boolean.turn_on
       target:
-        entity_id: input_boolean.hemma_washer_delay_start
+        entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'washer_delay_start') }}"
     - action: input_boolean.turn_off
       target:
-        entity_id: input_boolean.hemma_washer_delay_start_ui
+        entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'washer_delay_start_ui') }}"

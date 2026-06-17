@@ -34,7 +34,7 @@ input_select:
 template:
   - trigger:
       - trigger: state
-        entity_id: weather.forecast_home
+        entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'weather_home') }}"
         attribute: temperature
       - trigger: homeassistant
         event: start
@@ -189,7 +189,7 @@ automation:
 
       # Restore Ring doorbell chime volume
       - action: number.set_value
-        target: { entity_id: number.door_chime_volume }
+        target: { entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'door_chime_volume') }}" }
         data: { value: 11 }
 
       - action: logbook.log
@@ -235,7 +235,7 @@ automation:
       #   target: { entity_id: [ media_player.samsung_qb90_qe65qn90batxxu, media_player.sonos_arc ] }
 
       - action: number.set_value
-        target: { entity_id: number.door_chime_volume }
+        target: { entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'door_chime_volume') }}" }
         data: { value: 0 }
 
       - action: logbook.log
@@ -267,7 +267,7 @@ automation:
       #   target: { entity_id: [ switch.YOUR_PLUG_1, switch.YOUR_PLUG_2 ] }
 
       - action: number.set_value
-        target: { entity_id: number.door_chime_volume }
+        target: { entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'door_chime_volume') }}" }
         data: { value: 0 }
 
       - action: script.turn_on
@@ -310,7 +310,7 @@ automation:
               entity_id: "{{ away_lights }}"
       - action: switch.turn_off
         target:
-          entity_id: switch.zbminil2_study_downlight
+          entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'switch_study_downlight') }}"
       - if:
           - condition: template
             value_template: "{{ away_media_players | count > 0 }}"
@@ -325,7 +325,7 @@ automation:
       #   target: { entity_id: [ switch.YOUR_PLUG_1, switch.YOUR_PLUG_2 ] }
 
       - action: number.set_value
-        target: { entity_id: number.door_chime_volume }
+        target: { entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'door_chime_volume') }}" }
         data: { value: 0 }
 
       - action: logbook.log
@@ -370,7 +370,7 @@ automation:
       #   data: { message: "command_dnd_priority_only" }
 
       - action: number.set_value
-        target: { entity_id: number.door_chime_volume }
+        target: { entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'door_chime_volume') }}" }
         data: { value: 11 }
 
       - action: logbook.log
@@ -407,7 +407,7 @@ automation:
         data:
           brightness_pct: 20
       - action: number.set_value
-        target: { entity_id: number.door_chime_volume }
+        target: { entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'door_chime_volume') }}" }
         data: { value: 0 }
 
       - action: logbook.log
@@ -425,7 +425,7 @@ automation:
     action:
       # Silence Ring doorbell chime
       - action: number.set_value
-        target: { entity_id: number.door_chime_volume }
+        target: { entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'door_chime_volume') }}" }
         data: { value: 0 }
 
       - action: logbook.log
@@ -451,7 +451,7 @@ automation:
       #   target: { entity_id: lock.YOUR_BACK_DOOR }
 
       - action: number.set_value
-        target: { entity_id: number.door_chime_volume }
+        target: { entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'door_chime_volume') }}" }
         data: { value: 11 }
 
       # Auto-revert to Home after 2 hours
@@ -472,7 +472,7 @@ automation:
       otherwise apply the current Home Mode target. Also runs at HA startup.
     trigger:
       - trigger: state
-        entity_id: sensor.hemma_outdoor_temperature
+        entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'outdoor_temperature') }}"
       - trigger: homeassistant
         event: start
     action:

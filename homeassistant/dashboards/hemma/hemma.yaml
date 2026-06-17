@@ -51,6 +51,7 @@ views:
         template: hemma_room
         name: Home
         variables:
+          eids: !include /config/includes/hemma_entity_ids.yaml
           # Image Configuration
           # Place your images at: /config/www/hemma/rooms/home.jpg (light mode)
           #                       /config/www/hemma/rooms/home-night.jpg (dark mode)
@@ -64,24 +65,24 @@ views:
           # Presence Badges (optional - requires person/status sensors)
           # These show who's home on the hero card
           show_presence: true
-          presence_entity_1: sensor.presence_alex
-          presence_entity_2: sensor.presence_sammy
+          presence_entity_1: '[[[ return variables.eids.presence_alex ]]]'
+          presence_entity_2: '[[[ return variables.eids.presence_sammy ]]]'
 
           # Media Player Badges (shows what's playing across rooms)
           show_media_badge: true
           pause_timeout_minutes: 5
           show_media_player_1: true
-          media_player_1: media_player.samsung_qb90_qe65qn90batxxu
+          media_player_1: '[[[ return variables.eids.media_tv ]]]'
           show_media_player_2: true
-          media_player_2: media_player.sonos_arc
+          media_player_2: '[[[ return variables.eids.media_sonos_arc ]]]'
           show_media_player_3: true
-          media_player_3: media_player.homepod_living_room
+          media_player_3: '[[[ return variables.eids.media_homepod_living ]]]'
 
           # Weather Widget
           show_weather: true
-          weather_mode: outdoor                         
-          weather_entity: weather.forecast_home
-          weather_temp_sensor: state_attr('weather.forecast_home', 'temperature')
+          weather_mode: outdoor
+          weather_entity: '[[[ return variables.eids.weather_home ]]]'
+          weather_temp_sensor: ''
 
           # Temperature Unit (affects comfort labels like "Cool", "Warm", etc.)
           temp_unit: 'C'                                  # 'F' for Fahrenheit, 'C' for Celsius
@@ -100,26 +101,29 @@ views:
         cards:
           - type: custom:button-card
             template: hemma_doorbell
-            entity: camera.front_door_live_view 
+            variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
+              icon: doorbell
+              battery_entity: '[[[ return variables.eids.ring_battery ]]]'
+            entity: '[[[ return variables.eids.ring_live_view ]]]'
             camera_view: live
             name: Front Door
-            variables:
-              icon: doorbell
-              battery_entity: sensor.front_door_battery
           # Lights
           - type: custom:button-card
             template: hemma_light
-            entity: light.xuan_guan
-            name: Genkan light
             variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
               icon: light
+            entity: '[[[ return variables.eids.light_genkan ]]]'
+            name: Genkan light
 
           - type: custom:button-card
             template: hemma_light
-            entity: light.front_door
-            name: Door light
             variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
               icon: light
+            entity: '[[[ return variables.eids.light_front_door ]]]'
+            name: Door light
 
       # Weather forecast Bubble (hash #hemma-weather-forecast)
       - !include /config/dashboards/templates/button_cards/cards/hemma_weather/hemma_weather_bubble_popup.yml
@@ -227,34 +231,38 @@ views:
           # Radiator
           - type: custom:button-card
             template: hemma_thermostat
-            entity: climate.radiator_thermostat_x_living_room
-            name: Thermostat
             variables:
-              temp_sensor: sensor.radiator_thermostat_x_living_room_temperature
+              eids: !include /config/includes/hemma_entity_ids.yaml
+              temp_sensor: '[[[ return variables.eids.temp_living_room ]]]'
               thermostat_toggle_helper: input_boolean.hemma_thermostat_overlay
+            entity: '[[[ return variables.eids.climate_living_room ]]]'
+            name: Thermostat
 
           # Light
           - type: custom:button-card
-            template: hemma_light  
-            entity: light.sofa_light
-            name: Floor Lamp
+            template: hemma_light
             variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
               icon: lamp
+            entity: '[[[ return variables.eids.light_sofa ]]]'
+            name: Floor Lamp
 
           - type: custom:button-card
-            template: hemma_light  
-            entity: light.floor_light
-            name: Floor Lightstrip
+            template: hemma_light
             variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
               icon: light
-          
+            entity: '[[[ return variables.eids.light_floor_living ]]]'
+            name: Floor Lightstrip
+
           # Media
           - type: custom:button-card
-            template: hemma_entity 
-            entity: media_player.samsung_qb90_qe65qn90batxxu
-            name: Samsung TV
+            template: hemma_entity
             variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
               icon: tv
+            entity: '[[[ return variables.eids.media_tv ]]]'
+            name: Samsung TV
             # This section ensures it turns 'Active' (blue/white) when the TV is on
             state:
               - operator: template
@@ -263,10 +271,11 @@ views:
           
           - type: custom:button-card
             template: hemma_entity
-            entity: media_player.sonos_arc
-            name: Sonos Arc
             variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
               icon: speaker
+            entity: '[[[ return variables.eids.media_sonos_arc ]]]'
+            name: Sonos Arc
             tap_action:
               action: more-info # Tap the name/card for volume
 
@@ -309,7 +318,9 @@ views:
         # Dishwasher
           - type: custom:button-card
             template: hemma_dishwasher
-            entity: sensor.bosch_dishwasher_operation_state
+            variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
+            entity: '[[[ return variables.eids.dishwasher_operation_state ]]]'
             name: Dishwasher
 
       # Bubble Card pop-ups (must be last on this view; dishwasher hash listener must be the final popup card per Bubble README)
@@ -333,15 +344,16 @@ views:
         template: hemma_room
         name: Hallway
         variables:
+          eids: !include /config/includes/hemma_entity_ids.yaml
           image: hallway
           image_ext: png
           image_position: center center
 
           show_temp: true
-          temp_sensor: sensor.radiator_thermostat_x_hallway_temperature
+          temp_sensor: '[[[ return variables.eids.temp_hallway ]]]'
 
           show_humidity: true
-          humidity_sensor: sensor.smart_radiator_thermostat_x_humidity_2
+          humidity_sensor: '[[[ return variables.eids.humidity_hallway ]]]'
 
           show_quality: false
           quality_sensor: sensor.YOUR_AIR_QUALITY
@@ -366,22 +378,27 @@ views:
         # Radiator
           - type: custom:button-card
             template: hemma_thermostat
-            entity: climate.radiator_thermostat_x_hallway
-            name: Thermostat
             variables:
-              temp_sensor: sensor.radiator_thermostat_x_hallway_temperature
+              eids: !include /config/includes/hemma_entity_ids.yaml
+              temp_sensor: '[[[ return variables.eids.temp_hallway ]]]'
               thermostat_toggle_helper: input_boolean.hemma_thermostat_overlay
+            entity: '[[[ return variables.eids.climate_hallway ]]]'
+            name: Thermostat
 
         # Washing Machine
           - type: custom:button-card
             template: hemma_washer
-            entity: sensor.washer_current_status
+            variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
+            entity: '[[[ return variables.eids.washer_current_status ]]]'
             name: Washing Machine
-        
+
         # Dehumidifier
           - type: custom:button-card
             template: hemma_dehumidifier
-            entity: humidifier.probreeze_dehumidifier
+            variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
+            entity: '[[[ return variables.eids.dehumidifier ]]]'
             name: Dehumidifier
 
       # Bubble Card pop-ups (must be last on this view)
@@ -441,11 +458,12 @@ views:
         cards:
           # Light
           - type: custom:button-card
-            template: hemma_light  
-            entity: light.hue_lightstrip_plus_1
-            name: Floor lightstrip
+            template: hemma_light
             variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
               icon: light
+            entity: '[[[ return variables.eids.light_bedroom_strip ]]]'
+            name: Floor lightstrip
 
       # Scene picker pop-up (must be last on this view; hash #hemma-scenes-bedroom)
       - !include /config/dashboards/templates/button_cards/cards/hemma_scenes/hemma_scenes_bedroom_bubble_popup.yml
@@ -467,15 +485,16 @@ views:
         template: hemma_room
         name: Study
         variables:
+          eids: !include /config/includes/hemma_entity_ids.yaml
           image: studyroom
           image_ext: png
           image_position: center center
 
           show_temp: true
-          temp_sensor: sensor.radiator_thermostat_x_study_temperature
+          temp_sensor: '[[[ return variables.eids.temp_study ]]]'
 
           show_humidity: true
-          humidity_sensor: sensor.smart_radiator_thermostat_x_humidity
+          humidity_sensor: '[[[ return variables.eids.humidity_study ]]]'
 
           show_quality: false
           quality_sensor: sensor.YOUR_BEDROOM_AIR_QUALITY
@@ -504,40 +523,45 @@ views:
           # Radiator
           - type: custom:button-card
             template: hemma_thermostat
-            entity: climate.radiator_thermostat_x_study_room
-            name: Thermostat
             variables:
-              temp_sensor: sensor.radiator_thermostat_x_study_temperature
+              eids: !include /config/includes/hemma_entity_ids.yaml
+              temp_sensor: '[[[ return variables.eids.temp_study ]]]'
               thermostat_toggle_helper: input_boolean.hemma_thermostat_overlay
+            entity: '[[[ return variables.eids.climate_study ]]]'
+            name: Thermostat
 
           # Light
           - type: custom:button-card
-            template: hemma_light  
-            entity: light.alex_desk_light
+            template: hemma_light
+            variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
+              icon: light
+            entity: '[[[ return variables.eids.light_alex_desk ]]]'
             name: Alex Desk
-            variables:
-              icon: light
-
-          - type: custom:button-card
-            template: hemma_light  
-            entity: light.sammy_desk_light
-            name: Sammy Desk
-            variables:
-              icon: light
-
-          - type: custom:button-card
-            template: hemma_light  
-            entity: light.study_floor_light
-            name: Floor Light
-            variables:
-              icon: light
 
           - type: custom:button-card
             template: hemma_light
-            entity: switch.zbminil2_study_downlight
-            name: Downlight
             variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
               icon: light
+            entity: '[[[ return variables.eids.light_sammy_desk ]]]'
+            name: Sammy Desk
+
+          - type: custom:button-card
+            template: hemma_light
+            variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
+              icon: light
+            entity: '[[[ return variables.eids.light_study_floor ]]]'
+            name: Floor Light
+
+          - type: custom:button-card
+            template: hemma_light
+            variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
+              icon: light
+            entity: '[[[ return variables.eids.switch_study_downlight ]]]'
+            name: Downlight
             state_display: >
               [[[
                 const s = (entity?.state || '').toLowerCase();
@@ -547,7 +571,9 @@ views:
           # Printer
           - type: custom:button-card
             template: hemma_printer
-            entity: sensor.hp_officejet_pro_9720e_series
+            variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
+            entity: '[[[ return variables.eids.printer ]]]'
             name: Printer
 
       # Scene picker pop-up (must be last on this view; hash #hemma-scenes-study)

@@ -1,6 +1,7 @@
 hemma_dishwasher:
   # -------------------------------------------------------------------------
   # Bosch Dishwasher card — extends hemma_entity
+  # Entity IDs: includes/hemma_entity_ids.yaml (dishwasher_* keys)
   # Tap         → Bubble Card pop-up on Kitchen (navigate to #hemma-dishwasher)
   # Hold        → more-info
   # Double-tap  → turn dishwasher power off
@@ -12,6 +13,7 @@ hemma_dishwasher:
     icon: dishwasher
 
   triggers_update:
+    - sensor.hemma_entity_ids
     - sensor.bosch_dishwasher_operation_state
     - sensor.bosch_dishwasher_programme_finish_time
     - sensor.bosch_dishwasher_programme_progress
@@ -23,9 +25,10 @@ hemma_dishwasher:
 
   state_display: >
     [[[
-      const op   = (states['sensor.bosch_dishwasher_operation_state']?.state ?? '').toString().toLowerCase();
-      const fin  = states['sensor.bosch_dishwasher_programme_finish_time']?.state;
-      const prog = parseFloat(states['sensor.bosch_dishwasher_programme_progress']?.state ?? 0);
+      const EID = states['sensor.hemma_entity_ids']?.attributes ?? {};
+      const op   = (states[EID.dishwasher_operation_state]?.state ?? '').toString().toLowerCase();
+      const fin  = states[EID.dishwasher_programme_finish_time]?.state;
+      const prog = parseFloat(states[EID.dishwasher_programme_progress]?.state ?? 0);
       const secsUntilStartAt = (startAtRaw) => {
         if (!startAtRaw || startAtRaw === 'unknown' || startAtRaw === 'unavailable') return null;
         const p = startAtRaw.split(':').map((x) => parseInt(x, 10));
@@ -49,10 +52,10 @@ hemma_dishwasher:
         return prog > 0 ? `Running · ${prog}%` : 'Running';
       }
       if (op === 'delayedstart') {
-        const delayOn = states['input_boolean.hemma_dishwasher_delay_start']?.state === 'on';
-        const startAt = states['input_datetime.hemma_dishwasher_start_at']?.state;
+        const delayOn = states[EID.dishwasher_delay_start]?.state === 'on';
+        const startAt = states[EID.dishwasher_start_at]?.state;
         const fromStartAt = delayOn ? secsUntilStartAt(startAt) : null;
-        const dSec = fromStartAt ?? parseFloat(states['number.bosch_dishwasher_start_in_relative']?.state ?? 0);
+        const dSec = fromStartAt ?? parseFloat(states[EID.dishwasher_start_in_relative]?.state ?? 0);
         if (dSec > 0) return formatStartsIn(dSec);
       }
       return {
@@ -66,8 +69,9 @@ hemma_dishwasher:
     - operator: template
       value: |
         [[[
+          const EID = states['sensor.hemma_entity_ids']?.attributes ?? {};
           return ['run','delayedstart','pause'].includes(
-            (states['sensor.bosch_dishwasher_operation_state']?.state ?? '').toString().toLowerCase()
+            (states[EID.dishwasher_operation_state]?.state ?? '').toString().toLowerCase()
           );
         ]]]
       styles:
@@ -96,4 +100,4 @@ hemma_dishwasher:
     action: call-service
     service: switch.turn_off
     service_data:
-      entity_id: switch.bosch_dishwasher_power
+      entity_id: '[[[ return states["sensor.hemma_entity_ids"]?.attributes?.dishwasher_power ]]]'

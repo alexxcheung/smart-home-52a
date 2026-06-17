@@ -26,6 +26,7 @@ cards:
     hash: '#hemma-washer'
     name: Washing Machine
     # Status-only header (no toggle): power must be turned on at the physical machine.
+    # Entity ID: includes/hemma_entity_ids.yaml → washer_current_status
     entity: sensor.washer_current_status
     button_type: state
     # Hide raw state next to title (e.g. "Off" / power_off) — details are in the panel below.

@@ -507,11 +507,11 @@
   actions:
   - action: humidifier.turn_on
     target:
-      entity_id: humidifier.probreeze_dehumidifier
+      entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier') }}"
     data: {}
   - action: humidifier.set_humidity
     target:
-      entity_id: humidifier.probreeze_dehumidifier
+      entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier') }}"
     data:
       humidity: 60
   mode: single
@@ -527,7 +527,7 @@
   actions:
   - action: humidifier.turn_off
     target:
-      entity_id: humidifier.probreeze_dehumidifier
+      entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'dehumidifier') }}"
     data: {}
   mode: single
 # --- Entrance ---
@@ -535,11 +535,11 @@
   alias: Area - Entrance - Motion Detected Front Door
   description: ''
   triggers:
-  - type: turned_on
-    device_id: 19aa0b4688f45d61d8f0e337f0e4d023
-    entity_id: 0f636de54f26d61063b0dfc3481a400c
-    domain: switch
-    trigger: device
+  - trigger: state
+    entity_id: event.ring_motion
+    not_from:
+    - unknown
+    - unavailable
   conditions:
   - condition: sun
     after: sunset

@@ -5,10 +5,10 @@
 #
 # Avoid sensors that go unavailable during normal idle unless that is what you want.
 #
-# Current watch list:
-#   - sensor.bosch_dishwasher_operation_state
-#   - sensor.washer_current_status
-#   - humidifier.probreeze_dehumidifier
+# Current watch list (sync with includes/hemma_entity_ids.yaml):
+#   - dishwasher_operation_state
+#   - washer_current_status
+#   - dehumidifier
 
 automation:
   # Uses trigger.entity_id from whichever listed entity went unavailable.

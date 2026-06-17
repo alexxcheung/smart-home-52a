@@ -23,6 +23,7 @@ cards:
     shadow_opacity: '55'
     hash: '#hemma-dishwasher'
     name: Dishwasher
+    # Entity ID: includes/hemma_entity_ids.yaml → dishwasher_power
     entity: switch.bosch_dishwasher_power
     entity_picture_local: /local/hemma/icons/dishwasher.svg
     styles: |

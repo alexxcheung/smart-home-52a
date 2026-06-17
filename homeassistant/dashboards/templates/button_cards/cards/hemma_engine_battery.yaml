@@ -10,16 +10,17 @@ hemma_engine_battery:
   custom_fields:
     content: |
       [[[
+        const EID = states['sensor.hemma_entity_ids']?.attributes ?? {};
         const SPECS = [
-          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery' },
-          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery_2' },
-          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery_3' },
-          { level: 'sensor.front_door_battery' },
-          { level: 'sensor.imalex_17_battery_level', state: 'sensor.imalex_17_battery_state' },
-          { level: 'sensor.imalex_ipad_battery_level', state: 'sensor.imalex_ipad_battery_state' },
-          { level: 'sensor.imalex_mac_internal_battery_level', state: 'sensor.imalex_mac_internal_battery_state' },
-          { level: 'sensor.imsammy_iphone_battery_level', state: 'sensor.imsammy_iphone_battery_state' },
-          { level: 'sensor.zbminil2_study_downlight_battery' },
+          { binary: EID.battery_radiator_1 },
+          { binary: EID.battery_radiator_2 },
+          { binary: EID.battery_radiator_3 },
+          { level: EID.ring_battery },
+          { level: EID.battery_alex_iphone, state: EID.battery_alex_iphone_state },
+          { level: EID.battery_alex_ipad, state: EID.battery_alex_ipad_state },
+          { level: EID.battery_alex_mac, state: EID.battery_alex_mac_state },
+          { level: EID.battery_sammy_iphone, state: EID.battery_sammy_iphone_state },
+          { level: EID.battery_study_downlight },
         ];
         const bad = (s) => !s || ['unknown', 'unavailable'].includes(String(s.state));
         const needsCharge = (spec) => {
@@ -60,16 +61,17 @@ hemma_engine_battery_popup_content:
   custom_fields:
     content: |
       [[[
+        const EID = states['sensor.hemma_entity_ids']?.attributes ?? {};
         const SPECS = [
-          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery' },
-          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery_2' },
-          { binary: 'binary_sensor.smart_radiator_thermostat_x_battery_3' },
-          { level: 'sensor.front_door_battery' },
-          { level: 'sensor.imalex_17_battery_level', state: 'sensor.imalex_17_battery_state' },
-          { level: 'sensor.imalex_ipad_battery_level', state: 'sensor.imalex_ipad_battery_state' },
-          { level: 'sensor.imalex_mac_internal_battery_level', state: 'sensor.imalex_mac_internal_battery_state' },
-          { level: 'sensor.imsammy_iphone_battery_level', state: 'sensor.imsammy_iphone_battery_state' },
-          { level: 'sensor.zbminil2_study_downlight_battery' },
+          { binary: EID.battery_radiator_1 },
+          { binary: EID.battery_radiator_2 },
+          { binary: EID.battery_radiator_3 },
+          { level: EID.ring_battery },
+          { level: EID.battery_alex_iphone, state: EID.battery_alex_iphone_state },
+          { level: EID.battery_alex_ipad, state: EID.battery_alex_ipad_state },
+          { level: EID.battery_alex_mac, state: EID.battery_alex_mac_state },
+          { level: EID.battery_sammy_iphone, state: EID.battery_sammy_iphone_state },
+          { level: EID.battery_study_downlight },
         ];
         const na = 'N/A';
         const bad = (s) => !s || ['unknown', 'unavailable'].includes(String(s.state));

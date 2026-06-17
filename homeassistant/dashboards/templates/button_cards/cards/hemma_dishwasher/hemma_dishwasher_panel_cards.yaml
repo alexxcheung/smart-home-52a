@@ -693,57 +693,95 @@
                     - font-weight: 600
                     - opacity: "0.65"
 
-          # ── Delay start + Start at (only when power is on) ──────────────
-          - type: conditional
-            conditions:
-              - entity: switch.bosch_dishwasher_power
-                state: "on"
-            card:
-              type: vertical-stack
-              card_mod:
-                style: |
-                  ha-card .content {
-                    display: flex !important;
-                    flex-direction: column !important;
-                    gap: 0 !important;
-                  }
-              cards:
-                # Delay start — button card (tap toggles); alignment matches Turn Off
-                - type: custom:button-card
-                  entity: input_boolean.hemma_dishwasher_delay_start
+          # ── Delay start + Start at (same visibility as programme + options above) ──
+          - type: vertical-stack
+            card_mod:
+              style: |
+                ha-card .content {
+                  display: flex !important;
+                  flex-direction: column !important;
+                  gap: 0 !important;
+                }
+            cards:
+              # Delay start — button card (tap toggles); alignment matches Turn Off
+              - type: custom:button-card
+                entity: input_boolean.hemma_dishwasher_delay_start
+                triggers_update:
+                  - input_boolean.hemma_dishwasher_delay_start
+                template: hemma_plain_button_card
+                show_name: true
+                show_icon: true
+                icon: mdi:clock-start
+                show_state: false
+                layout: icon_name_state
+                name: >
+                  [[[
+                    return entity?.state === 'on' ? "'Delay Start' Enabled" : "Enable 'Delay Start'";
+                  ]]]
+                tap_action:
+                  action: toggle
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                state:
+                  - value: "on"
+                    styles:
+                      card:
+                        - background: "rgba(107,203,119,0.14) !important"
+                        - border: "1px solid rgba(107,203,119,0.28) !important"
+                      name:
+                        - color: "#6bcb77 !important"
+                      icon:
+                        - color: "#6bcb77 !important"
+                styles:
+                  card:
+                    - border-radius: 12px
+                    - box-shadow: none
+                    - margin: 24px 0 0
+                    - height: 48px
+                    - background: rgba(255,255,255,0.08)
+                    - border: 1px solid rgba(255,255,255,0.20)
+                  grid:
+                    - justify-content: center
+                  name:
+                    - font-size: 14px
+                    - font-weight: 700
+                    - text-align: center
+                    - color: "#cfd6dd"
+                  icon:
+                    - color: "#cfd6dd"
+                    - width: 20px
+                    - height: 20px
+
+              # Start at — button card (tap opens time picker); alignment matches Turn Off
+              - type: conditional
+                conditions:
+                  - entity: input_boolean.hemma_dishwasher_delay_start
+                    state: "on"
+                card:
+                  type: custom:button-card
+                  entity: input_datetime.hemma_dishwasher_start_at
                   triggers_update:
-                    - input_boolean.hemma_dishwasher_delay_start
+                    - input_datetime.hemma_dishwasher_start_at
                   template: hemma_plain_button_card
                   show_name: true
                   show_icon: true
-                  icon: mdi:clock-start
-                  show_state: false
+                  icon: mdi:clock-outline
+                  show_state: true
                   layout: icon_name_state
-                  name: >
-                    [[[
-                      return entity?.state === 'on' ? "'Delay Start' Enabled" : "Enable 'Delay Start'";
-                    ]]]
+                  name: Start at
                   tap_action:
-                    action: toggle
+                    action: more-info
                   hold_action:
                     action: none
                   double_tap_action:
                     action: none
-                  state:
-                    - value: "on"
-                      styles:
-                        card:
-                          - background: "rgba(107,203,119,0.14) !important"
-                          - border: "1px solid rgba(107,203,119,0.28) !important"
-                        name:
-                          - color: "#6bcb77 !important"
-                        icon:
-                          - color: "#6bcb77 !important"
                   styles:
                     card:
                       - border-radius: 12px
                       - box-shadow: none
-                      - margin: 24px 0 0
+                      - margin: 0 0 16px
                       - height: 48px
                       - background: rgba(255,255,255,0.08)
                       - border: 1px solid rgba(255,255,255,0.20)
@@ -754,57 +792,14 @@
                       - font-weight: 700
                       - text-align: center
                       - color: "#cfd6dd"
+                    state:
+                      - font-size: 13px
+                      - text-align: center
+                      - color: "#cfd6dd"
                     icon:
                       - color: "#cfd6dd"
                       - width: 20px
                       - height: 20px
-
-                # Start at — button card (tap opens time picker); alignment matches Turn Off
-                - type: conditional
-                  conditions:
-                    - entity: input_boolean.hemma_dishwasher_delay_start
-                      state: "on"
-                  card:
-                    type: custom:button-card
-                    entity: input_datetime.hemma_dishwasher_start_at
-                    triggers_update:
-                      - input_datetime.hemma_dishwasher_start_at
-                    template: hemma_plain_button_card
-                    show_name: true
-                    show_icon: true
-                    icon: mdi:clock-outline
-                    show_state: true
-                    layout: icon_name_state
-                    name: Start at
-                    tap_action:
-                      action: more-info
-                    hold_action:
-                      action: none
-                    double_tap_action:
-                      action: none
-                    styles:
-                      card:
-                        - border-radius: 12px
-                        - box-shadow: none
-                        - margin: 0 0 16px
-                        - height: 48px
-                        - background: rgba(255,255,255,0.08)
-                        - border: 1px solid rgba(255,255,255,0.20)
-                      grid:
-                        - justify-content: center
-                      name:
-                        - font-size: 14px
-                        - font-weight: 700
-                        - text-align: center
-                        - color: "#cfd6dd"
-                      state:
-                        - font-size: 13px
-                        - text-align: center
-                        - color: "#cfd6dd"
-                      icon:
-                        - color: "#cfd6dd"
-                        - width: 20px
-                        - height: 20px
 
           # ── Dynamic action button ──────────────────────────────────────
 

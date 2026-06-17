@@ -1,0 +1,11 @@
+# Exposes includes/hemma_entity_ids.yaml as sensor.hemma_entity_ids attributes
+# so automations and button-card JS can resolve semantic names at runtime.
+template:
+  - trigger:
+      - platform: homeassistant
+        event: start
+    sensor:
+      - name: Hemma Entity IDs
+        unique_id: hemma_entity_ids
+        state: ok
+        attributes: !include ../includes/hemma_entity_ids.yaml
