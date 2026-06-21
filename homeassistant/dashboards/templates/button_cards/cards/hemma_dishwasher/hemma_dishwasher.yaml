@@ -47,7 +47,7 @@ hemma_dishwasher:
       if (op === 'run') {
         if (fin && fin !== 'unavailable' && fin !== 'unknown') {
           const rem = Math.ceil((new Date(fin) - new Date()) / 60000);
-          if (rem > 0) return `${rem} min left`;
+          if (rem > 0) return `Running - ${rem} Min Left`;
         }
         return prog > 0 ? `Running · ${prog}%` : 'Running';
       }

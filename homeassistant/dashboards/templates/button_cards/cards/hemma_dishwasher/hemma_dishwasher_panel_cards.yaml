@@ -14,6 +14,9 @@
         - sensor.dishwasher_salt_nearly_empty
         - sensor.dishwasher_rinse_aid_nearly_empty
         - switch.bosch_dishwasher_power
+        # sensor.time (time_date) updates every minute so progress % and
+        # "X min remaining" stay fresh while the popup is open.
+        - sensor.time
       tap_action: { action: none }
       styles: { card: [ { background: transparent }, { box-shadow: none }, { border: none } ] }
       custom_fields:
@@ -38,7 +41,7 @@
         .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
         .status-label { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; padding: 8px; border-radius: 8px; display: inline-block; }
         .door-info { font-size: 11px; font-weight: 700; letter-spacing: 0.03em; opacity: 0.75; padding: 8px; border-radius: 8px; display: inline-block; }
-        .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
+        .prog-wrap { margin-bottom: 2px; } .prog-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 5px; }
         .prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; } .prog-info { font-size: 11px; opacity: 0.75; font-weight: 600; }
         .warn-badge { font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(244,162,97,0.18); color: #f4a261; letter-spacing: 0.03em; display: inline-block; }
 
@@ -78,728 +81,739 @@
       card:
         type: vertical-stack
         cards:
-          # ── Programme label ────────────────────────────────────────────
-          - type: custom:button-card
-            entity: switch.bosch_dishwasher_power
-            triggers_update:
-              - switch.bosch_dishwasher_power
-            name: Programme
-            show_icon: false
-            show_state: false
-            tap_action:
-              action: none
-            styles:
-              card:
-                - background: transparent
-                - box-shadow: none
-                - padding: 0 0 6px
-                - height: auto
-                - justify-content: flex-start
-              name:
-                - font-size: 11px
-                - font-weight: 700
-                - text-transform: uppercase
-                - letter-spacing: 0.08em
-                - color: "#ffffff"
-                - opacity: "0.8"
-                - text-align: left
-
-          # ── Programme chips — row 1: Eco 50°, Auto, Intensive 70° ────────
-          - type: horizontal-stack
-            cards:
-              - type: custom:button-card
-                entity: select.bosch_dishwasher_selected_programme
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Eco 50°
-                tap_action:
-                  action: call-service
-                  service: select.select_option
-                  service_data:
-                    entity_id: select.bosch_dishwasher_selected_programme
-                    option: dishcare_dishwasher_program_eco_50
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: dishcare_dishwasher_program_eco_50
-                    styles:
-                      card:
-                        - background: "rgba(255,255,255,0.92) !important"
-                        - border: "1.5px solid transparent !important"
-                        - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
-                      name:
-                        - color: "#1a1a1a !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1.5px solid rgba(255,255,255,0.14)
-                    - background: transparent
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 8px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - flex: 1 1 0
-                    - margin: 0 2px 0 0
-                  name:
-                    - font-size: 13px
-                    - font-weight: 600
-                    - opacity: "0.45"
-
-              - type: custom:button-card
-                entity: select.bosch_dishwasher_selected_programme
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Auto
-                tap_action:
-                  action: call-service
-                  service: select.select_option
-                  service_data:
-                    entity_id: select.bosch_dishwasher_selected_programme
-                    option: dishcare_dishwasher_program_auto_2
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: dishcare_dishwasher_program_auto_2
-                    styles:
-                      card:
-                        - background: "rgba(255,255,255,0.92) !important"
-                        - border: "1.5px solid transparent !important"
-                        - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
-                      name:
-                        - color: "#1a1a1a !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1.5px solid rgba(255,255,255,0.14)
-                    - background: transparent
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 8px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - flex: 1 1 0
-                    - margin: 0 2px
-                  name:
-                    - font-size: 13px
-                    - font-weight: 600
-                    - opacity: "0.45"
-
-              - type: custom:button-card
-                entity: select.bosch_dishwasher_selected_programme
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Intensive 70°
-                tap_action:
-                  action: call-service
-                  service: select.select_option
-                  service_data:
-                    entity_id: select.bosch_dishwasher_selected_programme
-                    option: dishcare_dishwasher_program_intensiv_70
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: dishcare_dishwasher_program_intensiv_70
-                    styles:
-                      card:
-                        - background: "rgba(255,255,255,0.92) !important"
-                        - border: "1.5px solid transparent !important"
-                        - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
-                      name:
-                        - color: "#1a1a1a !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1.5px solid rgba(255,255,255,0.14)
-                    - background: transparent
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 8px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - flex: 1 1 0
-                    - margin: 0 0 0 2px
-                  name:
-                    - font-size: 13px
-                    - font-weight: 600
-                    - opacity: "0.45"
-
-          # ── Programme chips — row 2: Quick 65°, Night Wash, Machine Care ─
-          - type: horizontal-stack
-            cards:
-              - type: custom:button-card
-                entity: select.bosch_dishwasher_selected_programme
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Quick 65°
-                tap_action:
-                  action: call-service
-                  service: select.select_option
-                  service_data:
-                    entity_id: select.bosch_dishwasher_selected_programme
-                    option: dishcare_dishwasher_program_quick_65
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: dishcare_dishwasher_program_quick_65
-                    styles:
-                      card:
-                        - background: "rgba(255,255,255,0.92) !important"
-                        - border: "1.5px solid transparent !important"
-                        - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
-                      name:
-                        - color: "#1a1a1a !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1.5px solid rgba(255,255,255,0.14)
-                    - background: transparent
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 8px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - flex: 1 1 0
-                    - margin: 8px 2px 0 0
-                  name:
-                    - font-size: 13px
-                    - font-weight: 600
-                    - opacity: "0.45"
-
-              - type: custom:button-card
-                entity: select.bosch_dishwasher_selected_programme
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Night Wash
-                tap_action:
-                  action: call-service
-                  service: select.select_option
-                  service_data:
-                    entity_id: select.bosch_dishwasher_selected_programme
-                    option: dishcare_dishwasher_program_night_wash
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: dishcare_dishwasher_program_night_wash
-                    styles:
-                      card:
-                        - background: "rgba(255,255,255,0.92) !important"
-                        - border: "1.5px solid transparent !important"
-                        - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
-                      name:
-                        - color: "#1a1a1a !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1.5px solid rgba(255,255,255,0.14)
-                    - background: transparent
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 8px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - flex: 1 1 0
-                    - margin: 8px 2px 0
-                  name:
-                    - font-size: 13px
-                    - font-weight: 600
-                    - opacity: "0.45"
-
-              - type: custom:button-card
-                entity: select.bosch_dishwasher_selected_programme
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Machine Care
-                tap_action:
-                  action: call-service
-                  service: select.select_option
-                  service_data:
-                    entity_id: select.bosch_dishwasher_selected_programme
-                    option: dishcare_dishwasher_program_machine_care
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: dishcare_dishwasher_program_machine_care
-                    styles:
-                      card:
-                        - background: "rgba(255,255,255,0.92) !important"
-                        - border: "1.5px solid transparent !important"
-                        - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
-                      name:
-                        - color: "#1a1a1a !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1.5px solid rgba(255,255,255,0.14)
-                    - background: transparent
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 8px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - flex: 1 1 0
-                    - margin: 8px 0 0 2px
-                  name:
-                    - font-size: 13px
-                    - font-weight: 600
-                    - opacity: "0.45"
-
-          # ── Programme chips — row 3: Pre-rinse ────────────────────────
-          - type: horizontal-stack
-            cards:
-              - type: custom:button-card
-                entity: select.bosch_dishwasher_selected_programme
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Pre-rinse
-                tap_action:
-                  action: call-service
-                  service: select.select_option
-                  service_data:
-                    entity_id: select.bosch_dishwasher_selected_programme
-                    option: dishcare_dishwasher_program_pre_rinse
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: dishcare_dishwasher_program_pre_rinse
-                    styles:
-                      card:
-                        - background: "rgba(255,255,255,0.92) !important"
-                        - border: "1.5px solid transparent !important"
-                        - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
-                      name:
-                        - color: "#1a1a1a !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1.5px solid rgba(255,255,255,0.14)
-                    - background: transparent
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 8px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - flex: 1 1 0
-                    - margin: 8px 2px 0 0
-                  name:
-                    - font-size: 13px
-                    - font-weight: 600
-                    - opacity: "0.45"
-
-              - type: custom:button-card
-                show_icon: false
-                show_name: false
-                tap_action:
-                  action: none
-                styles:
-                  card:
-                    - background: transparent
-                    - box-shadow: none
-                    - border: none
-                    - flex: 1 1 0
-                    - min-width: 0
-
-              - type: custom:button-card
-                show_icon: false
-                show_name: false
-                tap_action:
-                  action: none
-                styles:
-                  card:
-                    - background: transparent
-                    - box-shadow: none
-                    - border: none
-                    - flex: 1 1 0
-                    - min-width: 0
-
-          # ── Options label ──────────────────────────────────────────────
-          - type: custom:button-card
-            entity: switch.bosch_dishwasher_power
-            name: Options
-            show_icon: false
-            tap_action:
-              action: none
-            triggers_update:
-              - switch.bosch_dishwasher_power
-            styles:
-              card:
-                - background: transparent
-                - box-shadow: none
-                - padding: 24px 16px 6px
-                - height: auto
-                - justify-content: flex-start
-              name:
-                - font-size: 11px
-                - font-weight: 700
-                - text-transform: uppercase
-                - letter-spacing: 0.08em
-                - color: "#ffffff"
-                - opacity: "0.8"
-                - text-align: left
-
-          # ── Option chips — row 1: Extra Dry, Hygiene+, Intensive Zone ───
-          - type: horizontal-stack
-            cards:
-              - type: custom:button-card
-                entity: switch.bosch_dishwasher_extra_dry
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Extra Dry
-                tap_action:
-                  action: toggle
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: "on"
-                    styles:
-                      card:
-                        - background: "rgba(107,203,119,0.18) !important"
-                        - border: "1px solid rgba(107,203,119,0.38) !important"
-                      name:
-                        - color: "#6bcb77 !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1px solid rgba(255,255,255,0.12)
-                    - background: rgba(255,255,255,0.05)
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 7px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - margin: 0 2px 0 0
-                  name:
-                    - font-size: 12px
-                    - font-weight: 600
-                    - opacity: "0.65"
-
-              - type: custom:button-card
-                entity: switch.bosch_dishwasher_hygiene
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: "Hygiene +"
-                tap_action:
-                  action: toggle
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: "on"
-                    styles:
-                      card:
-                        - background: "rgba(107,203,119,0.18) !important"
-                        - border: "1px solid rgba(107,203,119,0.38) !important"
-                      name:
-                        - color: "#6bcb77 !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1px solid rgba(255,255,255,0.12)
-                    - background: rgba(255,255,255,0.05)
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 7px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - margin: 0 2px
-                  name:
-                    - font-size: 12px
-                    - font-weight: 600
-                    - opacity: "0.65"
-
-              - type: custom:button-card
-                entity: switch.bosch_dishwasher_intensive_zone
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Intensive Zone
-                tap_action:
-                  action: toggle
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: "on"
-                    styles:
-                      card:
-                        - background: "rgba(107,203,119,0.18) !important"
-                        - border: "1px solid rgba(107,203,119,0.38) !important"
-                      name:
-                        - color: "#6bcb77 !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1px solid rgba(255,255,255,0.12)
-                    - background: rgba(255,255,255,0.05)
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 7px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - margin: 0 0 0 4px
-                  name:
-                    - font-size: 12px
-                    - font-weight: 600
-                    - opacity: "0.65"
-
-          # ── Option chips — row 2: Vario Speed, Silence, Child Lock ─────
-          - type: horizontal-stack
-            cards:
-              - type: custom:button-card
-                entity: switch.bosch_dishwasher_vario_speed
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Vario Speed
-                tap_action:
-                  action: toggle
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: "on"
-                    styles:
-                      card:
-                        - background: "rgba(107,203,119,0.18) !important"
-                        - border: "1px solid rgba(107,203,119,0.38) !important"
-                      name:
-                        - color: "#6bcb77 !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1px solid rgba(255,255,255,0.12)
-                    - background: rgba(255,255,255,0.05)
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 7px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - margin: 8px 4px 0 0
-                  name:
-                    - font-size: 12px
-                    - font-weight: 600
-                    - opacity: "0.65"
-
-              - type: custom:button-card
-                entity: switch.bosch_dishwasher_silence_on_demand
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Silence
-                tap_action:
-                  action: toggle
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: "on"
-                    styles:
-                      card:
-                        - background: "rgba(107,203,119,0.18) !important"
-                        - border: "1px solid rgba(107,203,119,0.38) !important"
-                      name:
-                        - color: "#6bcb77 !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1px solid rgba(255,255,255,0.12)
-                    - background: rgba(255,255,255,0.05)
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 7px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - margin: 8px 4px 0
-                  name:
-                    - font-size: 12px
-                    - font-weight: 600
-                    - opacity: "0.65"
-
-              - type: custom:button-card
-                entity: switch.bosch_dishwasher_child_lock
-                triggers_update:
-                  - switch.bosch_dishwasher_power
-                show_icon: false
-                name: Child Lock
-                tap_action:
-                  action: toggle
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: "on"
-                    styles:
-                      card:
-                        - background: "rgba(107,203,119,0.18) !important"
-                        - border: "1px solid rgba(107,203,119,0.38) !important"
-                      name:
-                        - color: "#6bcb77 !important"
-                        - opacity: "1 !important"
-                styles:
-                  card:
-                    - border-radius: 20px
-                    - border: 1px solid rgba(255,255,255,0.12)
-                    - background: rgba(255,255,255,0.05)
-                    - box-shadow: none
-                    - height: auto
-                    - padding: 7px 4px
-                    - overflow: hidden
-                    - min-width: 0
-                    - margin: 8px 0 0 4px
-                  name:
-                    - font-size: 12px
-                    - font-weight: 600
-                    - opacity: "0.65"
-
-          # ── Delay start + Start at (same visibility as programme + options above) ──
-          - type: vertical-stack
-            card_mod:
-              style: |
-                ha-card .content {
-                  display: flex !important;
-                  flex-direction: column !important;
-                  gap: 0 !important;
-                }
-            cards:
-              # Delay start — button card (tap toggles); alignment matches Turn Off
-              - type: custom:button-card
-                entity: input_boolean.hemma_dishwasher_delay_start
-                triggers_update:
-                  - input_boolean.hemma_dishwasher_delay_start
-                template: hemma_plain_button_card
-                show_name: true
-                show_icon: true
-                icon: mdi:clock-start
-                show_state: false
-                layout: icon_name_state
-                name: >
-                  [[[
-                    return entity?.state === 'on' ? "'Delay Start' Enabled" : "Enable 'Delay Start'";
-                  ]]]
-                tap_action:
-                  action: toggle
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                state:
-                  - value: "on"
-                    styles:
-                      card:
-                        - background: "rgba(107,203,119,0.14) !important"
-                        - border: "1px solid rgba(107,203,119,0.28) !important"
-                      name:
-                        - color: "#6bcb77 !important"
-                      icon:
-                        - color: "#6bcb77 !important"
-                styles:
-                  card:
-                    - border-radius: 12px
-                    - box-shadow: none
-                    - margin: 24px 0 0
-                    - height: 48px
-                    - background: rgba(255,255,255,0.08)
-                    - border: 1px solid rgba(255,255,255,0.20)
-                  grid:
-                    - justify-content: center
-                  name:
-                    - font-size: 14px
-                    - font-weight: 700
-                    - text-align: center
-                    - color: "#cfd6dd"
-                  icon:
-                    - color: "#cfd6dd"
-                    - width: 20px
-                    - height: 20px
-
-              # Start at — button card (tap opens time picker); alignment matches Turn Off
-              - type: conditional
+          # ── Programme, options, delay start (hidden while running) ───
+          - type: conditional
+            conditions:
+              - condition: not
                 conditions:
-                  - entity: input_boolean.hemma_dishwasher_delay_start
-                    state: "on"
-                card:
-                  type: custom:button-card
-                  entity: input_datetime.hemma_dishwasher_start_at
+                  - condition: state
+                    entity: sensor.bosch_dishwasher_operation_state
+                    state: run
+            card:
+              type: vertical-stack
+              cards:
+                # ── Programme label ────────────────────────────────────────────
+                - type: custom:button-card
+                  entity: switch.bosch_dishwasher_power
                   triggers_update:
-                    - input_datetime.hemma_dishwasher_start_at
-                  template: hemma_plain_button_card
-                  show_name: true
-                  show_icon: true
-                  icon: mdi:clock-outline
-                  show_state: true
-                  layout: icon_name_state
-                  name: Start at
+                    - switch.bosch_dishwasher_power
+                  name: Programme
+                  show_icon: false
+                  show_state: false
                   tap_action:
-                    action: more-info
-                  hold_action:
-                    action: none
-                  double_tap_action:
                     action: none
                   styles:
                     card:
-                      - border-radius: 12px
+                      - background: transparent
                       - box-shadow: none
-                      - margin: 0 0 16px
-                      - height: 48px
-                      - background: rgba(255,255,255,0.08)
-                      - border: 1px solid rgba(255,255,255,0.20)
-                    grid:
-                      - justify-content: center
+                      - padding: 0 0 6px
+                      - height: auto
+                      - justify-content: flex-start
                     name:
-                      - font-size: 14px
+                      - font-size: 11px
                       - font-weight: 700
-                      - text-align: center
-                      - color: "#cfd6dd"
-                    state:
-                      - font-size: 13px
-                      - text-align: center
-                      - color: "#cfd6dd"
-                    icon:
-                      - color: "#cfd6dd"
-                      - width: 20px
-                      - height: 20px
+                      - text-transform: uppercase
+                      - letter-spacing: 0.08em
+                      - color: "#ffffff"
+                      - opacity: "0.8"
+                      - text-align: left
+
+                # ── Programme chips — row 1: Eco 50°, Auto, Intensive 70° ────────
+                - type: horizontal-stack
+                  cards:
+                    - type: custom:button-card
+                      entity: select.bosch_dishwasher_selected_programme
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Eco 50°
+                      tap_action:
+                        action: call-service
+                        service: select.select_option
+                        service_data:
+                          entity_id: select.bosch_dishwasher_selected_programme
+                          option: dishcare_dishwasher_program_eco_50
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: dishcare_dishwasher_program_eco_50
+                          styles:
+                            card:
+                              - background: "rgba(255,255,255,0.92) !important"
+                              - border: "1.5px solid transparent !important"
+                              - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                            name:
+                              - color: "#1a1a1a !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1.5px solid rgba(255,255,255,0.14)
+                          - background: transparent
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 8px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - flex: 1 1 0
+                          - margin: 0 2px 0 0
+                        name:
+                          - font-size: 13px
+                          - font-weight: 600
+                          - opacity: "0.45"
+
+                    - type: custom:button-card
+                      entity: select.bosch_dishwasher_selected_programme
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Auto
+                      tap_action:
+                        action: call-service
+                        service: select.select_option
+                        service_data:
+                          entity_id: select.bosch_dishwasher_selected_programme
+                          option: dishcare_dishwasher_program_auto_2
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: dishcare_dishwasher_program_auto_2
+                          styles:
+                            card:
+                              - background: "rgba(255,255,255,0.92) !important"
+                              - border: "1.5px solid transparent !important"
+                              - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                            name:
+                              - color: "#1a1a1a !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1.5px solid rgba(255,255,255,0.14)
+                          - background: transparent
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 8px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - flex: 1 1 0
+                          - margin: 0 2px
+                        name:
+                          - font-size: 13px
+                          - font-weight: 600
+                          - opacity: "0.45"
+
+                    - type: custom:button-card
+                      entity: select.bosch_dishwasher_selected_programme
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Intensive 70°
+                      tap_action:
+                        action: call-service
+                        service: select.select_option
+                        service_data:
+                          entity_id: select.bosch_dishwasher_selected_programme
+                          option: dishcare_dishwasher_program_intensiv_70
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: dishcare_dishwasher_program_intensiv_70
+                          styles:
+                            card:
+                              - background: "rgba(255,255,255,0.92) !important"
+                              - border: "1.5px solid transparent !important"
+                              - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                            name:
+                              - color: "#1a1a1a !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1.5px solid rgba(255,255,255,0.14)
+                          - background: transparent
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 8px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - flex: 1 1 0
+                          - margin: 0 0 0 2px
+                        name:
+                          - font-size: 13px
+                          - font-weight: 600
+                          - opacity: "0.45"
+
+                # ── Programme chips — row 2: Quick 65°, Night Wash, Machine Care ─
+                - type: horizontal-stack
+                  cards:
+                    - type: custom:button-card
+                      entity: select.bosch_dishwasher_selected_programme
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Quick 65°
+                      tap_action:
+                        action: call-service
+                        service: select.select_option
+                        service_data:
+                          entity_id: select.bosch_dishwasher_selected_programme
+                          option: dishcare_dishwasher_program_quick_65
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: dishcare_dishwasher_program_quick_65
+                          styles:
+                            card:
+                              - background: "rgba(255,255,255,0.92) !important"
+                              - border: "1.5px solid transparent !important"
+                              - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                            name:
+                              - color: "#1a1a1a !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1.5px solid rgba(255,255,255,0.14)
+                          - background: transparent
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 8px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - flex: 1 1 0
+                          - margin: 8px 2px 0 0
+                        name:
+                          - font-size: 13px
+                          - font-weight: 600
+                          - opacity: "0.45"
+
+                    - type: custom:button-card
+                      entity: select.bosch_dishwasher_selected_programme
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Night Wash
+                      tap_action:
+                        action: call-service
+                        service: select.select_option
+                        service_data:
+                          entity_id: select.bosch_dishwasher_selected_programme
+                          option: dishcare_dishwasher_program_night_wash
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: dishcare_dishwasher_program_night_wash
+                          styles:
+                            card:
+                              - background: "rgba(255,255,255,0.92) !important"
+                              - border: "1.5px solid transparent !important"
+                              - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                            name:
+                              - color: "#1a1a1a !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1.5px solid rgba(255,255,255,0.14)
+                          - background: transparent
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 8px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - flex: 1 1 0
+                          - margin: 8px 2px 0
+                        name:
+                          - font-size: 13px
+                          - font-weight: 600
+                          - opacity: "0.45"
+
+                    - type: custom:button-card
+                      entity: select.bosch_dishwasher_selected_programme
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Machine Care
+                      tap_action:
+                        action: call-service
+                        service: select.select_option
+                        service_data:
+                          entity_id: select.bosch_dishwasher_selected_programme
+                          option: dishcare_dishwasher_program_machine_care
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: dishcare_dishwasher_program_machine_care
+                          styles:
+                            card:
+                              - background: "rgba(255,255,255,0.92) !important"
+                              - border: "1.5px solid transparent !important"
+                              - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                            name:
+                              - color: "#1a1a1a !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1.5px solid rgba(255,255,255,0.14)
+                          - background: transparent
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 8px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - flex: 1 1 0
+                          - margin: 8px 0 0 2px
+                        name:
+                          - font-size: 13px
+                          - font-weight: 600
+                          - opacity: "0.45"
+
+                # ── Programme chips — row 3: Pre-rinse ────────────────────────
+                - type: horizontal-stack
+                  cards:
+                    - type: custom:button-card
+                      entity: select.bosch_dishwasher_selected_programme
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Pre-rinse
+                      tap_action:
+                        action: call-service
+                        service: select.select_option
+                        service_data:
+                          entity_id: select.bosch_dishwasher_selected_programme
+                          option: dishcare_dishwasher_program_pre_rinse
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: dishcare_dishwasher_program_pre_rinse
+                          styles:
+                            card:
+                              - background: "rgba(255,255,255,0.92) !important"
+                              - border: "1.5px solid transparent !important"
+                              - box-shadow: "0 2px 8px rgba(0,0,0,0.25) !important"
+                            name:
+                              - color: "#1a1a1a !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1.5px solid rgba(255,255,255,0.14)
+                          - background: transparent
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 8px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - flex: 1 1 0
+                          - margin: 8px 2px 0 0
+                        name:
+                          - font-size: 13px
+                          - font-weight: 600
+                          - opacity: "0.45"
+
+                    - type: custom:button-card
+                      show_icon: false
+                      show_name: false
+                      tap_action:
+                        action: none
+                      styles:
+                        card:
+                          - background: transparent
+                          - box-shadow: none
+                          - border: none
+                          - flex: 1 1 0
+                          - min-width: 0
+
+                    - type: custom:button-card
+                      show_icon: false
+                      show_name: false
+                      tap_action:
+                        action: none
+                      styles:
+                        card:
+                          - background: transparent
+                          - box-shadow: none
+                          - border: none
+                          - flex: 1 1 0
+                          - min-width: 0
+
+                # ── Options label ──────────────────────────────────────────────
+                - type: custom:button-card
+                  entity: switch.bosch_dishwasher_power
+                  name: Options
+                  show_icon: false
+                  tap_action:
+                    action: none
+                  triggers_update:
+                    - switch.bosch_dishwasher_power
+                  styles:
+                    card:
+                      - background: transparent
+                      - box-shadow: none
+                      - padding: 24px 16px 6px
+                      - height: auto
+                      - justify-content: flex-start
+                    name:
+                      - font-size: 11px
+                      - font-weight: 700
+                      - text-transform: uppercase
+                      - letter-spacing: 0.08em
+                      - color: "#ffffff"
+                      - opacity: "0.8"
+                      - text-align: left
+
+                # ── Option chips — row 1: Extra Dry, Hygiene+, Intensive Zone ───
+                - type: horizontal-stack
+                  cards:
+                    - type: custom:button-card
+                      entity: switch.bosch_dishwasher_extra_dry
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Extra Dry
+                      tap_action:
+                        action: toggle
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: "on"
+                          styles:
+                            card:
+                              - background: "rgba(107,203,119,0.18) !important"
+                              - border: "1px solid rgba(107,203,119,0.38) !important"
+                            name:
+                              - color: "#6bcb77 !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1px solid rgba(255,255,255,0.12)
+                          - background: rgba(255,255,255,0.05)
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 7px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - margin: 0 2px 0 0
+                        name:
+                          - font-size: 12px
+                          - font-weight: 600
+                          - opacity: "0.65"
+
+                    - type: custom:button-card
+                      entity: switch.bosch_dishwasher_hygiene
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: "Hygiene +"
+                      tap_action:
+                        action: toggle
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: "on"
+                          styles:
+                            card:
+                              - background: "rgba(107,203,119,0.18) !important"
+                              - border: "1px solid rgba(107,203,119,0.38) !important"
+                            name:
+                              - color: "#6bcb77 !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1px solid rgba(255,255,255,0.12)
+                          - background: rgba(255,255,255,0.05)
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 7px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - margin: 0 2px
+                        name:
+                          - font-size: 12px
+                          - font-weight: 600
+                          - opacity: "0.65"
+
+                    - type: custom:button-card
+                      entity: switch.bosch_dishwasher_intensive_zone
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Intensive Zone
+                      tap_action:
+                        action: toggle
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: "on"
+                          styles:
+                            card:
+                              - background: "rgba(107,203,119,0.18) !important"
+                              - border: "1px solid rgba(107,203,119,0.38) !important"
+                            name:
+                              - color: "#6bcb77 !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1px solid rgba(255,255,255,0.12)
+                          - background: rgba(255,255,255,0.05)
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 7px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - margin: 0 0 0 4px
+                        name:
+                          - font-size: 12px
+                          - font-weight: 600
+                          - opacity: "0.65"
+
+                # ── Option chips — row 2: Vario Speed, Silence, Child Lock ─────
+                - type: horizontal-stack
+                  cards:
+                    - type: custom:button-card
+                      entity: switch.bosch_dishwasher_vario_speed
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Vario Speed
+                      tap_action:
+                        action: toggle
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: "on"
+                          styles:
+                            card:
+                              - background: "rgba(107,203,119,0.18) !important"
+                              - border: "1px solid rgba(107,203,119,0.38) !important"
+                            name:
+                              - color: "#6bcb77 !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1px solid rgba(255,255,255,0.12)
+                          - background: rgba(255,255,255,0.05)
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 7px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - margin: 8px 4px 0 0
+                        name:
+                          - font-size: 12px
+                          - font-weight: 600
+                          - opacity: "0.65"
+
+                    - type: custom:button-card
+                      entity: switch.bosch_dishwasher_silence_on_demand
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Silence
+                      tap_action:
+                        action: toggle
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: "on"
+                          styles:
+                            card:
+                              - background: "rgba(107,203,119,0.18) !important"
+                              - border: "1px solid rgba(107,203,119,0.38) !important"
+                            name:
+                              - color: "#6bcb77 !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1px solid rgba(255,255,255,0.12)
+                          - background: rgba(255,255,255,0.05)
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 7px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - margin: 8px 4px 0
+                        name:
+                          - font-size: 12px
+                          - font-weight: 600
+                          - opacity: "0.65"
+
+                    - type: custom:button-card
+                      entity: switch.bosch_dishwasher_child_lock
+                      triggers_update:
+                        - switch.bosch_dishwasher_power
+                      show_icon: false
+                      name: Child Lock
+                      tap_action:
+                        action: toggle
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: "on"
+                          styles:
+                            card:
+                              - background: "rgba(107,203,119,0.18) !important"
+                              - border: "1px solid rgba(107,203,119,0.38) !important"
+                            name:
+                              - color: "#6bcb77 !important"
+                              - opacity: "1 !important"
+                      styles:
+                        card:
+                          - border-radius: 20px
+                          - border: 1px solid rgba(255,255,255,0.12)
+                          - background: rgba(255,255,255,0.05)
+                          - box-shadow: none
+                          - height: auto
+                          - padding: 7px 4px
+                          - overflow: hidden
+                          - min-width: 0
+                          - margin: 8px 0 0 4px
+                        name:
+                          - font-size: 12px
+                          - font-weight: 600
+                          - opacity: "0.65"
+
+                # ── Delay start + Start at (same visibility as programme + options above) ──
+                - type: vertical-stack
+                  card_mod:
+                    style: |
+                      ha-card .content {
+                        display: flex !important;
+                        flex-direction: column !important;
+                        gap: 0 !important;
+                      }
+                  cards:
+                    # Delay start — button card (tap toggles); alignment matches Turn Off
+                    - type: custom:button-card
+                      entity: input_boolean.hemma_dishwasher_delay_start
+                      triggers_update:
+                        - input_boolean.hemma_dishwasher_delay_start
+                      template: hemma_plain_button_card
+                      show_name: true
+                      show_icon: true
+                      icon: mdi:clock-start
+                      show_state: false
+                      layout: icon_name_state
+                      name: >
+                        [[[
+                          return entity?.state === 'on' ? "'Delay Start' Enabled" : "Enable 'Delay Start'";
+                        ]]]
+                      tap_action:
+                        action: toggle
+                      hold_action:
+                        action: none
+                      double_tap_action:
+                        action: none
+                      state:
+                        - value: "on"
+                          styles:
+                            card:
+                              - background: "rgba(107,203,119,0.14) !important"
+                              - border: "1px solid rgba(107,203,119,0.28) !important"
+                            name:
+                              - color: "#6bcb77 !important"
+                            icon:
+                              - color: "#6bcb77 !important"
+                      styles:
+                        card:
+                          - border-radius: 12px
+                          - box-shadow: none
+                          - margin: 24px 0 0
+                          - height: 48px
+                          - background: rgba(255,255,255,0.08)
+                          - border: 1px solid rgba(255,255,255,0.20)
+                        grid:
+                          - justify-content: center
+                        name:
+                          - font-size: 14px
+                          - font-weight: 700
+                          - text-align: center
+                          - color: "#cfd6dd"
+                        icon:
+                          - color: "#cfd6dd"
+                          - width: 20px
+                          - height: 20px
+
+                    # Start at — button card (tap opens time picker); alignment matches Turn Off
+                    - type: conditional
+                      conditions:
+                        - entity: input_boolean.hemma_dishwasher_delay_start
+                          state: "on"
+                      card:
+                        type: custom:button-card
+                        entity: input_datetime.hemma_dishwasher_start_at
+                        triggers_update:
+                          - input_datetime.hemma_dishwasher_start_at
+                        template: hemma_plain_button_card
+                        show_name: true
+                        show_icon: true
+                        icon: mdi:clock-outline
+                        show_state: true
+                        layout: icon_name_state
+                        name: Start at
+                        tap_action:
+                          action: more-info
+                        hold_action:
+                          action: none
+                        double_tap_action:
+                          action: none
+                        styles:
+                          card:
+                            - border-radius: 12px
+                            - box-shadow: none
+                            - margin: 0 0 16px
+                            - height: 48px
+                            - background: rgba(255,255,255,0.08)
+                            - border: 1px solid rgba(255,255,255,0.20)
+                          grid:
+                            - justify-content: center
+                          name:
+                            - font-size: 14px
+                            - font-weight: 700
+                            - text-align: center
+                            - color: "#cfd6dd"
+                          state:
+                            - font-size: 13px
+                            - text-align: center
+                            - color: "#cfd6dd"
+                          icon:
+                            - color: "#cfd6dd"
+                            - width: 20px
+                            - height: 20px
 
           # ── Dynamic action button ──────────────────────────────────────
 

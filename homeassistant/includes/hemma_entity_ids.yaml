@@ -24,6 +24,8 @@
 #     washer_current_status          → packages/hemma_appliance_connect_monitor.yaml
 #     dehumidifier                   → packages/hemma_appliance_connect_monitor.yaml
 #                                      automations.yaml (dehumidifier automations)
+#     device_tracker_alex            → packages/hemma_helpers.yaml (presence automations)
+#     device_tracker_sammy           → packages/hemma_helpers.yaml (presence automations)
 # ============================================================================
 
 # --- Ring doorbell (Front Door area) ---
@@ -109,13 +111,31 @@ media_homepod_living: media_player.homepod_living_room
 weather_home: weather.forecast_home
 weather_today_range: sensor.hemma_weather_today_range
 
-# --- Presence ---
+# --- User devices (Mobile App / person) ---
+person_alex: person.alex
+person_sammy: person.sammy
 presence_alex: sensor.presence_alex
 presence_sammy: sensor.presence_sammy
 presence_alex_select: input_select.presence_alex
 presence_sammy_select: input_select.presence_sammy
 device_tracker_alex: device_tracker.imalex_17
+device_tracker_alex_iphone: device_tracker.imalex_17
+device_tracker_alex_ipad: device_tracker.imalex_ipad
+device_tracker_alex_mac: device_tracker.imalex_mac
 device_tracker_sammy: device_tracker.imsammy_iphone
+device_tracker_sammy_iphone: device_tracker.imsammy_iphone
+notify_alex_iphone: notify.imalex_17
+notify_alex_ipad: notify.imalex_ipad
+notify_alex_mac: notify.imalex_mac
+notify_sammy_iphone: notify.imsammy_iphone
+battery_alex_iphone: sensor.imalex_17_battery_level
+battery_alex_iphone_state: sensor.imalex_17_battery_state
+battery_alex_ipad: sensor.imalex_ipad_battery_level
+battery_alex_ipad_state: sensor.imalex_ipad_battery_state
+battery_alex_mac: sensor.imalex_mac_internal_battery_level
+battery_alex_mac_state: sensor.imalex_mac_internal_battery_state
+battery_sammy_iphone: sensor.imsammy_iphone_battery_level
+battery_sammy_iphone_state: sensor.imsammy_iphone_battery_state
 
 # --- Octopus Agile ---
 octopus_current_rate: sensor.octopus_energy_electricity_20l3765434_2000057767569_current_rate
@@ -131,16 +151,8 @@ thermostat_target_temperature: input_number.hemma_thermostat_target_temperature
 thermostat_mode: input_select.hemma_thermostat_mode
 architectural_notifications_enabled: input_boolean.hemma_architectural_notifications_enabled
 
-# --- Battery monitor (Engine strip) ---
+# --- Battery monitor (Engine strip; non-user devices) ---
 battery_radiator_1: binary_sensor.smart_radiator_thermostat_x_battery
 battery_radiator_2: binary_sensor.smart_radiator_thermostat_x_battery_2
 battery_radiator_3: binary_sensor.smart_radiator_thermostat_x_battery_3
-battery_alex_iphone: sensor.imalex_17_battery_level
-battery_alex_iphone_state: sensor.imalex_17_battery_state
-battery_alex_ipad: sensor.imalex_ipad_battery_level
-battery_alex_ipad_state: sensor.imalex_ipad_battery_state
-battery_alex_mac: sensor.imalex_mac_internal_battery_level
-battery_alex_mac_state: sensor.imalex_mac_internal_battery_state
-battery_sammy_iphone: sensor.imsammy_iphone_battery_level
-battery_sammy_iphone_state: sensor.imsammy_iphone_battery_state
 battery_study_downlight: sensor.zbminil2_study_downlight_battery

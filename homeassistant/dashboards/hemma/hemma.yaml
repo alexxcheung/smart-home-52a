@@ -393,13 +393,13 @@ views:
             entity: '[[[ return variables.eids.washer_current_status ]]]'
             name: Washing Machine
 
-        # Dehumidifier
-          - type: custom:button-card
-            template: hemma_dehumidifier
-            variables:
-              eids: !include /config/includes/hemma_entity_ids.yaml
-            entity: '[[[ return variables.eids.dehumidifier ]]]'
-            name: Dehumidifier
+        # Dehumidifier (commented out — re-enable when needed)
+        # - type: custom:button-card
+        #   template: hemma_dehumidifier
+        #   variables:
+        #     eids: !include /config/includes/hemma_entity_ids.yaml
+        #   entity: '[[[ return variables.eids.dehumidifier ]]]'
+        #   name: Dehumidifier
 
       # Bubble Card pop-ups (must be last on this view)
       - !include /config/dashboards/templates/button_cards/cards/hemma_washer/hemma_washer_bubble_popup.yml
@@ -456,14 +456,14 @@ views:
         layout_type: custom:grid-layout
         layout: !include /config/dashboards/templates/includes/hemma_entity_layout.yaml
         cards:
-          # Light
-          - type: custom:button-card
-            template: hemma_light
-            variables:
-              eids: !include /config/includes/hemma_entity_ids.yaml
-              icon: light
-            entity: '[[[ return variables.eids.light_bedroom_strip ]]]'
-            name: Floor lightstrip
+          # Floor lightstrip (commented out — re-enable when needed)
+          # - type: custom:button-card
+          #   template: hemma_light
+          #   variables:
+          #     eids: !include /config/includes/hemma_entity_ids.yaml
+          #     icon: light
+          #   entity: '[[[ return variables.eids.light_bedroom_strip ]]]'
+          #   name: Floor lightstrip
 
       # Scene picker pop-up (must be last on this view; hash #hemma-scenes-bedroom)
       - !include /config/dashboards/templates/button_cards/cards/hemma_scenes/hemma_scenes_bedroom_bubble_popup.yml
@@ -530,30 +530,32 @@ views:
             entity: '[[[ return variables.eids.climate_study ]]]'
             name: Thermostat
 
-          # Light
-          - type: custom:button-card
-            template: hemma_light
-            variables:
-              eids: !include /config/includes/hemma_entity_ids.yaml
-              icon: light
-            entity: '[[[ return variables.eids.light_alex_desk ]]]'
-            name: Alex Desk
+          # Alex Desk (commented out — re-enable when needed)
+          # - type: custom:button-card
+          #   template: hemma_light
+          #   variables:
+          #     eids: !include /config/includes/hemma_entity_ids.yaml
+          #     icon: light
+          #   entity: '[[[ return variables.eids.light_alex_desk ]]]'
+          #   name: Alex Desk
 
-          - type: custom:button-card
-            template: hemma_light
-            variables:
-              eids: !include /config/includes/hemma_entity_ids.yaml
-              icon: light
-            entity: '[[[ return variables.eids.light_sammy_desk ]]]'
-            name: Sammy Desk
+          # Sammy Desk (commented out — re-enable when needed)
+          # - type: custom:button-card
+          #   template: hemma_light
+          #   variables:
+          #     eids: !include /config/includes/hemma_entity_ids.yaml
+          #     icon: light
+          #   entity: '[[[ return variables.eids.light_sammy_desk ]]]'
+          #   name: Sammy Desk
 
-          - type: custom:button-card
-            template: hemma_light
-            variables:
-              eids: !include /config/includes/hemma_entity_ids.yaml
-              icon: light
-            entity: '[[[ return variables.eids.light_study_floor ]]]'
-            name: Floor Light
+          # Floor Light (commented out — re-enable when needed)
+          # - type: custom:button-card
+          #   template: hemma_light
+          #   variables:
+          #     eids: !include /config/includes/hemma_entity_ids.yaml
+          #     icon: light
+          #   entity: '[[[ return variables.eids.light_study_floor ]]]'
+          #   name: Floor Light
 
           - type: custom:button-card
             template: hemma_light
@@ -568,13 +570,13 @@ views:
                 return s === 'on' ? 'On' : 'Off';
               ]]]
 
-          # Printer
-          - type: custom:button-card
-            template: hemma_printer
-            variables:
-              eids: !include /config/includes/hemma_entity_ids.yaml
-            entity: '[[[ return variables.eids.printer ]]]'
-            name: Printer
+          # Printer (commented out — re-enable when needed)
+          # - type: custom:button-card
+          #   template: hemma_printer
+          #   variables:
+          #     eids: !include /config/includes/hemma_entity_ids.yaml
+          #   entity: '[[[ return variables.eids.printer ]]]'
+          #   name: Printer
 
       # Scene picker pop-up (must be last on this view; hash #hemma-scenes-study)
       - !include /config/dashboards/templates/button_cards/cards/hemma_scenes/hemma_scenes_study_bubble_popup.yml
