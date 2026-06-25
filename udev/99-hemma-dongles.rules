@@ -1,0 +1,8 @@
+# Hemma USB dongles — stable symlinks by factory serial (survives ttyUSB reorder).
+# Install: sudo cp udev/99-hemma-dongles.rules /etc/udev/rules.d/ && sudo udevadm control --reload-rules && sudo udevadm trigger
+
+# Zigbee coordinator (ZHA / EZSP @ 115200) — serial f2815ec4
+SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="f2815ec4bfa3ef11989f4fbd61ce3355", SYMLINK+="hemma-zigbee-dongle", GROUP="dialout", MODE="0660"
+
+# Thread border router (OTBR / Spinel @ 460800) — serial 06c44e33
+SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="06c44e3381a0ef11a49da1a361ce3355", SYMLINK+="hemma-thread-dongle", GROUP="dialout", MODE="0660"

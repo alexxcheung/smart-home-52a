@@ -11,6 +11,8 @@ hemma_thermostat:
 
   state_display: |
     [[[
+      const s = String(entity?.state ?? '').toLowerCase();
+      if (s === 'unavailable' || s === 'unknown') return 'Not Connected';
       const mode = entity.state;
       const target = entity.attributes.temperature;
       const t = Number(target);
@@ -47,6 +49,8 @@ hemma_thermostat:
           action: more-info
         state_display: |
           [[[
+            const s = String(entity?.state ?? '').toLowerCase();
+            if (s === 'unavailable' || s === 'unknown') return '';
             let raw;
             const eid = variables.temp_sensor;
             if (eid && states[eid] && !["unknown","unavailable"].includes(states[eid].state)) {
@@ -61,6 +65,8 @@ hemma_thermostat:
         custom_fields:
           temp_display: |
             [[[
+              const s = String(entity?.state ?? '').toLowerCase();
+              if (s === 'unavailable' || s === 'unknown') return '';
               let raw;
               const eid = variables.temp_sensor;
               if (eid && states[eid] && !["unknown","unavailable"].includes(states[eid].state)) {

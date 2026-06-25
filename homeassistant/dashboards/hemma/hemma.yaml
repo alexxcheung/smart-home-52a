@@ -570,6 +570,19 @@ views:
                 return s === 'on' ? 'On' : 'Off';
               ]]]
 
+          - type: custom:button-card
+            template: hemma_light
+            variables:
+              eids: !include /config/includes/hemma_entity_ids.yaml
+              icon: light
+            entity: '[[[ return variables.eids.switch_bathroom_downlight ]]]'
+            name: Bathroom downlight
+            state_display: >
+              [[[
+                const s = (entity?.state || '').toLowerCase();
+                return s === 'on' ? 'On' : 'Off';
+              ]]]
+
           # Printer (commented out — re-enable when needed)
           # - type: custom:button-card
           #   template: hemma_printer

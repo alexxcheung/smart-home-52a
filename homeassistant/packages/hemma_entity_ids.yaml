@@ -73,6 +73,7 @@ template:
           light_sammy_desk: "{{ 'light.sammy_desk_light' }}"
           light_study_floor: "{{ 'light.study_floor_light' }}"
           switch_study_downlight: "{{ 'switch.zbminil2_study_downlight' }}"
+          switch_bathroom_downlight: "{{ 'switch.sonoff_zbminil2_bathroom_downlight' }}"
           media_tv: "{{ 'media_player.samsung_qb90_qe65qn90batxxu' }}"
           media_sonos_arc: "{{ 'media_player.sonos_arc' }}"
           media_homepod_living: "{{ 'media_player.homepod_living_room' }}"

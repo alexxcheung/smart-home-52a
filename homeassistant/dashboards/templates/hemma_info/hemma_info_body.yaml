@@ -31,9 +31,9 @@ cards:
     card_mod: !include /config/dashboards/templates/hemma_info/hemma_info_strip_card_mod.yaml
     cards:
       - type: custom:button-card
-        template: hemma_shopping_list
-      - type: custom:button-card
         template: hemma_bin_collection
+      - type: custom:button-card
+        template: hemma_shopping_list
       - type: custom:button-card
         template: hemma_plain_button_card
         tap_action:
@@ -155,111 +155,112 @@ cards:
             - border: 1px solid rgba(255,255,255,0.12)
             - min-height: 120px
 
-  # ----- 2. Atmosphere -----
-  - type: custom:button-card
-    template: hemma_plain_button_card
-    class: hemma-info-section-title
-    tap_action:
-      action: none
-    custom_fields:
-      content: |
-        [[[
-          return `<div style="padding:0 2px 0 24px;box-sizing:border-box;max-width:100%;">
-            <div style="font-size:clamp(1.275rem,2vw,1.525rem);font-weight:700;line-height:1.2;color:var(--primary-text-color);">Atmosphere</div>
-            <div style="opacity:0.58;font-size:16px;margin-top:6px;line-height:1.35;color:var(--primary-text-color);padding-bottom:12px;box-sizing:border-box;">Climate & Air Quality</div>
-          </div>`;
-        ]]]
-    styles:
-      card:
-        - background: transparent
-        - border: none
-        - box-shadow: none
-        - border-radius: 0
-        - margin: 8px 0 12px 0
-        - padding: 0
-        - width: 100%
-  - type: custom:layout-card
-    class: hemma-info-strip
-    layout_type: custom:grid-layout
-    layout: !include /config/dashboards/templates/hemma_info/hemma_info_row_scroll_tiles.yaml
-    card_mod: !include /config/dashboards/templates/hemma_info/hemma_info_strip_card_mod.yaml
-    cards:
-      - type: custom:button-card
-        template: hemma_plain_button_card
-        tap_action:
-          action: none
-        custom_fields:
-          content: |
-            [[[
-              return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
-                <ha-icon icon="mdi:air-filter" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
-                <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Living Room AQI</div>
-                <div style="font-size:14px;opacity:0.45;margin-top:4px;">42 · sample</div>
-              </div>`;
-            ]]]
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 20px
-            - border: 1px solid rgba(255,255,255,0.12)
-      - type: custom:button-card
-        template: hemma_plain_button_card
-        tap_action:
-          action: none
-        custom_fields:
-          content: |
-            [[[
-              return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
-                <ha-icon icon="mdi:water-percent" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
-                <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Master Bedroom Humidity</div>
-                <div style="font-size:14px;opacity:0.45;margin-top:4px;">48% · sample</div>
-              </div>`;
-            ]]]
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 20px
-            - border: 1px solid rgba(255,255,255,0.12)
-      - type: custom:button-card
-        template: hemma_plain_button_card
-        tap_action:
-          action: none
-        custom_fields:
-          content: |
-            [[[
-              return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
-                <ha-icon icon="mdi:thermometer" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
-                <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Kitchen Temp</div>
-                <div style="font-size:14px;opacity:0.45;margin-top:4px;">21.5°C · sample</div>
-              </div>`;
-            ]]]
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 20px
-            - border: 1px solid rgba(255,255,255,0.12)
-      - type: custom:button-card
-        template: hemma_plain_button_card
-        tap_action:
-          action: none
-        custom_fields:
-          content: |
-            [[[
-              return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
-                <ha-icon icon="mdi:sun-wireless" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
-                <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Outdoor UV Index</div>
-                <div style="font-size:14px;opacity:0.45;margin-top:4px;">3 · sample</div>
-              </div>`;
-            ]]]
-        styles:
-          card:
-            - background: rgba(255,255,255,0.06)
-            - backdrop-filter: blur(20px)
-            - border-radius: 20px
-            - border: 1px solid rgba(255,255,255,0.12)
+  # Atmosphere section (commented out — re-enable when needed)
+  # # ----- 2. Atmosphere -----
+  # - type: custom:button-card
+  #   template: hemma_plain_button_card
+  #   class: hemma-info-section-title
+  #   tap_action:
+  #     action: none
+  #   custom_fields:
+  #     content: |
+  #       [[[
+  #         return `<div style="padding:0 2px 0 24px;box-sizing:border-box;max-width:100%;">
+  #           <div style="font-size:clamp(1.275rem,2vw,1.525rem);font-weight:700;line-height:1.2;color:var(--primary-text-color);">Atmosphere</div>
+  #           <div style="opacity:0.58;font-size:16px;margin-top:6px;line-height:1.35;color:var(--primary-text-color);padding-bottom:12px;box-sizing:border-box;">Climate & Air Quality</div>
+  #         </div>`;
+  #       ]]]
+  #   styles:
+  #     card:
+  #       - background: transparent
+  #       - border: none
+  #       - box-shadow: none
+  #       - border-radius: 0
+  #       - margin: 8px 0 12px 0
+  #       - padding: 0
+  #       - width: 100%
+  # - type: custom:layout-card
+  #   class: hemma-info-strip
+  #   layout_type: custom:grid-layout
+  #   layout: !include /config/dashboards/templates/hemma_info/hemma_info_row_scroll_tiles.yaml
+  #   card_mod: !include /config/dashboards/templates/hemma_info/hemma_info_strip_card_mod.yaml
+  #   cards:
+  #     - type: custom:button-card
+  #       template: hemma_plain_button_card
+  #       tap_action:
+  #         action: none
+  #       custom_fields:
+  #         content: |
+  #           [[[
+  #             return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
+  #               <ha-icon icon="mdi:air-filter" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
+  #               <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Living Room AQI</div>
+  #               <div style="font-size:14px;opacity:0.45;margin-top:4px;">42 · sample</div>
+  #             </div>`;
+  #           ]]]
+  #       styles:
+  #         card:
+  #           - background: rgba(255,255,255,0.06)
+  #           - backdrop-filter: blur(20px)
+  #           - border-radius: 20px
+  #           - border: 1px solid rgba(255,255,255,0.12)
+  #     - type: custom:button-card
+  #       template: hemma_plain_button_card
+  #       tap_action:
+  #         action: none
+  #       custom_fields:
+  #         content: |
+  #           [[[
+  #             return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
+  #               <ha-icon icon="mdi:water-percent" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
+  #               <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Master Bedroom Humidity</div>
+  #               <div style="font-size:14px;opacity:0.45;margin-top:4px;">48% · sample</div>
+  #             </div>`;
+  #           ]]]
+  #       styles:
+  #         card:
+  #           - background: rgba(255,255,255,0.06)
+  #           - backdrop-filter: blur(20px)
+  #           - border-radius: 20px
+  #           - border: 1px solid rgba(255,255,255,0.12)
+  #     - type: custom:button-card
+  #       template: hemma_plain_button_card
+  #       tap_action:
+  #         action: none
+  #       custom_fields:
+  #         content: |
+  #           [[[
+  #             return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
+  #               <ha-icon icon="mdi:thermometer" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
+  #               <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Kitchen Temp</div>
+  #               <div style="font-size:14px;opacity:0.45;margin-top:4px;">21.5°C · sample</div>
+  #             </div>`;
+  #           ]]]
+  #       styles:
+  #         card:
+  #           - background: rgba(255,255,255,0.06)
+  #           - backdrop-filter: blur(20px)
+  #           - border-radius: 20px
+  #           - border: 1px solid rgba(255,255,255,0.12)
+  #     - type: custom:button-card
+  #       template: hemma_plain_button_card
+  #       tap_action:
+  #         action: none
+  #       custom_fields:
+  #         content: |
+  #           [[[
+  #             return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 10px;box-sizing:border-box;min-height:116px;">
+  #               <ha-icon icon="mdi:sun-wireless" style="--mdc-icon-size:36px;opacity:0.88;"></ha-icon>
+  #               <div style="font-size:12px;font-weight:600;margin-top:10px;text-align:center;line-height:1.2;">Outdoor UV Index</div>
+  #               <div style="font-size:14px;opacity:0.45;margin-top:4px;">3 · sample</div>
+  #             </div>`;
+  #           ]]]
+  #       styles:
+  #         card:
+  #           - background: rgba(255,255,255,0.06)
+  #           - backdrop-filter: blur(20px)
+  #           - border-radius: 20px
+  #           - border: 1px solid rgba(255,255,255,0.12)
 
   # ----- 3. Energy & Utilities -----
   - type: custom:button-card
