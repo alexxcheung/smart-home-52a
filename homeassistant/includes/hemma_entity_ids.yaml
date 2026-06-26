@@ -26,6 +26,7 @@
 #                                      automations.yaml (dehumidifier automations)
 #     device_tracker_alex            → packages/hemma_helpers.yaml (presence automations)
 #     device_tracker_sammy           → packages/hemma_helpers.yaml (presence automations)
+#     weather_home                   → packages/hemma_home_mode.yaml (climate sync trigger)
 # ============================================================================
 
 # --- Ring doorbell (Front Door area) ---
@@ -91,7 +92,8 @@ temp_hallway: sensor.radiator_thermostat_x_hallway_temperature
 temp_study: sensor.radiator_thermostat_x_study_temperature
 humidity_hallway: sensor.smart_radiator_thermostat_x_humidity_2
 humidity_study: sensor.smart_radiator_thermostat_x_humidity
-outdoor_temperature: sensor.hemma_outdoor_temperature
+# Outdoor temp: read via state_attr(..., 'temperature') — same source as Home page weather row
+outdoor_temperature: weather.forecast_home
 
 # --- Lights ---
 light_sofa: light.sofa_light

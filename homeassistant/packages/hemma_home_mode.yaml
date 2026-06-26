@@ -4,7 +4,10 @@
 #
 # ENTITIES CREATED:
 #   - input_select.hemma_home_state: current home mode (Home/Sleep/Vacation/…)
-#   - sensor.hemma_outdoor_temperature: outdoor temp mirror for reliable change triggers
+#
+# OUTDOOR TEMPERATURE (radiator gate):
+#   Uses weather.forecast_home.temperature — same as the Home page hero weather row
+#   (includes/hemma_entity_ids.yaml → weather_home / outdoor_temperature).
 #
 # SCRIPTS CREATED:
 #   - script.hemma_set_radiators_if_cold: Off radiators when outdoor temp > 20°C, else set target
@@ -30,23 +33,6 @@ input_select:
       - Bypass
     initial: Home
     icon: mdi:home
-
-template:
-  - trigger:
-      - trigger: state
-        entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'weather_home') }}"
-        attribute: temperature
-      - trigger: homeassistant
-        event: start
-    sensor:
-      - name: "Hemma outdoor temperature"
-        unique_id: hemma_outdoor_temperature
-        state: >
-          {% set t = state_attr('weather.forecast_home', 'temperature') %}
-          {{ t if t not in [none, 'unknown', 'unavailable'] else none }}
-        unit_of_measurement: "°C"
-        device_class: temperature
-        state_class: measurement
 
 # ---------------------------------------------------------------------------
 # Presence simulation script (used by Vacation mode)
@@ -74,7 +60,9 @@ script:
         example: heat
     sequence:
       - variables:
-          outdoor_temp: "{{ states('sensor.hemma_outdoor_temperature') }}"
+          outdoor_temp: >
+            {% set w = state_attr('sensor.hemma_entity_ids', 'outdoor_temperature') %}
+            {{ state_attr(w, 'temperature') }}
       - choose:
           - conditions:
               - condition: template
@@ -471,8 +459,10 @@ automation:
       Re-syncs radiators whenever outdoor temperature changes: off above 20°C,
       otherwise apply the current Home Mode target. Also runs at HA startup.
     trigger:
+      # Same entity as Home page weather row (weather.forecast_home → temperature attribute).
       - trigger: state
-        entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'outdoor_temperature') }}"
+        entity_id: weather.forecast_home
+        attribute: temperature
       - trigger: homeassistant
         event: start
     action:

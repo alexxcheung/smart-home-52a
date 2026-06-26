@@ -43,11 +43,11 @@ input_boolean:
     initial: off
 
   hemma_washer_delay_start:
-    name: Washer Delay Start
+    name: Washing Machine Delay Start
     initial: off
 
   hemma_washer_delay_start_ui:
-    name: Washer Delay Start UI
+    name: Washing Machine Delay Start UI
     initial: off
 
 input_number:
@@ -87,7 +87,7 @@ input_datetime:
     icon: mdi:clock-outline
 
   hemma_washer_start_at:
-    name: Washer Start At
+    name: Washing Machine Start At
     has_date: false
     has_time: true
     icon: mdi:clock-outline
@@ -220,10 +220,10 @@ template:
 # Automations for presence state transitions
 automation:
   # -------------------------
-  # Washer Delay Start
+  # Washing Machine Delay Start
   # -------------------------
   - id: hemma_washer_delay_start_run
-    alias: "Washer - Run delayed start"
+    alias: "Washing Machine - Run delayed start"
     trigger:
       - trigger: time
         at: input_datetime.hemma_washer_start_at

@@ -65,7 +65,7 @@ template:
           temp_study: "{{ 'sensor.radiator_thermostat_x_study_temperature' }}"
           humidity_hallway: "{{ 'sensor.smart_radiator_thermostat_x_humidity_2' }}"
           humidity_study: "{{ 'sensor.smart_radiator_thermostat_x_humidity' }}"
-          outdoor_temperature: "{{ 'sensor.hemma_outdoor_temperature' }}"
+          outdoor_temperature: "{{ 'weather.forecast_home' }}"
           light_sofa: "{{ 'light.sofa_light' }}"
           light_floor_living: "{{ 'light.floor_light' }}"
           light_bedroom_strip: "{{ 'light.hue_lightstrip_plus_1' }}"

@@ -2,7 +2,7 @@
 # Lovelace fragment (not a button-card template). Uses .yml so !include_dir_merge_named
 # on button_cards/ (*.yaml only) does not merge this dict into button_card_templates.
 #
-# Washer Bubble pop-up — must be LAST on Hallway view (Bubble README).
+# Washing Machine Bubble pop-up — must be LAST on Hallway view (Bubble README).
 # Open: navigate → '#hemma-washer'
 #
 # Bubble card body matches includes/hemma_bubble_popup_shell.yaml; edit both if you change the shell.

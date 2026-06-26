@@ -195,19 +195,19 @@ start_dishwasher:
             {% endif %}
           {% endif %}
 
-# Washer start (ThinQ): use washer option select API.
+# Washing Machine start (ThinQ): use washer option select API.
 start_washing_machine:
-  alias: "Start Washer"
+  alias: "Start Washing Machine"
   sequence:
     - action: select.select_option
       data:
         entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'washer_operation') }}"
         option: start
 
-# Washer delay-start (local HA scheduler):
+# Washing Machine delay-start (local HA scheduler):
 # Arms delay mode; automation in packages/hemma_helpers.yaml executes script.start_washing_machine at input_datetime.hemma_washer_start_at.
 start_washing_machine_with_delay:
-  alias: "Start Washer With Delay"
+  alias: "Start Washing Machine With Delay"
   sequence:
     - action: input_boolean.turn_on
       target:

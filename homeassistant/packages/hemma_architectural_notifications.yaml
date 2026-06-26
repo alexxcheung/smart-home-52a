@@ -97,7 +97,7 @@ automation:
             {% elif trigger.entity_id == 'sensor.bosch_dishwasher_operation_state' %}
               Dishwasher
             {% elif trigger.entity_id == 'sensor.washer_current_status' %}
-              Washer
+              Washing Machine
             {% elif trigger.entity_id == 'humidifier.probreeze_dehumidifier' %}
               Dehumidifier
             {% elif trigger.entity_id == 'input_text.hemma_living_room_scene' %}
@@ -155,7 +155,7 @@ automation:
       - action: script.hemma_send_device_status_notification
         data:
           entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'washer_current_status') }}"
-          label: "Washer"
+          label: "Washing Machine"
           value: "{{ states('sensor.washer_current_status') | replace('_', ' ') | title }}"
           reason: "Manual refresh"
       - action: script.hemma_send_device_status_notification
@@ -199,7 +199,7 @@ automation:
 
   - id: hemma_program_start_end_notifications
     alias: "Routines - Appliance Program Start/End Notifications"
-    description: Notify when dishwasher or washer programs start and end
+    description: Notify when dishwasher or washing machine programs start and end
     trigger:
       - trigger: state
         entity_id:
@@ -257,7 +257,7 @@ automation:
               - action: script.hemma_send_device_status_notification
                 data:
                   entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'washer_current_status') }}"
-                  label: "Washer"
+                  label: "Washing Machine"
                   value: "Program started"
                   reason: "Program started"
           - conditions:
@@ -272,7 +272,7 @@ automation:
               - action: script.hemma_send_device_status_notification
                 data:
                   entity_id: "{{ state_attr('sensor.hemma_entity_ids', 'washer_current_status') }}"
-                  label: "Washer"
+                  label: "Washing Machine"
                   value: "Program finished"
                   reason: "Program ended"
     mode: queued

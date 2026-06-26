@@ -1,11 +1,13 @@
 hemma_washer:
   # -------------------------------------------------------------------------
-  # Washer card — extends hemma_entity (status only; start controls in popup removed)
+  # Washing Machine card — extends hemma_entity (status only; start controls in popup removed)
   # Tap  → Bubble Card pop-up on Hallway (navigate to #hemma-washer)
   # Hold → more-info
   # -------------------------------------------------------------------------
   template:
     - hemma_entity
+
+  name: Washing Machine
 
   variables:
     icon: washing_machine
